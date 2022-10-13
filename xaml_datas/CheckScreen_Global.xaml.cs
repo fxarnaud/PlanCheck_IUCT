@@ -37,7 +37,6 @@ namespace PlanCheck_IUCT
             //_globalresult_status = true;
 
             //If one test in sublist is not true => global result status is false and color is red
-
             Result_Status res = new Result_Status();
             _globalresult_status = res.True;
 
