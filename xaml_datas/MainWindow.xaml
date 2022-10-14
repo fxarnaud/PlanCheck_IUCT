@@ -12,7 +12,7 @@
                 <StackPanel>
                     <DockPanel>
                         <StackPanel>
-                            <Grid>
+                            <Grid Margin="10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
