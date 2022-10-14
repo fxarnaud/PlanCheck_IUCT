@@ -77,6 +77,7 @@ namespace PlanCheck_IUCT
 
         public void FillPreliminarytInfos()
         {
+            //blablazfl
             //Patient, plan and others infos to bind to xml
             PatientFullName = _pinfo.PatientName ;
             PatientDOB = _pinfo.PatientDOB;
