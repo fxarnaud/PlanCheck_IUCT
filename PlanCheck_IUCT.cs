@@ -8,7 +8,7 @@ using VMS.TPS.Common.Model.Types;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 using PlanCheck_IUCT;
-
+using PlanCheck_IUCT.Users;
 
 [assembly: AssemblyVersion("1.0.0.1")]
 namespace VMS.TPS
@@ -27,11 +27,13 @@ namespace VMS.TPS
 
         public static void Perform(PlanSetup planSetup, ScriptContext context)
         {
+
             //Get Plan information
-            PlanInformation pinfo = new PlanInformation(context);
+            PreliminaryInformation pinfo = new PreliminaryInformation(context);
 
             //Generate Main Window
-            var window = new MainWindow(planSetup); //passer pinfo dans main window
+            var window = new MainWindow(planSetup, pinfo ); //passer pinfo dans main window
+            
 
 
             //First point check    

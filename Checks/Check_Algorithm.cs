@@ -8,7 +8,7 @@ namespace PlanCheck_IUCT
 {
     internal class Check_Algorithm
     {
-        public Check_Algorithm(PlanInformation pinfo)  //Constructor
+        public Check_Algorithm(PreliminaryInformation pinfo)  //Constructor
         {
             // _testpartlabel = "Algorithme";
             _pinfo = pinfo;
@@ -16,7 +16,7 @@ namespace PlanCheck_IUCT
         }
 
         private List<Item_Result> _result = new List<Item_Result>();
-        private PlanInformation _pinfo;
+        private PreliminaryInformation _pinfo;
         private string _title = "Algorithme";
 
         public void Check()

@@ -12,18 +12,28 @@
                 <StackPanel>
                     <DockPanel>
                         <StackPanel>
-                            <TextBlock Margin="10" FontSize="20" Text="{Binding Id}"></TextBlock>
-                            <TextBlock Margin="10" FontSize="20" Text="{Binding PlanSetupId}"></TextBlock>
-                        </StackPanel>
-                        <StackPanel Margin="10" HorizontalAlignment="Right">
-                            <ListView>
-                                <TextBlock  Text="{Binding PhotonModel}"></TextBlock>
-                                <TextBlock  Text="{Binding OptimizationModel}"></TextBlock>
-                            </ListView>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column ="0" FontSize="15" Text="{Binding PatientFullName}" ToolTip="{Binding PatientDOB}"></TextBlock>
+                                <TextBlock Grid.Row="1" Grid.Column ="0" FontSize="15" Text="{Binding CourseID}"></TextBlock>
+                                <TextBlock  Grid.Row="2" Grid.Column ="0" FontSize="15" Text="{Binding PlanID}"></TextBlock>
+                                <TextBlock  Grid.Row="3" Grid.Column ="0" FontSize="15" Text="{Binding PlanCreatorName}" Background="{Binding PlanCreatorBackgroundColor}" Foreground="{Binding  PlanCreatorForegroundColor}"></TextBlock>
+                                <TextBlock  Grid.Row="3" Grid.Column ="1" FontSize="15" Text="{Binding CurrentUserName}" Background="{Binding CurrentUserBackgroundColor}" Foreground="{Binding  CurrentUserForegroundColor}"></TextBlock>
+                            </Grid>                          
 
-                            <ListView HorizontalAlignment="Center" x:Name="Options" ItemsSource="{Binding CalculationOptions}">
-                            </ListView>
+
                         </StackPanel>
+                        
+
                     </DockPanel>
 
                 </StackPanel>
