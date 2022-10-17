@@ -32,7 +32,7 @@ namespace VMS.TPS
             PreliminaryInformation pinfo = new PreliminaryInformation(context);
 
             //Generate Main Window
-            var window = new MainWindow(planSetup, pinfo ); //passer pinfo dans main window
+            var window = new MainWindow(planSetup, pinfo,context); //passer pinfo dans main window
             
 
 

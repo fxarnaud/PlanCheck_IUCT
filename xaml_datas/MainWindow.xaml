@@ -23,7 +23,7 @@
                                     <RowDefinition Height="*" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column ="0" FontSize="15" Text="{Binding PatientFullName}" ToolTip="{Binding PatientDOB}"></TextBlock>
+                                <TextBlock Grid.Row="0" Grid.Column ="0" FontSize="15" Text="{Binding PatientFullName}" Background="{Binding sexBackgroundColor}" Foreground="{Binding  sexForegroundColor}" ToolTip="{Binding PatientDOB}"></TextBlock>
                                 <TextBlock Grid.Row="1" Grid.Column ="0" FontSize="15" Text="{Binding CourseID}"></TextBlock>
                                 <TextBlock  Grid.Row="2" Grid.Column ="0" FontSize="15" Text="{Binding PlanID}"></TextBlock>
                                 <TextBlock  Grid.Row="3" Grid.Column ="0" FontSize="15" Text="{Binding PlanCreatorName}" Background="{Binding PlanCreatorBackgroundColor}" Foreground="{Binding  PlanCreatorForegroundColor}"></TextBlock>

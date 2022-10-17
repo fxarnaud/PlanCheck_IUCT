@@ -16,6 +16,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
+using System.Windows.Navigation;
+using VMS.TPS;
+using VMS.TPS.Common.Model.API;
+using System.Drawing;
+
+
 
 namespace PlanCheck_IUCT
 {
@@ -29,6 +35,8 @@ namespace PlanCheck_IUCT
         private PlanSetup _plan;
 
         private PreliminaryInformation _pinfo;
+
+        private ScriptContext _pcontext;
         public string PatientFullName { get; set; }
         public string PatientDOB { get; set; }
         public string CourseID { get; set; }
@@ -40,6 +48,13 @@ namespace PlanCheck_IUCT
         public SolidColorBrush PlanCreatorBackgroundColor { get; set; }
 
         public SolidColorBrush PlanCreatorForegroundColor { get; set; }
+
+
+        public SolidColorBrush sexBackgroundColor { get; set; }
+
+        public SolidColorBrush sexForegroundColor { get; set; }
+
+
 
         public string CurrentUserName { get; set; }
 
@@ -63,12 +78,12 @@ namespace PlanCheck_IUCT
 
 
 
-        public MainWindow(PlanSetup plan, PreliminaryInformation pinfo) //Constructeur
+        public MainWindow(PlanSetup plan, PreliminaryInformation pinfo,ScriptContext pcontext) //Constructeur
         {
             DataContext = this;
             _pinfo = pinfo;
             _plan = plan;
-
+            _pcontext = pcontext;
             //Filling datas binded to xaml
             FillPreliminarytInfos();
 
@@ -77,10 +92,30 @@ namespace PlanCheck_IUCT
 
         public void FillPreliminarytInfos()
         {
-            //blablazfl
             //Patient, plan and others infos to bind to xml
-            PatientFullName = _pinfo.PatientName ;
-            PatientDOB = _pinfo.PatientDOB;
+            DateTime PatientDOB = (DateTime)_pcontext.Patient.DateOfBirth;
+            DateTime zeroTime = new DateTime(1, 1, 1);
+            DateTime myToday = DateTime.Today;
+            TimeSpan span = myToday - PatientDOB;
+            int years = (zeroTime + span).Year - 1;
+
+            String sex;
+            if (_pcontext.Patient.Sex == "Female")
+            {
+                sex = "F";
+                sexBackgroundColor = System.Windows.Media.Brushes.DeepPink;
+                sexForegroundColor = System.Windows.Media.Brushes.White;
+            }
+            else
+            {
+                sex = "H";
+                sexBackgroundColor = System.Windows.Media.Brushes.Blue;
+                sexForegroundColor = System.Windows.Media.Brushes.White;
+            }
+            PatientFullName = _pinfo.PatientName + " " + sex + "/" + years.ToString();
+            
+             
+
             CourseID = _pinfo.CourseName;
             PlanID = _pinfo.PlanName;
             PlanCreatorName = _pinfo.PlanCreator.UserFamilyName;
@@ -91,8 +126,7 @@ namespace PlanCheck_IUCT
             CurrentUserForegroundColor = _pinfo.CurrentUser.UserForeGroundColor;
 
             //Plans infos
-            CalculationOptions =
-    _plan.PhotonCalculationOptions.Select(e => e.Key + " : " + e.Value);
+            CalculationOptions = _plan.PhotonCalculationOptions.Select(e => e.Key + " : " + e.Value);
             PhotonModel = _plan.PhotonCalculationModel;
             OptimizationModel = _plan.GetCalculationModel(CalculationType.PhotonVMATOptimization);
             OptimizationModel = _plan.GetCalculationModel(CalculationType.PhotonVMATOptimization);
