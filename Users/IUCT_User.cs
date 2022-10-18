@@ -15,8 +15,8 @@ namespace PlanCheck_IUCT
         private string _gender;
         private SolidColorBrush _userbackgroundcolor;
         private SolidColorBrush _userforegroundcolor;
-
-
+        private SolidColorBrush _doctorBackgroundColor;
+        private SolidColorBrush _doctorForegroundColor;
         public string Gender
         {
             get { return _gender; }
@@ -40,6 +40,20 @@ namespace PlanCheck_IUCT
             get { return _userbackgroundcolor; }
             set { _userbackgroundcolor = value; }
         }
+
+        public SolidColorBrush DoctorBackgroundColor
+        {
+            get { return _doctorBackgroundColor; }
+            set { _doctorBackgroundColor = value; }
+        }
+
+        public SolidColorBrush DoctorForeGroundColor
+        {
+            get { return _doctorForegroundColor; }
+            set { _doctorForegroundColor = value; }
+        }
+
+
         public string Function
         {
             get { return _function; }

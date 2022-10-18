@@ -15,10 +15,12 @@ namespace PlanCheck_IUCT
         private ScriptContext _ctx;
         private string _patientname;
         private string _patientdob;
+        private DateTime _patientdob_dt;
         private string _coursename;
         private string _planname;
         private IUCT_User _plancreator;
         private IUCT_User _currentuser;
+        private IUCT_User _doctor;
         private string _algoname;
         private string _mlctype;
 
@@ -27,12 +29,13 @@ namespace PlanCheck_IUCT
             _ctx = ctx;
 
             _patientname = ctx.Patient.Name;
-            DateTime tmp = (DateTime)ctx.Patient.DateOfBirth;
-            _patientdob = tmp.Day+"/"+ tmp.Month + "/" + tmp.Year;
+            _patientdob_dt = (DateTime)ctx.Patient.DateOfBirth;
+            _patientdob = _patientdob_dt.Day+"/"+ _patientdob_dt.Month + "/" + _patientdob_dt.Year;
             _coursename = ctx.Course.Id;
             _planname = ctx.PlanSetup.Id;
             _plancreator = GetUser("creator");
             _currentuser = GetUser("currentuser");
+            _doctor = GetUser("doctor");
             _algoname = ctx.PlanSetup.PhotonCalculationModel;
             _mlctype = Check_mlc_type(ctx.PlanSetup);
 
@@ -52,11 +55,14 @@ namespace PlanCheck_IUCT
             string tocheck;
             switch (searchtype)
             {
+                case "doctor":
+                    tocheck = _ctx.PlanSetup.RTPrescription.HistoryUserName;
+                    break;
                 case "creator":
                     tocheck = _ctx.PlanSetup.CreationUserName;
                     break;
                 default:
-                    tocheck = _ctx.CurrentUser.Name;
+                    tocheck = _ctx.CurrentUser.Name;                    
                     break;
             }            
 
@@ -68,9 +74,11 @@ namespace PlanCheck_IUCT
             user = iuct_users.UsersList.Where(name => name.UserFamilyName == "indefini").FirstOrDefault();
             foreach (IUCT_User user_tmp in iuct_users.UsersList)
             {
-                if (tocheck.Contains(user_tmp.UserFamilyName))
+                
+                if (tocheck.ToLower().Contains(user_tmp.UserFamilyName.ToLower()))
                 {
                     user = user_tmp;
+                   
                 }
             }
 
@@ -114,7 +122,10 @@ namespace PlanCheck_IUCT
         {
             get { return _patientdob; }
         }
-
+        public DateTime PatientDOB_dt
+        {
+            get { return _patientdob_dt; }
+        }
         public string CourseName
         {
             get { return _coursename; }
@@ -128,6 +139,10 @@ namespace PlanCheck_IUCT
         public IUCT_User PlanCreator
         {
             get { return _plancreator; }
+        }
+        public IUCT_User Doctor
+        {
+            get { return _doctor; }
         }
 
         public IUCT_User CurrentUser

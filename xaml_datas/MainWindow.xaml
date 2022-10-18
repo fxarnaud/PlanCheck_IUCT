@@ -23,11 +23,14 @@
                                     <RowDefinition Height="*" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.Column ="0" FontSize="15" Text="{Binding PatientFullName}" Background="{Binding sexBackgroundColor}" Foreground="{Binding  sexForegroundColor}" ToolTip="{Binding PatientDOB}"></TextBlock>
-                                <TextBlock Grid.Row="1" Grid.Column ="0" FontSize="15" Text="{Binding CourseID}"></TextBlock>
-                                <TextBlock  Grid.Row="2" Grid.Column ="0" FontSize="15" Text="{Binding PlanID}"></TextBlock>
-                                <TextBlock  Grid.Row="3" Grid.Column ="0" FontSize="15" Text="{Binding PlanCreatorName}" Background="{Binding PlanCreatorBackgroundColor}" Foreground="{Binding  PlanCreatorForegroundColor}"></TextBlock>
-                                <TextBlock  Grid.Row="3" Grid.Column ="1" FontSize="15" Text="{Binding CurrentUserName}" Background="{Binding CurrentUserBackgroundColor}" Foreground="{Binding  CurrentUserForegroundColor}"></TextBlock>
+                                <TextBlock Grid.Row="0" Grid.Column ="0" FontSize="15" Text="{Binding PatientFullName}" Background="{Binding sexBackgroundColor}" Foreground="{Binding  sexForegroundColor}" ToolTip="{Binding strPatientDOB}"></TextBlock>
+                                <TextBlock Grid.Row="0" Grid.Column ="1" FontSize="15" FontWeight="Bold" Text="{Binding DoctorName}" Background="{Binding DoctorBackgroundColor}" Foreground="{Binding  DoctorForegroundColor}" TextAlignment="Left" ToolTip="Prescripteur"></TextBlock>
+                                <TextBlock Grid.Row="1" Grid.Column ="0" FontSize="15" FontWeight="Bold" Text="{Binding PlanAndCourseID}" Background="LightGray" ToolTip="planID (CourseID)"></TextBlock>
+                                <TextBlock TextWrapping="WrapWithOverflow" Grid.Row="1" Grid.Column ="1" FontSize="15" Text="{Binding prescriptionComment}" Background="LightGray"  ToolTip="Commentaire dans la prescription" TextAlignment="Left"></TextBlock>
+                                <TextBlock  Grid.Row="2" Grid.Column ="0" FontSize="15" FontWeight="Bold" Text="{Binding theMachine}" Background="{Binding machineBackgroundColor}"  ToolTip="Nom de la machine"></TextBlock>
+                                <TextBlock  Grid.Row="2" Grid.Column ="1" FontSize="15" FontWeight="Bold" Text="{Binding theFields}" TextAlignment="Left"  Background="{Binding machineBackgroundColor}"  ToolTip="Description des champs"></TextBlock>
+                                <TextBlock  Grid.Row="3" Grid.Column ="0" FontSize="15" FontWeight="Bold" Text="{Binding PlanCreatorName}" Background="{Binding PlanCreatorBackgroundColor}" Foreground="{Binding  PlanCreatorForegroundColor}" ToolTip="créateur du plan"></TextBlock>
+                                <TextBlock  Grid.Row="3" Grid.Column ="1" FontSize="15" FontWeight="Bold" Text="{Binding CurrentUserName}" Background="{Binding CurrentUserBackgroundColor}" Foreground="{Binding  CurrentUserForegroundColor}" TextAlignment="Left" ToolTip="user name"></TextBlock>
                             </Grid>                          
 
 
