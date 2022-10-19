@@ -39,7 +39,7 @@ namespace PlanCheck_IUCT
         private ScriptContext _pcontext;
         public string PatientFullName { get; set; }
         public string strPatientDOB { get; set; }
-        public string PlanAndCourseID { get; set; }     
+        public string PlanAndCourseID { get; set; }
         public string prescriptionComment { get; set; }
         public string PlanCreatorName { get; set; }
         public SolidColorBrush PlanCreatorBackgroundColor { get; set; }
@@ -47,6 +47,7 @@ namespace PlanCheck_IUCT
         public SolidColorBrush sexBackgroundColor { get; set; }
         public SolidColorBrush sexForegroundColor { get; set; }
         public string machineBackgroundColor { get; set; }
+        public string machineForegroundColor { get; set; }
         public string CurrentUserName { get; set; }
         public SolidColorBrush CurrentUserBackgroundColor { get; set; }
         public SolidColorBrush CurrentUserForegroundColor { get; set; }
@@ -68,7 +69,7 @@ namespace PlanCheck_IUCT
 
 
 
-        public MainWindow(PlanSetup plan, PreliminaryInformation pinfo,ScriptContext pcontext) //Constructeur
+        public MainWindow(PlanSetup plan, PreliminaryInformation pinfo, ScriptContext pcontext) //Constructeur
         {
             DataContext = this;
             _pinfo = pinfo;
@@ -76,7 +77,6 @@ namespace PlanCheck_IUCT
             _pcontext = pcontext;
             //Filling datas binded to xaml
             FillPreliminarytInfos();
-
             InitializeComponent();
         }
 
@@ -96,7 +96,7 @@ namespace PlanCheck_IUCT
                 sex = "F";
                 sexBackgroundColor = System.Windows.Media.Brushes.DeepPink;
                 sexForegroundColor = System.Windows.Media.Brushes.White;
-                strPatientDOB = "Née le "+ _pinfo.PatientDOB; // for tooltip only
+                strPatientDOB = "Née le " + _pinfo.PatientDOB; // for tooltip only
             }
             else
             {
@@ -110,7 +110,7 @@ namespace PlanCheck_IUCT
 
             #region course and plan ID format:  PlanID (CourseID)
 
-            PlanAndCourseID = _pinfo.PlanName + " (" + _pinfo.CourseName + ")" ;
+            PlanAndCourseID = _pinfo.PlanName + " (" + _pinfo.CourseName + ")";
 
             #endregion
 
@@ -119,14 +119,14 @@ namespace PlanCheck_IUCT
             PlanCreatorName = _pinfo.PlanCreator.UserFirstName + " " + _pinfo.PlanCreator.UserFamilyName;
             PlanCreatorBackgroundColor = _pinfo.PlanCreator.UserBackgroundColor;
             PlanCreatorForegroundColor = _pinfo.PlanCreator.UserForeGroundColor;
-            CurrentUserName = _pinfo.CurrentUser.UserFirstName +  " " + _pinfo.CurrentUser.UserFamilyName;
+            CurrentUserName = _pinfo.CurrentUser.UserFirstName + " " + _pinfo.CurrentUser.UserFamilyName;
             CurrentUserBackgroundColor = _pinfo.CurrentUser.UserBackgroundColor;
             CurrentUserForegroundColor = _pinfo.CurrentUser.UserForeGroundColor;
             #endregion
 
             #region doctor in the prescription
-            
-            DoctorName = "Dr " + _pinfo.Doctor.UserFamilyName; 
+
+            DoctorName = "Dr " + _pinfo.Doctor.UserFamilyName;
 
 
             DoctorBackgroundColor = _pinfo.Doctor.UserBackgroundColor; //System.Windows.Media.Brushes.DeepPink; // _pinfo.Doctor.DoctorBackgroundColor;
@@ -138,13 +138,20 @@ namespace PlanCheck_IUCT
             if (_pcontext.PlanSetup.RTPrescription.Notes.Length == 0)
                 prescriptionComment = "Pas de commentaire dans la presciption.";
             else
-                prescriptionComment = _pcontext.PlanSetup.RTPrescription.Notes;
-            //prescriptionComment = "Commentaire de la presciption : " + _pcontext.PlanSetup.RTPrescription.Notes;
+            {
+                prescriptionComment = _pcontext.PlanSetup.RTPrescription.Name;
+                prescriptionComment += " (R" + _pcontext.PlanSetup.RTPrescription.RevisionNumber + "): ";
+                prescriptionComment +=  _pcontext.PlanSetup.RTPrescription.Notes;
+                
+                //+ _pcontext.PlanSetup.RTPrescription.RevisionNumber + ": " + ": " + _pcontext.PlanSetup.RTPrescription.Id + ": " + _pcontext.PlanSetup.RTPrescription.Notes;
+                //prescriptionComment = "Commentaire de la presciption : " + _pcontext.PlanSetup.RTPrescription.Notes;
+
+            }
             #endregion
 
             #region machine and fields
-            String machineName =null;
-            String myMLCtype=null;
+            String machineName = null;
+            String myMLCtype = null;
             int setupFieldNumber = 0;
             int TreatmentFieldNumber = 0;
             foreach (Beam b in _pcontext.PlanSetup.Beams)
@@ -152,50 +159,90 @@ namespace PlanCheck_IUCT
 
                 if (b.IsSetupField)
                 {
-                    machineName = b.TreatmentUnit.Id;
+                    
                     setupFieldNumber++;
                 }
                 else
                 {
-                    myMLCtype = b.Technique.Id + " " +  b.MLCPlanType ;
+                    myMLCtype = b.Technique.Id + " " + b.MLCPlanType;
                     TreatmentFieldNumber++;
+                    machineName = b.TreatmentUnit.Id;
                 }
             }
             theMachine = machineName;
+
             #region color the machines
+            // see palette at https://learn.microsoft.com/fr-fr/dotnet/api/system.windows.media.brushes?view=windowsdesktop-6.0
+
+            
             if (machineName == "V4")
-                machineBackgroundColor = "LightBlue";
-            else if (machineName == "TOMO2")
+            {
+                machineBackgroundColor = "Blue";
+                machineForegroundColor = "White";
+            }
+            else if (machineName == "TOM")
+            {
                 machineBackgroundColor = "Orange";
+                machineForegroundColor = "White";
+            }
+            else if (machineName == "TOMO2")
+            {
+                machineBackgroundColor = "Orange";
+                machineForegroundColor = "White";
+            }
             else if (machineName == "NOVA3")
+            {
                 machineBackgroundColor = "Green";
+                machineForegroundColor = "White";
+            }
             else if (machineName == "TOMO4")
+            {
                 machineBackgroundColor = "Red";
+                machineForegroundColor = "White";
+            }
             else if (machineName == "NOVA5")
+            {
                 machineBackgroundColor = "Yellow";
+                machineForegroundColor = "Black";
+            }
             else if (machineName == "HALCYON6")
+            {
                 machineBackgroundColor = "LightBlue";
+                machineForegroundColor = "White";
+            }
             else if (machineName == "TOMO7")
+            {
                 machineBackgroundColor = "Brown";
+                machineForegroundColor = "White";
+            }
             else if (machineName == "HALCYON8")
-                machineBackgroundColor = "DeepBlue";
-            else 
+            {
+                machineBackgroundColor = "DeepSkyBlue";
+                machineForegroundColor = "White";
+            }
+            else
+            {
                 machineBackgroundColor = "Gray";
+                machineForegroundColor = "White";
+            }
             #endregion
 
 
-
-            theFields = TreatmentFieldNumber + " " + myMLCtype + " et " + setupFieldNumber + " champs de set-up";
+            if (machineName != "TOM")
+                theFields = TreatmentFieldNumber + " " + myMLCtype + " et " + setupFieldNumber + " champs de set-up";
+            else
+                theFields = "Helicoidal Tomo Field";
             //MessageBox.Show(machineAndFields);
             #endregion
 
+            #region other infos
             //Plans infos
             CalculationOptions = _plan.PhotonCalculationOptions.Select(e => e.Key + " : " + e.Value);
             PhotonModel = _plan.PhotonCalculationModel;
             OptimizationModel = _plan.GetCalculationModel(CalculationType.PhotonVMATOptimization);
             OptimizationModel = _plan.GetCalculationModel(CalculationType.PhotonVMATOptimization);
             ListChecks = new List<UserControl>();
-
+            #endregion
 
         }
         public void AddCheck(UserControl checkScreen)

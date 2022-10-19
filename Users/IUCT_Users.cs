@@ -73,6 +73,9 @@ namespace PlanCheck_IUCT.Users
             IUCT_User dalmasso = new IUCT_User() { UserFirstName = "Céline", UserFamilyName = "Dalmasso", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.IndianRed, UserForeGroundColor = System.Windows.Media.Brushes.White };
             _users_list.Add(dalmasso);
 
+            IUCT_User desrousseaux = new IUCT_User() { UserFirstName = "Desrousseaux", UserFamilyName = "Jacques", Gender = "H", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.Orange, UserForeGroundColor = System.Windows.Media.Brushes.Black };
+            _users_list.Add(desrousseaux);
+
             IUCT_User ducassou = new IUCT_User() { UserFirstName = "Anne", UserFamilyName = "Ducassou", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.HotPink, UserForeGroundColor = System.Windows.Media.Brushes.White };
             _users_list.Add(ducassou);
 
