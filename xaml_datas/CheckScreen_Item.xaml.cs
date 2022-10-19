@@ -30,7 +30,12 @@ namespace PlanCheck_IUCT
         {
             DataContext = this;
             _item_title = resultat.Label;
-            _comment = resultat.ExpectedValue + " " + resultat.Comparator + " " + resultat.MeasuredValue + "?";
+
+            // FX
+            // _comment = resultat.ExpectedValue + " " + resultat.Comparator + " " + resultat.MeasuredValue + "?";
+            //LS
+            _comment = resultat.MeasuredValue;
+
             _item_result = resultat.ResultStatus.Item1;
             _tooltip = resultat.Infobulle;
             _resultcolor = resultat.ResultStatus.Item2;

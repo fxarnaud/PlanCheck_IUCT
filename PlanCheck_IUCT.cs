@@ -41,9 +41,16 @@ namespace VMS.TPS
             var check_point1 = new CheckScreen_Global(c_algo.Title, c_algo.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point1);
 
+
+
             Check_Course c_course = new Check_Course(pinfo, context);
             var check_point2 = new CheckScreen_Global(c_course.Title, c_course.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point2);
+
+
+            Check_CT c_CT = new Check_CT(pinfo, context);
+            var check_point3 = new CheckScreen_Global(c_CT.Title, c_CT.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            window.AddCheck(check_point3);
 
             //Put here other class tests. Must be the same as Check_Algorithm class
             ////

@@ -46,6 +46,23 @@ namespace PlanCheck_IUCT
             get { return _infobulle; }
             set { _infobulle = value; }
         }
+        public void setToTRUE()
+        {
+            this.ResultStatus = ("OK", new SolidColorBrush(Colors.LightGreen));
+        }
+        public void setToFALSE()
+        {
+            this.ResultStatus = ("X", new SolidColorBrush(Colors.LightSalmon));
+        }
+        public void setToINFO()
+        {
+            this.ResultStatus = ("INFORMATIF", new SolidColorBrush(Colors.Gray));
+        }
+        public void setToWARNING()
+        {
+            this.ResultStatus = ("WARNING", new SolidColorBrush(Colors.LightYellow));
+        }
 
+       
     }
 }
