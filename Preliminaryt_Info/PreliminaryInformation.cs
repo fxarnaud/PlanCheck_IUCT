@@ -74,7 +74,8 @@ namespace PlanCheck_IUCT
             user = iuct_users.UsersList.Where(name => name.UserFamilyName == "indefini").FirstOrDefault();
             foreach (IUCT_User user_tmp in iuct_users.UsersList)
             {
-                
+
+                //MessageBox.Show(tocheck.ToLower() + " vs " + user_tmp.UserFamilyName.ToLower());
                 if (tocheck.ToLower().Contains(user_tmp.UserFamilyName.ToLower()))
                 {
                     user = user_tmp;
