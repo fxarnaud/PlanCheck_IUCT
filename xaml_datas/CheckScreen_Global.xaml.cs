@@ -47,7 +47,7 @@ namespace PlanCheck_IUCT
             {
                 _globalresult_status = res.False;
             }
-            if (_items.Any(i => i.ResultStatus.Item1 == "VARIATION" && i.ResultStatus.Item1 !="X" ))
+            if (_items.Any(i => i.ResultStatus.Item1 == "WARNING" && i.ResultStatus.Item1 !="X" ))
             {
                 _globalresult_status = res.Variation;
             }
