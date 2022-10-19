@@ -18,7 +18,6 @@ using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
 using System.Windows.Navigation;
 using VMS.TPS;
-using VMS.TPS.Common.Model.API;
 using System.Drawing;
 
 

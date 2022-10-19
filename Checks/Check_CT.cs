@@ -7,7 +7,6 @@ using System.Runtime.Remoting.Contexts;
 using VMS.TPS.Common.Model.API;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Contexts;
 using System.Windows;
 using VMS.TPS.Common.Model.Types;
 using System.Windows.Navigation;
@@ -127,14 +126,14 @@ namespace PlanCheck_IUCT
 
 
             //String imageName = null;//myContext.Image.Id;
-            String okOrNot = null;
+            //String okOrNot = null;
 
-            MessageBox.Show(_context.Image.Id + " ** " + imageDate);
+            //MessageBox.Show(_context.Image.Id + " ** " + imageDate);
 
-            if (_context.Image.Id.Contains(imageDate))
+            /*if (_context.Image.Id.Contains(imageDate))
                 okOrNot = "OK";
             else
-                okOrNot = "warning";
+                okOrNot = "warning";*/
 
             image3Dnaming.ExpectedValue = "OK";//XXXXX TO GET         
             image3Dnaming.MeasuredValue = _context.Image.Id;

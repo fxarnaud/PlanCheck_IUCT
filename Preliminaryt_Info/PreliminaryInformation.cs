@@ -23,6 +23,7 @@ namespace PlanCheck_IUCT
         private IUCT_User _doctor;
         private string _algoname;
         private string _mlctype;
+        private string[] calculoptions;
 
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
@@ -39,7 +40,7 @@ namespace PlanCheck_IUCT
             _algoname = ctx.PlanSetup.PhotonCalculationModel;
             _mlctype = Check_mlc_type(ctx.PlanSetup);
 
-            string[] calculoptions = new string[ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.Count];
+            calculoptions = new string[ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.Count];
             calculoptions = ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.ToArray();
             //MessageBox.Show(string.Format("test = {0}", calculoptions[0]));
             //MessageBox.Show(string.Format("test = {0}", calculoptions[1]));
@@ -117,6 +118,11 @@ namespace PlanCheck_IUCT
         public string PatientName
         {
             get { return _patientname; }
+        }
+
+        public string[] Calculoptions
+        {
+            get { return calculoptions; }
         }
 
         public string PatientDOB

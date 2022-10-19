@@ -1,14 +1,20 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
-using System.Collections.Generic;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 using PlanCheck_IUCT;
 using PlanCheck_IUCT.Users;
+using System.Threading.Tasks;
+using System.Runtime.Remoting.Contexts;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Windows.Navigation;
+
 
 [assembly: AssemblyVersion("1.0.0.1")]
 namespace VMS.TPS
@@ -21,7 +27,11 @@ namespace VMS.TPS
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void Execute(ScriptContext context)
         {
+            if (context == null) 
+                MessageBox.Show("Merci de charger un plan");
             var planSetup = context.PlanSetup;
+            if (planSetup == null) 
+                MessageBox.Show("Merci de charger un plan");
             Perform(planSetup, context);
         }
 
@@ -37,7 +47,7 @@ namespace VMS.TPS
 
 
             //First point check    
-            Check_Algorithm c_algo = new Check_Algorithm(pinfo);
+            Check_Algorithm c_algo = new Check_Algorithm(pinfo,context);
             var check_point1 = new CheckScreen_Global(c_algo.Title, c_algo.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point1);
 
