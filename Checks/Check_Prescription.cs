@@ -6,6 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
+using System.Windows;
+using System.Windows.Navigation;
+
+
+
 
 namespace PlanCheck_IUCT
 {
@@ -28,6 +33,7 @@ namespace PlanCheck_IUCT
 
         public void Check()
         {
+            
             #region APPROBATION DE LA PRESCRIPTION
             Item_Result prescriptionStatus = new Item_Result();
             prescriptionStatus.Label =  "Approbation de la prescription (" + _ctx.PlanSetup.RTPrescription.Name + ")";
@@ -118,6 +124,47 @@ namespace PlanCheck_IUCT
             prescriptionVolumes.Infobulle = "information : liste des volumes de la prescription";
             this._result.Add(prescriptionVolumes);
             #endregion
+
+            // pas réussi à attraper le % dans la prescription
+            #region POURCENTAGE DE LA PRESCRIPTION
+            
+            Item_Result percentage = new Item_Result();
+            double myTreatPercentage = _ctx.PlanSetup.TreatmentPercentage;
+            myTreatPercentage = 100 * myTreatPercentage;
+            percentage.Label = "Pourcentage de traitement";
+            percentage.ExpectedValue = "VOIR PROTOCOLE";
+            //MessageBox.Show("toto " + percentage.ExpectedValue);
+            percentage.MeasuredValue = myTreatPercentage.ToString() + "%";
+            percentage.setToINFO(); // 
+            percentage.Infobulle = "L'isodose de prescription doit être en accord avec la prescription ou le protocole";
+            this._result.Add(percentage);
+            #endregion
+
+
+
+            #region NORMALISATION DU PLAN
+            Item_Result normalisation = new Item_Result();
+            string normMethod = _ctx.PlanSetup.PlanNormalizationMethod;
+            normalisation.Label = "Mode de normalisation du plan";
+            normalisation.ExpectedValue = "VOIR PROTOCOLE";
+            normalisation.MeasuredValue = normMethod;
+
+            if (normMethod == "100.00% couvre 50.00% du volume cible")
+                normalisation.MeasuredValue = normMethod + " au " + _ctx.PlanSetup.TargetVolumeID;
+            else if (normMethod == "100% au point de référence principal")
+                normalisation.MeasuredValue = normMethod + " au point " + _ctx.PlanSetup.PrimaryReferencePoint.Id;
+
+            if (normMethod == "Aucune normalisation de plan")
+                normalisation.setToWARNING();
+            else
+                normalisation.setToINFO();
+
+
+
+            normalisation.Infobulle = "La normalisation doit être en accord avec le protocole. Aucune normalisation = WARNING";
+            this._result.Add(normalisation);
+            #endregion 
+
 
         }
         public string Title
