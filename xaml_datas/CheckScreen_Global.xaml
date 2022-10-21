@@ -16,13 +16,13 @@
                     <TextBlock FontSize="20" HorizontalAlignment="Right" Background="Transparent" >Resultado</TextBlock>
                 </DockPanel>-->
                 <DockPanel Margin="20" Background="Transparent"  VerticalAlignment="Center" HorizontalAlignment="Stretch">
-                    <TextBlock Background="Transparent" FontSize="20"
+                    <TextBlock Background="Transparent" Foreground="Black" FontSize="20"
                            Text="{Binding TitleGlobal}" FontWeight="Bold"></TextBlock>
-                    <Button MinWidth="50"  Click="Button_Click" Margin="0,0,5,0" HorizontalAlignment="Right" Background="Transparent" FontSize="20"
+                    <Button MinWidth="50"  Click="Button_Click" Margin="0,0,5,0" HorizontalAlignment="Right" Background="Transparent" Foreground="Black" FontSize="20"
                         Content="{Binding ResultGlobalString}"></Button>
                 </DockPanel>
                 <StackPanel  HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <TextBlock x:Name="CommentBlock" Padding="5" Visibility="Collapsed" Background="Transparent" FontSize="20"
+                    <TextBlock x:Name="CommentBlock" Padding="5" Visibility="Collapsed" Background="Transparent" Foreground="Black" FontSize="20"
                            Text="{Binding Comment}"></TextBlock>
                 </StackPanel>
                 <StackPanel>

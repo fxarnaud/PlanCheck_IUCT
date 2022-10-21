@@ -46,13 +46,13 @@ namespace PlanCheck_IUCT
                 prescriptionStatus.setToFALSE();
 
 
-            prescriptionStatus.Infobulle = "La prescription doit être approuvée"; 
+            prescriptionStatus.Infobulle = "OK si la prescription est approuvée"; 
             this._result.Add(prescriptionStatus);
             #endregion
 
             #region FRACTIONNEMENT - PTV LE PLUS HAUT
             Item_Result fractionation = new Item_Result();
-            fractionation.Label = "Fractionnement du PTV HD";
+            fractionation.Label = "Fractionnement du PTV principal";
 
             double nPrescribedDosePerFraction = 0;
             int nPrescribedNFractions = 0;
@@ -81,7 +81,8 @@ namespace PlanCheck_IUCT
                 fractionation.setToFALSE();
 
 
-            fractionation.Infobulle = "Le nombre de séances et la dose par séance du plan doivent\nêtre conforme à la prescription du PTV ayant la plus forte dose prescrite : "+ nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction + " Gy";
+            fractionation.Infobulle = "Le 'nombre de fractions' et la 'dose par fraction' doivent\nêtre conformes à la prescription "+_ctx.PlanSetup.RTPrescription.Id +
+                " : "+ nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
             this._result.Add(fractionation);
             #endregion
 
@@ -136,10 +137,9 @@ namespace PlanCheck_IUCT
             //MessageBox.Show("toto " + percentage.ExpectedValue);
             percentage.MeasuredValue = myTreatPercentage.ToString() + "%";
             percentage.setToINFO(); // 
-            percentage.Infobulle = "L'isodose de prescription doit être en accord avec la prescription ou le protocole";
+            percentage.Infobulle = "Le pourcentage de traitement (onglet Dose) doit être en accord avec la prescription ou le protocole";
             this._result.Add(percentage);
             #endregion
-
 
 
             #region NORMALISATION DU PLAN
@@ -161,7 +161,7 @@ namespace PlanCheck_IUCT
 
 
 
-            normalisation.Infobulle = "La normalisation doit être en accord avec le protocole. Aucune normalisation = WARNING";
+            normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le protocole. Cet item est en WARNING si Aucune normalisation";
             this._result.Add(normalisation);
             #endregion 
 

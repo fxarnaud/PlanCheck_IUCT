@@ -112,34 +112,22 @@ namespace PlanCheck_IUCT
             // get the CT date in format: ddmmyy
             String imageDate = ((DateTime)_context.Image.CreationDateTime).ToString("dd");
             imageDate += ((DateTime)_context.Image.CreationDateTime).ToString("MM");
-            imageDate += ((DateTime)_context.Image.CreationDateTime).ToString("yy");
+            imageDate += ((DateTime)_context.Image.CreationDateTime).ToString("yy");       
 
-
-            //_context.Image.CreationDateTime.ToString("dd");
-
-            // String imageDate = _context.Image.Series.HistoryDateTime.ToString("dd");
-
-
-            //imageDate += _context.Image.Series.CreationDateTime.ToString("MM");
-            //imageDate += _context.Image.Series.CreationDateTime.ToString("yy");
-
-
-
-            //String imageName = null;//myContext.Image.Id;
-            //String okOrNot = null;
-
-            //MessageBox.Show(_context.Image.Id + " ** " + imageDate);
-
-            /*if (_context.Image.Id.Contains(imageDate))
-                okOrNot = "OK";
+            if (_context.Image.Id.Contains(imageDate))
+            {
+                image3Dnaming.setToTRUE();                
+            }
             else
-                okOrNot = "warning";*/
+            {
+                image3Dnaming.setToWARNING();                
+            }
 
-            image3Dnaming.ExpectedValue = "OK";//XXXXX TO GET         
+            image3Dnaming.ExpectedValue = imageDate;
             image3Dnaming.MeasuredValue = _context.Image.Id;
-            image3Dnaming.Comparator = "=";
-            image3Dnaming.Infobulle = "Le nom de l'image 3D doit contenir la date du CT au format jjmmdd";
-            image3Dnaming.ResultStatus = testing.CompareDatas(image3Dnaming.ExpectedValue, image3Dnaming.MeasuredValue, image3Dnaming.Comparator);
+             image3Dnaming.Infobulle = "Le nom de l'image 3D doit contenir la date du CT au format jjmmdd ("+imageDate+")";
+            //image3Dnaming.ResultStatus = testing.CompareDatas(image3Dnaming.ExpectedValue, image3Dnaming.MeasuredValue, image3Dnaming.Comparator);
+            //image3Dnaming.Comparator = "=";
             this._result.Add(image3Dnaming);
 
             #endregion

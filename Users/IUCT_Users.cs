@@ -21,7 +21,7 @@ namespace PlanCheck_IUCT.Users
             _users_list.Add(recordon);
             IUCT_User lacaze = new IUCT_User() { UserFirstName = "Thierry", UserFamilyName = "Lacaze", Gender = "H", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.Yellow, UserForeGroundColor = System.Windows.Media.Brushes.Navy };
             _users_list.Add(lacaze);
-            IUCT_User defour = new IUCT_User() { UserFirstName = "Nathalie", UserFamilyName = "Defour", Gender = "F", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.AliceBlue, UserForeGroundColor = System.Windows.Media.Brushes.White };
+            IUCT_User defour = new IUCT_User() { UserFirstName = "Nathalie", UserFamilyName = "Defour", Gender = "F", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.AliceBlue, UserForeGroundColor = System.Windows.Media.Brushes.Black };
             _users_list.Add(defour);
             IUCT_User lanaspeze = new IUCT_User() { UserFirstName = "Christel", UserFamilyName = "Lanaspeze", Gender = "F", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.Firebrick, UserForeGroundColor = System.Windows.Media.Brushes.White };
             _users_list.Add(lanaspeze);

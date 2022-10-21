@@ -134,12 +134,13 @@ namespace PlanCheck_IUCT
             #endregion
 
             #region prescription comment
+            prescriptionComment = _pcontext.PlanSetup.RTPrescription.Name;
+            prescriptionComment += " (R" + _pcontext.PlanSetup.RTPrescription.RevisionNumber + "): ";
             if (_pcontext.PlanSetup.RTPrescription.Notes.Length == 0)
-                prescriptionComment = "Pas de commentaire dans la presciption.";
+                prescriptionComment += "Pas de commentaire dans la presciption.";
             else
             {
-                prescriptionComment = _pcontext.PlanSetup.RTPrescription.Name;
-                prescriptionComment += " (R" + _pcontext.PlanSetup.RTPrescription.RevisionNumber + "): ";
+                
                 prescriptionComment +=  _pcontext.PlanSetup.RTPrescription.Notes;
                 
                 //+ _pcontext.PlanSetup.RTPrescription.RevisionNumber + ": " + ": " + _pcontext.PlanSetup.RTPrescription.Id + ": " + _pcontext.PlanSetup.RTPrescription.Notes;
@@ -225,7 +226,7 @@ namespace PlanCheck_IUCT
                 machineForegroundColor = "White";
             }
             #endregion
-
+            
 
             if (machineName != "TOM")
                 theFields = TreatmentFieldNumber + " " + myMLCtype + " et " + setupFieldNumber + " champs de set-up";
