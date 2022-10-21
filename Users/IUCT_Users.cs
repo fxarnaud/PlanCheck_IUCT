@@ -72,7 +72,7 @@ namespace PlanCheck_IUCT.Users
 
             IUCT_User dalmasso = new IUCT_User() { UserFirstName = "Céline", UserFamilyName = "Dalmasso", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.IndianRed, UserForeGroundColor = System.Windows.Media.Brushes.White };
             _users_list.Add(dalmasso);
-
+            
             IUCT_User desrousseaux = new IUCT_User() { UserFirstName = "Desrousseaux", UserFamilyName = "Jacques", Gender = "H", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.Orange, UserForeGroundColor = System.Windows.Media.Brushes.Black };
             _users_list.Add(desrousseaux);
 
@@ -85,7 +85,7 @@ namespace PlanCheck_IUCT.Users
             IUCT_User keller = new IUCT_User() { UserFirstName = "Audrey", UserFamilyName = "Keller", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.BlueViolet, UserForeGroundColor = System.Windows.Media.Brushes.White };
             _users_list.Add(keller);
 
-            IUCT_User khalifa = new IUCT_User() { UserFirstName = "Jonathan", UserFamilyName = "Khalifa", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.Gold, UserForeGroundColor = System.Windows.Media.Brushes.White };
+            IUCT_User khalifa = new IUCT_User() { UserFirstName = "Jonathan", UserFamilyName = "Khalifa", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.Gold, UserForeGroundColor = System.Windows.Media.Brushes.Black };
             _users_list.Add(khalifa); 
 
             IUCT_User laprie = new IUCT_User() { UserFirstName = "Anne", UserFamilyName = "Laprie", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.MediumPurple, UserForeGroundColor = System.Windows.Media.Brushes.Navy };
