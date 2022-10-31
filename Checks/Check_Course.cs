@@ -27,7 +27,7 @@ namespace PlanCheck_IUCT
         {
             #region ACTUAL COURSE
             Item_Result currentCourseStatus = new Item_Result();
-            currentCourseStatus.Label =  _ctx.Course.Id + " (Course ouvert)";
+            currentCourseStatus.Label =  "Course actuel : " + _ctx.Course.Id;
             currentCourseStatus.ExpectedValue = "EN COURS";
             if(_ctx.Course.CompletedDateTime == null)
             {
@@ -52,7 +52,7 @@ namespace PlanCheck_IUCT
                 //myCourseStatus.Comparator = "=";
                 myCourseStatus.Infobulle = "OK si TERMINE, WARNING si en cours depuis < "+ maxNumberOfDays +" jours, X sinon";
                 //Comparator testing = new Comparator();
-                myCourseStatus.Label = courseN.Id;
+                myCourseStatus.Label = "Course : " + courseN.Id;
 
                 if (courseN.Id != _ctx.Course.Id) // do not test current course
                     if (courseN.CompletedDateTime != null) // --> terminated courses = there is a  completed date time

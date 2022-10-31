@@ -26,7 +26,7 @@
                            Text="{Binding Comment}"></TextBlock>
                 </StackPanel>
                 <StackPanel>
-                    <ListView HorizontalAlignment="Center" x:Name="CheckScreen_lsv" Visibility="Collapsed">
+                    <ListView HorizontalAlignment="Right" x:Name="CheckScreen_lsv" Visibility="Collapsed">
                     </ListView>
                 </StackPanel>
 

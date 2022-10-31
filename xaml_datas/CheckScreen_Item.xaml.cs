@@ -29,7 +29,7 @@ namespace PlanCheck_IUCT
         public CheckScreen_Item(Item_Result resultat)
         {
             DataContext = this;
-            _item_title = resultat.Label;
+            _item_title = " " + resultat.Label;
 
             // FX
             // _comment = resultat.ExpectedValue + " " + resultat.Comparator + " " + resultat.MeasuredValue + "?";
