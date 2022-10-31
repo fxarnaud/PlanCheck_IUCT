@@ -38,7 +38,7 @@ namespace VMS.TPS
         public static void Perform(PlanSetup planSetup, ScriptContext context)
         {
 
-            //Get Plan information
+            //Get Plan information...test
             PreliminaryInformation pinfo = new PreliminaryInformation(context);
 
             //Generate Main Window
