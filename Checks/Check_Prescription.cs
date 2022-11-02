@@ -81,7 +81,7 @@ namespace PlanCheck_IUCT
                 fractionation.setToFALSE();
 
 
-            fractionation.Infobulle = "Le 'nombre de fractions' et la 'dose par fraction' doivent\nêtre conformes à la prescription "+_ctx.PlanSetup.RTPrescription.Id +
+            fractionation.Infobulle = "Le 'nombre de fractions' et la 'dose par fraction' du plan doivent\nêtre conformes à la prescription "+_ctx.PlanSetup.RTPrescription.Id +
                 " : "+ nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
             this._result.Add(fractionation);
             #endregion

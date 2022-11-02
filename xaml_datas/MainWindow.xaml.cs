@@ -83,6 +83,8 @@ namespace PlanCheck_IUCT
         {
             //Patient, plan and others infos to bind to xml
 
+           
+
             #region PATIENT NAME, SEX AND AGE
             DateTime PatientDOB = (DateTime)_pinfo.PatientDOB_dt;// .Patient.DateOfBirth;         
             DateTime zeroTime = new DateTime(1, 1, 1);
@@ -106,13 +108,13 @@ namespace PlanCheck_IUCT
             }
             PatientFullName = _pinfo.PatientName + " " + sex + "/" + years.ToString();
             #endregion
-
+            
             #region course and plan ID format:  PlanID (CourseID)
 
             PlanAndCourseID = _pinfo.PlanName + " (" + _pinfo.CourseName + ")";
 
             #endregion
-
+            
             #region creator name
 
             PlanCreatorName = _pinfo.PlanCreator.UserFirstName + " " + _pinfo.PlanCreator.UserFamilyName;
@@ -122,33 +124,38 @@ namespace PlanCheck_IUCT
             CurrentUserBackgroundColor = _pinfo.CurrentUser.UserBackgroundColor;
             CurrentUserForegroundColor = _pinfo.CurrentUser.UserForeGroundColor;
             #endregion
-
+            
             #region doctor in the prescription
-
-            DoctorName = "Dr " + _pinfo.Doctor.UserFamilyName;
-
-
-            DoctorBackgroundColor = _pinfo.Doctor.UserBackgroundColor; //System.Windows.Media.Brushes.DeepPink; // _pinfo.Doctor.DoctorBackgroundColor;
-            DoctorForegroundColor = _pinfo.Doctor.UserForeGroundColor;// System.Windows.Media.Brushes.Wheat; // _pinfo.Doctor.DoctorForeGroundColor;
-
-            #endregion
-
-            #region prescription comment
-            prescriptionComment = _pcontext.PlanSetup.RTPrescription.Name;
-            prescriptionComment += " (R" + _pcontext.PlanSetup.RTPrescription.RevisionNumber + "): ";
-            if (_pcontext.PlanSetup.RTPrescription.Notes.Length == 0)
-                prescriptionComment += "Pas de commentaire dans la presciption.";
-            else
+            if (_pcontext.PlanSetup.RTPrescription != null)
             {
-                
-                prescriptionComment +=  _pcontext.PlanSetup.RTPrescription.Notes;
-                
-                //+ _pcontext.PlanSetup.RTPrescription.RevisionNumber + ": " + ": " + _pcontext.PlanSetup.RTPrescription.Id + ": " + _pcontext.PlanSetup.RTPrescription.Notes;
-                //prescriptionComment = "Commentaire de la presciption : " + _pcontext.PlanSetup.RTPrescription.Notes;
-
+                DoctorName = "Dr " + _pinfo.Doctor.UserFamilyName;
+                DoctorBackgroundColor = _pinfo.Doctor.UserBackgroundColor; //System.Windows.Media.Brushes.DeepPink; // _pinfo.Doctor.DoctorBackgroundColor;
+                DoctorForegroundColor = _pinfo.Doctor.UserForeGroundColor;// System.Windows.Media.Brushes.Wheat; // _pinfo.Doctor.DoctorForeGroundColor;
             }
+            else DoctorName = "Pas de prescripteur";
             #endregion
+            
+            #region prescription comment
+            if (_pcontext.PlanSetup.RTPrescription != null)
+            {
+                prescriptionComment = _pcontext.PlanSetup.RTPrescription.Name;
+                prescriptionComment += " (R" + _pcontext.PlanSetup.RTPrescription.RevisionNumber + "): ";
+                if (_pcontext.PlanSetup.RTPrescription.Notes.Length == 0)
+                    prescriptionComment += "Pas de commentaire dans la presciption.";
+                else
+                {
 
+                    prescriptionComment += _pcontext.PlanSetup.RTPrescription.Notes;
+
+                    //+ _pcontext.PlanSetup.RTPrescription.RevisionNumber + ": " + ": " + _pcontext.PlanSetup.RTPrescription.Id + ": " + _pcontext.PlanSetup.RTPrescription.Notes;
+                    //prescriptionComment = "Commentaire de la presciption : " + _pcontext.PlanSetup.RTPrescription.Notes;
+
+                }
+            }
+            else
+                prescriptionComment = "pas de prescription";
+            #endregion
+            
             #region machine and fields
             String machineName = null;
             String myMLCtype = null;
@@ -234,7 +241,7 @@ namespace PlanCheck_IUCT
                 theFields = "Helicoidal Tomo Field";
             //MessageBox.Show(machineAndFields);
             #endregion
-
+            
             #region other infos
             //Plans infos
             CalculationOptions = _plan.PhotonCalculationOptions.Select(e => e.Key + " : " + e.Value);
@@ -243,7 +250,7 @@ namespace PlanCheck_IUCT
             OptimizationModel = _plan.GetCalculationModel(CalculationType.PhotonVMATOptimization);
             ListChecks = new List<UserControl>();
             #endregion
-
+            
         }
         public void AddCheck(UserControl checkScreen)
         {

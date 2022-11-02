@@ -28,26 +28,32 @@ namespace PlanCheck_IUCT
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
             _ctx = ctx;
-
             _patientname = ctx.Patient.Name;
             _patientdob_dt = (DateTime)ctx.Patient.DateOfBirth;
             _patientdob = _patientdob_dt.Day+"/"+ _patientdob_dt.Month + "/" + _patientdob_dt.Year;
             _coursename = ctx.Course.Id;
-            _planname = ctx.PlanSetup.Id;
-            _plancreator = GetUser("creator");
+
+
+            _planname = ctx.PlanSetup.Id; 
+            _plancreator = GetUser("creator"); 
             _currentuser = GetUser("currentuser");
-            _doctor = GetUser("doctor");
+            if(ctx.PlanSetup.RTPrescription != null)
+                _doctor = GetUser("doctor");
+            
             _algoname = ctx.PlanSetup.PhotonCalculationModel;
             _mlctype = Check_mlc_type(ctx.PlanSetup);
-
+            
             calculoptions = new string[ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.Count];
             calculoptions = ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.ToArray();
+           
             //MessageBox.Show(string.Format("test = {0}", calculoptions[0]));
             //MessageBox.Show(string.Format("test = {0}", calculoptions[1]));
             //_calculationgridsize = calculoptions[0];
             //SELON L'ALGO ON A DES OPTIONS ET UN NOMBRE D'OPTIONS DIFFERENT. METTRE DES IF !
 
             //MessageBox.Show(string.Format("Date image = {0}", ctx.Image.CreationDateTime));         
+           
+
         }
 
 

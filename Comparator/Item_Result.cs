@@ -56,7 +56,7 @@ namespace PlanCheck_IUCT
         }
         public void setToINFO()
         {
-            this.ResultStatus = ("INFORMATIF", new SolidColorBrush(Colors.LightGray));
+            this.ResultStatus = ("INFO", new SolidColorBrush(Colors.LightGray));
         }
         public void setToWARNING()
         {
