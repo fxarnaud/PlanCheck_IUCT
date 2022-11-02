@@ -25,24 +25,7 @@ namespace PlanCheck_IUCT
 
         public void Check()
         {
-            #region Plan approuvé ? ( mettre ailleurs)
-            Item_Result approve = new Item_Result();
-            approve.Label = "Statut d'approbation du plan";
-            approve.ExpectedValue = "EN COURS";
-
-            if (_ctx.PlanSetup.ApprovalStatus.ToString() == "PlanningApproved")
-            {
-                approve.MeasuredValue = "Plan approuvé ";// + _ctx.PlanSetup.PlanningApprover;
-                approve.setToTRUE();
-            }
-            else
-            {
-                approve.MeasuredValue = "Différent de Planning Approved";
-                approve.setToFALSE();
-            }
-            approve.Infobulle = "Le plan doit être Planning Approved";
-            this._result.Add(approve);
-            #endregion
+           
 
             #region UM per Gray
             Item_Result um = new Item_Result();
