@@ -7,7 +7,7 @@
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PlanCheck_IUCT</RootNamespace>
-    <AssemblyName>PlanCheck_IUCT_Beta_v0231.esapi</AssemblyName>
+    <AssemblyName>PlanCheck_IUCT_Beta_v0235.esapi</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -60,7 +60,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Checks\Check_Beam.cs" />
+    <Compile Include="Checks\Check_UM.cs" />
     <Compile Include="Checks\Check_Prescription.cs" />
     <Compile Include="Checks\Check_CT.cs" />
     <Compile Include="Checks\Check_Course.cs" />

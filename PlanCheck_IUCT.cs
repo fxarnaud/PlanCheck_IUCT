@@ -66,8 +66,8 @@ namespace VMS.TPS
             var check_point4 = new CheckScreen_Global(c_algo.Title, c_algo.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point4);
             
-            Check_Beam c_beam = new Check_Beam(pinfo, context);
-            var check_point5 = new CheckScreen_Global(c_beam.Title, c_beam.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            Check_UM c_UM = new Check_UM(pinfo, context);
+            var check_point5 = new CheckScreen_Global(c_UM.Title, c_UM.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point5);
 
            
