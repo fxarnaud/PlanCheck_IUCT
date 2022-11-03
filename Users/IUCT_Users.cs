@@ -17,7 +17,7 @@ namespace PlanCheck_IUCT.Users
             #region planners   
             #region color theme 1
             
-            IUCT_User carillo = new IUCT_User() { UserFirstName = "Fabienne", UserFamilyName = "Carillo", Gender = "F", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.PapayaWhip, UserForeGroundColor = System.Windows.Media.Brushes.Navy };
+            IUCT_User carillo = new IUCT_User() { UserFirstName = "Fabienne", UserFamilyName = "Carillo", Gender = "F", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.Gold, UserForeGroundColor = System.Windows.Media.Brushes.Navy };
             _users_list.Add(carillo);
             IUCT_User recordon = new IUCT_User() { UserFirstName = "Frédérique", UserFamilyName = "Recordon", Gender = "F", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.Salmon, UserForeGroundColor = System.Windows.Media.Brushes.Navy };
             _users_list.Add(recordon);
@@ -49,6 +49,7 @@ namespace PlanCheck_IUCT.Users
             _users_list.Add(cavet);
             */
             #endregion
+
             #endregion
 
             #region physicists

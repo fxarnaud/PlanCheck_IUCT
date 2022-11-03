@@ -50,7 +50,7 @@ namespace PlanCheck_IUCT
             this._result.Add(prescriptionStatus);
             #endregion
 
-            #region FRACTIONNEMENT - PTV LE PLUS HAUT
+            #region FRACTIONNEMENT - CIBLE LA PLUS HAUTE
             Item_Result fractionation = new Item_Result();
             //fractionation.Label = "Fractionnement du PTV principal";
 
@@ -75,7 +75,7 @@ namespace PlanCheck_IUCT
                 }
             }
 
-            fractionation.Label = "Fractionnement du PTV principal (" + PrescriptionName + ")";
+            fractionation.Label = "Fractionnement de la cible principal (" + PrescriptionName + ")";
             fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction + " Gy";
             fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.Dose.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
 
@@ -90,7 +90,7 @@ namespace PlanCheck_IUCT
             this._result.Add(fractionation);
             #endregion
 
-            #region LISTE DES VOLUMES DE LA PRESCRIPTION
+            #region LISTE DES CIBLES DE LA PRESCRIPTION
             Item_Result prescriptionVolumes = new Item_Result();
 
             int targetNumber = 0;
@@ -105,7 +105,7 @@ namespace PlanCheck_IUCT
             }
 
             prescriptionVolumes.ExpectedValue = "info";
-            prescriptionVolumes.Label = " "+targetNumber + " PTV(s) dans la prescription : ";
+            prescriptionVolumes.Label = " "+targetNumber + " cible(s) dans la prescription : ";
             prescriptionVolumes.setToINFO();
             
             this._result.Add(prescriptionVolumes);
