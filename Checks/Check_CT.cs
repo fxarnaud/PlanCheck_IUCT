@@ -45,9 +45,16 @@ namespace PlanCheck_IUCT
             DateTime myToday = DateTime.Today;
             int nDays = (myToday - (DateTime)_context.Image.Series.HistoryDateTime).Days;
             CT_age.MeasuredValue = nDays.ToString();
-            CT_age.Comparator = "<";
-            CT_age.Infobulle = "Le CT doit avoir moins de 10 jours";
-            CT_age.ResultStatus = testing.CompareDatas(CT_age.ExpectedValue, CT_age.MeasuredValue, CT_age.Comparator);
+            //CT_age.Comparator = "<";
+            CT_age.Infobulle = "Le CT doit avoir moins de 10 jours. Warning si > 10 jours, ERREUR si > 30";
+            //CT_age.ResultStatus = testing.CompareDatas(CT_age.ExpectedValue, CT_age.MeasuredValue, CT_age.Comparator);
+            CT_age.setToTRUE();
+            if (nDays > 10)
+                CT_age.setToWARNING();
+            if (nDays > 30)
+                CT_age.setToFALSE();
+
+
             this._result.Add(CT_age);
             #endregion
 

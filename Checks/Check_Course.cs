@@ -11,10 +11,12 @@ namespace PlanCheck_IUCT
     internal class Check_Course
     {
         private ScriptContext _ctx;
+        private PreliminaryInformation _pinfo;
         private int maxNumberOfDays = 5;
         public Check_Course(PreliminaryInformation pinfo, ScriptContext ctx)  //Constructor
         {     
             _ctx = ctx;
+            _pinfo = pinfo;
             Check();
             
         }
@@ -33,7 +35,8 @@ namespace PlanCheck_IUCT
 
             if (_ctx.PlanSetup.ApprovalStatus.ToString() == "PlanningApproved")
             {
-                approve.MeasuredValue = "Plan approuvé par le Dr " + _ctx.PlanSetup.PlanningApprover;// + _ctx.PlanSetup.PlanningApprover;
+                String[] beautifulDoctorName = _ctx.PlanSetup.PlanningApprover.Split('\\');
+                approve.MeasuredValue = "Plan approuvé par le Dr " + beautifulDoctorName[1].ToUpper();// + _ctx.PlanSetup.PlanningApprover;s[0].ToString().ToUpper() + s.Substring(1);
                 approve.setToTRUE();
             }
             else

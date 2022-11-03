@@ -180,12 +180,14 @@ namespace PlanCheck_IUCT
                         myMLCtype = "VMAT";
                     TreatmentFieldNumber++;
                     machineName = b.TreatmentUnit.Id;
+
+                    if (b.MLCPlanType.ToString() == "Static")
+                        myMLCtype += " (MLC fixe)";
+                    else
+                        myMLCtype += " (MLC dynamique)";
                 }
 
-                if (b.MLCPlanType.ToString() == "Static")
-                    myMLCtype += " (MLC fixe)";
-                else
-                    myMLCtype += " (MLC dynamique)";
+                
 
             }
             theMachine = machineName;
