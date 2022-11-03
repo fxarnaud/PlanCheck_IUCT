@@ -43,7 +43,7 @@ namespace PlanCheck_IUCT
             #region Nom de l'algo
             Item_Result algo_name = new Item_Result();
             algo_name.Label = "Algorithme de calcul";
-            algo_name.ExpectedValue = "AAA_13714";// TO GET IN PRTOCOLE
+            algo_name.ExpectedValue = "AAA_15605New";// TO GET IN PRTOCOLE
             algo_name.MeasuredValue = _pinfo.AlgoName;
             algo_name.Comparator = "=";
             algo_name.Infobulle = "Algorithme attendu pour ce protocole : " + algo_name.ExpectedValue;

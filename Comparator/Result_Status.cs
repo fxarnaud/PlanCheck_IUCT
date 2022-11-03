@@ -10,9 +10,9 @@ namespace PlanCheck_IUCT
     public  class Result_Status
     {    
         (string, SolidColorBrush) _true = ("OK", new SolidColorBrush(Colors.LightGreen));
-        (string, SolidColorBrush) _false = ("X", new SolidColorBrush(Colors.LightSalmon));
-        (string, SolidColorBrush) _variation = ("WARNING", new SolidColorBrush(Colors.LightYellow));
-        (string, SolidColorBrush) _informatif = ("INFORMATIF", new SolidColorBrush(Colors.Gray));
+        (string, SolidColorBrush) _false = ("X", new SolidColorBrush(Colors.Red));
+        (string, SolidColorBrush) _variation = ("WARNING", new SolidColorBrush(Colors.LightSalmon));
+        (string, SolidColorBrush) _informatif = ("INFORMATIF", new SolidColorBrush(Colors.LightYellow));
 
 
 

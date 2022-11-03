@@ -52,16 +52,16 @@ namespace PlanCheck_IUCT
         }
         public void setToFALSE()
         {
-            this.ResultStatus = ("X", new SolidColorBrush(Colors.LightSalmon));// .Red ?
+            this.ResultStatus = ("X", new SolidColorBrush(Colors.Red));// .Red ?  fx -- LightSalmon
         }
         public void setToINFO()
         {
-            this.ResultStatus = ("INFO", new SolidColorBrush(Colors.LightGray));
-        }
+            this.ResultStatus = ("INFO", new SolidColorBrush(Colors.LightYellow));//LightGray
+            }
         public void setToWARNING()
         {
-            this.ResultStatus = ("WARNING", new SolidColorBrush(Colors.LightYellow)); // .Light Salmon ? 
-        }
+            this.ResultStatus = ("WARNING", new SolidColorBrush(Colors.LightSalmon)); // .Light Salmon ? LightYellow
+            }
 
        
     }

@@ -33,7 +33,7 @@ namespace PlanCheck_IUCT
 
             if (_ctx.PlanSetup.ApprovalStatus.ToString() == "PlanningApproved")
             {
-                approve.MeasuredValue = "Plan approuvé ";// + _ctx.PlanSetup.PlanningApprover;
+                approve.MeasuredValue = "Plan approuvé par le Dr " + _ctx.PlanSetup.PlanningApprover;// + _ctx.PlanSetup.PlanningApprover;
                 approve.setToTRUE();
             }
             else

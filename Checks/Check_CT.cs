@@ -125,7 +125,7 @@ namespace PlanCheck_IUCT
 
             image3Dnaming.ExpectedValue = imageDate;
             image3Dnaming.MeasuredValue = _context.Image.Id;
-             image3Dnaming.Infobulle = "Le nom de l'image 3D doit contenir la date du CT au format jjmmdd ("+imageDate+")";
+             image3Dnaming.Infobulle = "Le nom de l'image 3D doit contenir la date du CT au format jjmmaa ("+imageDate+")";
             //image3Dnaming.ResultStatus = testing.CompareDatas(image3Dnaming.ExpectedValue, image3Dnaming.MeasuredValue, image3Dnaming.Comparator);
             //image3Dnaming.Comparator = "=";
             this._result.Add(image3Dnaming);

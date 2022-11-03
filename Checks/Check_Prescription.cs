@@ -18,62 +18,66 @@ namespace PlanCheck_IUCT
     {
         private ScriptContext _ctx;
         private PreliminaryInformation _pinfo;
-        
+
         public Check_Prescription(PreliminaryInformation pinfo, ScriptContext ctx)  //Constructor
-        {     
+        {
             _ctx = ctx;
             _pinfo = pinfo;
             Check();
-            
+
         }
 
         private List<Item_Result> _result = new List<Item_Result>();
-       // private PreliminaryInformation _pinfo;
+        // private PreliminaryInformation _pinfo;
         private string _title = "Prescription";
 
         public void Check()
         {
-            
+
             #region APPROBATION DE LA PRESCRIPTION
             Item_Result prescriptionStatus = new Item_Result();
-            prescriptionStatus.Label =  "Approbation de la prescription (" + _ctx.PlanSetup.RTPrescription.Name + ")";
+            prescriptionStatus.Label = "Approbation de la prescription (" + _ctx.PlanSetup.RTPrescription.Name + ")";
             prescriptionStatus.ExpectedValue = "Approved";
             prescriptionStatus.MeasuredValue = _ctx.PlanSetup.RTPrescription.Status;
 
-            if (prescriptionStatus.MeasuredValue == "Approved") 
+            if (prescriptionStatus.MeasuredValue == "Approved")
                 prescriptionStatus.setToTRUE();
             else
                 prescriptionStatus.setToFALSE();
 
 
-            prescriptionStatus.Infobulle = "OK si la prescription est approuvée"; 
+            prescriptionStatus.Infobulle = "OK si la prescription est approuvée";
             this._result.Add(prescriptionStatus);
             #endregion
 
             #region FRACTIONNEMENT - PTV LE PLUS HAUT
             Item_Result fractionation = new Item_Result();
-            fractionation.Label = "Fractionnement du PTV principal";
+            //fractionation.Label = "Fractionnement du PTV principal";
 
             double nPrescribedDosePerFraction = 0;
             int nPrescribedNFractions = 0;
-            string PrescriptionName;
+            string PrescriptionName = null;
             double PrescriptionValue = 0;
             DoseValue myDosePerFraction = _ctx.PlanSetup.DosePerFraction;
             int nFraction = (int)_ctx.PlanSetup.NumberOfFractions;
             foreach (var target in _ctx.PlanSetup.RTPrescription.Targets) //boucle sur les différents niveaux de dose de la prescription
             {
-                nPrescribedNFractions = target.NumberOfFractions;              
+                // MessageBox.Show("one : " + target.Name);
+                nPrescribedNFractions = target.NumberOfFractions;
                 if (target.DosePerFraction.Dose > nPrescribedDosePerFraction)  // get the highest dose per fraction level
                 {
                     nPrescribedDosePerFraction = target.DosePerFraction.Dose;
                     PrescriptionValue = target.Value;
-                    PrescriptionName = target.Name;
+                    PrescriptionName = target.TargetId;
+
+                    //if(PrescriptionName !=null)
+                    // 
                 }
             }
-            fractionation.ExpectedValue = nPrescribedNFractions+" x " + nPrescribedDosePerFraction +  " Gy" ;
 
-
-            fractionation.MeasuredValue = nFraction + " x " + myDosePerFraction.Dose.ToString() + " Gy";
+            fractionation.Label = "Fractionnement du PTV principal (" + PrescriptionName + ")";
+            fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction + " Gy";
+            fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.Dose.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
 
             if ((nPrescribedNFractions == nFraction) && (nPrescribedDosePerFraction == myDosePerFraction.Dose))
                 fractionation.setToTRUE();
@@ -81,54 +85,36 @@ namespace PlanCheck_IUCT
                 fractionation.setToFALSE();
 
 
-            fractionation.Infobulle = "Le 'nombre de fractions' et la 'dose par fraction' du plan doivent\nêtre conformes à la prescription "+_ctx.PlanSetup.RTPrescription.Id +
-                " : "+ nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
+            fractionation.Infobulle = "Le 'nombre de fractions' et la 'dose par fraction' du plan doivent\nêtre conformes à la prescription " + _ctx.PlanSetup.RTPrescription.Id +
+                " : " + nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
             this._result.Add(fractionation);
             #endregion
 
             #region LISTE DES VOLUMES DE LA PRESCRIPTION
             Item_Result prescriptionVolumes = new Item_Result();
-            prescriptionVolumes.Label = "Liste des volumes à traiter";
-            prescriptionVolumes.ExpectedValue = "info";
-
 
             int targetNumber = 0;
             prescriptionVolumes.MeasuredValue = "";
+            prescriptionVolumes.Infobulle = "information : liste des cibles de la prescription\n";
             foreach (var target in _ctx.PlanSetup.RTPrescription.Targets) //boucle sur les différents niveaux de dose de la prescription
             {
                 targetNumber++;
-                // ItemResult myItem00 = new ItemResult();
-                //myItem00.testID = "4.2." + targetNumber.ToString();
-                //myItem00.Label = "  Target " + targetNumber.ToString() + ": " + target.TargetId;
                 double tot = target.NumberOfFractions * target.DosePerFraction.Dose;
-                prescriptionVolumes.MeasuredValue += target.TargetId + " : " + target.NumberOfFractions + " x " + target.DosePerFraction.Dose + " Gy " + "(" + tot.ToString("N2") + " Gy)\t";
-                //mymsg = (target.DosePerFraction.Dose * target.NumberOfFractions) + "/";
-                //mymsg = mymsg + target.DosePerFraction.Dose;
-                //myItem00.MeasuredValue = mymsg;
-               // myItem00.ExpectedValue = "Info only (no check)";
-               // myItem00.Objective = "=";
-               // myItem00.ResultStatus = testing.CompareDatas(myItem00.ExpectedValue, myItem00.MeasuredValue, myItem00.Objective);
-               // this._result.Add(myItem00);
-
-
+                prescriptionVolumes.Infobulle += target.TargetId + " : " + target.NumberOfFractions + " x " + target.DosePerFraction.Dose + " Gy " + "(" + tot.ToString("N2") + " Gy)\n";
+                prescriptionVolumes.MeasuredValue += target.TargetId + " (" + tot.ToString("N2") + " Gy)  ";
             }
 
-            //prescriptionVolumes.MeasuredValue = _ctx.PlanSetup.RTPrescription.Status;
-
-            //if (prescriptionVolumes.MeasuredValue == "Approved")
-
-
+            prescriptionVolumes.ExpectedValue = "info";
+            prescriptionVolumes.Label = " "+targetNumber + " PTV(s) dans la prescription : ";
             prescriptionVolumes.setToINFO();
-            //else                 prescriptionVolumes.setToFALSE();
-
-
-            prescriptionVolumes.Infobulle = "information : liste des volumes de la prescription";
+            
             this._result.Add(prescriptionVolumes);
+
             #endregion
 
-            // pas réussi à attraper le % dans la prescription
+            // pas réussi à attraper le % dans la prescription (que dans le plan)
             #region POURCENTAGE DE LA PRESCRIPTION
-            
+
             Item_Result percentage = new Item_Result();
             double myTreatPercentage = _ctx.PlanSetup.TreatmentPercentage;
             myTreatPercentage = 100 * myTreatPercentage;

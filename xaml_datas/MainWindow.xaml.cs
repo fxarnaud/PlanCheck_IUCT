@@ -83,8 +83,6 @@ namespace PlanCheck_IUCT
         {
             //Patient, plan and others infos to bind to xml
 
-           
-
             #region PATIENT NAME, SEX AND AGE
             DateTime PatientDOB = (DateTime)_pinfo.PatientDOB_dt;// .Patient.DateOfBirth;         
             DateTime zeroTime = new DateTime(1, 1, 1);
@@ -95,15 +93,19 @@ namespace PlanCheck_IUCT
             if (_pcontext.Patient.Sex == "Female")
             {
                 sex = "F";
-                sexBackgroundColor = System.Windows.Media.Brushes.DeepPink;
-                sexForegroundColor = System.Windows.Media.Brushes.White;
+                //sexBackgroundColor = System.Windows.Media.Brushes.DeepPink;
+                sexBackgroundColor = System.Windows.Media.Brushes.Wheat;
+                // sexForegroundColor = System.Windows.Media.Brushes.White;
+                sexForegroundColor = System.Windows.Media.Brushes.DeepPink;
                 strPatientDOB = "Née le " + _pinfo.PatientDOB; // for tooltip only
             }
             else
             {
                 sex = "H";
-                sexBackgroundColor = System.Windows.Media.Brushes.Blue;
-                sexForegroundColor = System.Windows.Media.Brushes.White;
+                //sexBackgroundColor = System.Windows.Media.Brushes.Blue;
+                //sexForegroundColor = System.Windows.Media.Brushes.White;
+                sexBackgroundColor = System.Windows.Media.Brushes.Wheat;
+                sexForegroundColor = System.Windows.Media.Brushes.Blue;
                 strPatientDOB = "Né le " + _pinfo.PatientDOB; // for tooltip only
             }
             PatientFullName = _pinfo.PatientName + " " + sex + "/" + years.ToString();
@@ -161,6 +163,7 @@ namespace PlanCheck_IUCT
             String myMLCtype = null;
             int setupFieldNumber = 0;
             int TreatmentFieldNumber = 0;
+            //String monTypeMLC = null;
             foreach (Beam b in _pcontext.PlanSetup.Beams)
             {
 
@@ -171,21 +174,31 @@ namespace PlanCheck_IUCT
                 }
                 else
                 {
-                    myMLCtype = b.Technique.Id + " " + b.MLCPlanType;
+                    if(b.Technique.Id == "STATIC")
+                       myMLCtype = "RTC" ;
+                    else
+                        myMLCtype = "VMAT";
                     TreatmentFieldNumber++;
                     machineName = b.TreatmentUnit.Id;
                 }
+
+                if (b.MLCPlanType.ToString() == "Static")
+                    myMLCtype += " (MLC fixe)";
+                else
+                    myMLCtype += " (MLC dynamique)";
+
             }
             theMachine = machineName;
 
-            #region color the machines
+            #region color the machines first theme
+            /*
             // see palette at https://learn.microsoft.com/fr-fr/dotnet/api/system.windows.media.brushes?view=windowsdesktop-6.0
 
             
             if (machineName == "V4")
             {
-                machineBackgroundColor = "Blue";
-                machineForegroundColor = "White";
+                machineBackgroundColor = "PowderBlue";
+                machineForegroundColor = "Blue";
             }
             else if (machineName == "TOM")
             {
@@ -232,11 +245,70 @@ namespace PlanCheck_IUCT
                 machineBackgroundColor = "Gray";
                 machineForegroundColor = "White";
             }
+            */
             #endregion
-            
+
+
+            #region color the machines second theme
+            // see palette at https://learn.microsoft.com/fr-fr/dotnet/api/system.windows.media.brushes?view=windowsdesktop-6.0
+
+            String machineBGcolor1 = "Wheat";
+            String machineFGcolor1 = "Black";
+
+            if (machineName == "V4")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            else if (machineName == "TOM")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            else if (machineName == "TOMO2")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            else if (machineName == "NOVA3")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            else if (machineName == "TOMO4")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            else if (machineName == "NOVA5")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            else if (machineName == "HALCYON6")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            else if (machineName == "TOMO7")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            else if (machineName == "HALCYON8")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            else
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
+            #endregion
 
             if (machineName != "TOM")
-                theFields = TreatmentFieldNumber + " " + myMLCtype + " et " + setupFieldNumber + " champs de set-up";
+                theFields = TreatmentFieldNumber + " champs " + myMLCtype + " et " + setupFieldNumber + " champs de set-up";
             else
                 theFields = "Helicoidal Tomo Field";
             //MessageBox.Show(machineAndFields);
