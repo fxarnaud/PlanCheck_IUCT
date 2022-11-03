@@ -16,6 +16,7 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
+                                    <!-- ColumnDefinition Width="30" /-->
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="*" />
@@ -24,17 +25,19 @@
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Grid.Column ="0" FontSize="15" FontWeight="Bold" Text="{Binding PatientFullName}" Background="{Binding sexBackgroundColor}" Foreground="{Binding  sexForegroundColor}" ToolTip="{Binding strPatientDOB}" TextAlignment="Center"></TextBlock>
-                                <TextBlock Grid.Row="0" Grid.Column ="1" FontSize="15" Text="{Binding DoctorName}" Background="{Binding DoctorBackgroundColor}" Foreground="{Binding  DoctorForegroundColor}" TextAlignment="Center" ToolTip="Prescripteur"></TextBlock>
+                                <TextBlock Grid.Row="0" Grid.Column ="1" FontSize="15" Text="{Binding DoctorName}" Background="Wheat" Foreground="Black" TextAlignment="Center" ToolTip="Prescripteur"></TextBlock>
+                                <Ellipse Grid.Row="0" Grid.Column ="1"  Fill="{Binding DoctorBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Right" StrokeThickness="2" Stroke="Black" ToolTip="couleur RT"/>
+                                
                                 <TextBlock Grid.Row="1" Grid.Column ="0" FontSize="15" Text="{Binding PlanAndCourseID}" Background="AntiqueWhite" Foreground="MidnightBlue" ToolTip="planID (CourseID)" TextAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <TextBlock Grid.Row="1" Grid.Column ="1" FontStyle="Italic" TextWrapping="WrapWithOverflow" FontSize="15" Text="{Binding prescriptionComment}" Background="AntiqueWhite"  Foreground="MidnightBlue" ToolTip="Nom, version et commentaire de la prescription" TextAlignment="Center"></TextBlock>
                                 <TextBlock  Grid.Row="2" Grid.Column ="0" FontSize="15" Text="{Binding theMachine}" Background="{Binding machineBackgroundColor}" Foreground="{Binding  machineForegroundColor}"  ToolTip="Nom de la machine" TextAlignment="Center" VerticalAlignment="Center"></TextBlock>
                                 <TextBlock  Grid.Row="2" Grid.Column ="1" TextWrapping="WrapWithOverflow" FontSize="15" Text="{Binding theFields}" TextAlignment="Center"  Background="Wheat" Foreground="Black" ToolTip="Description des champs"></TextBlock>
-                                <TextBlock  Grid.Row="3" Grid.Column ="0" FontSize="15" Text="{Binding PlanCreatorName}" Background="{Binding PlanCreatorBackgroundColor}" Foreground="{Binding  PlanCreatorForegroundColor}" ToolTip="créateur du plan"  TextAlignment="Center"></TextBlock>
-                                <TextBlock  Grid.Row="3" Grid.Column ="1" FontSize="15" Text="{Binding CurrentUserName}" Background="{Binding CurrentUserBackgroundColor}" Foreground="{Binding  CurrentUserForegroundColor}" TextAlignment="Center" VerticalAlignment="Center" ToolTip="user name"></TextBlock>
+                                <TextBlock  Grid.Row="3" Grid.Column ="0" FontSize="15" Text="{Binding CurrentUserName}" Background="{Binding CurrentUserBackgroundColor}" Foreground="{Binding  CurrentUserForegroundColor}" TextAlignment="Center" VerticalAlignment="Center" ToolTip="user name"></TextBlock>
+                                <TextBlock  Grid.Row="3" Grid.Column ="1" FontSize="15" Text="{Binding PlanCreatorName}" Background="AntiqueWhite" Foreground="MidnightBlue" ToolTip="créateur du plan"  TextAlignment="Center"></TextBlock>
+                                <Ellipse Grid.Row="3" Grid.Column ="1"  Fill="{Binding PlanCreatorBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Right"  StrokeThickness="2" Stroke="Black" ToolTip="couleur dosimétriste" />
 
 
-
-                                </Grid>                          
+                            </Grid>                          
 
 
                         </StackPanel>
