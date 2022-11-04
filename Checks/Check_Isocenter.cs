@@ -105,7 +105,7 @@ namespace PlanCheck_IUCT
             }
 
 
-            allFieldsSameIso.Infobulle = "Tous les champs du plan doivent avoir le même isocentre, sauf plan multi-socentres";
+            allFieldsSameIso.Infobulle = "Tous les champs du plan doivent avoir le même isocentre, sauf plan multi-isocentres";
 
 
             this._result.Add(allFieldsSameIso);
