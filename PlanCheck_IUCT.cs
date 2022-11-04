@@ -70,7 +70,11 @@ namespace VMS.TPS
             var check_point5 = new CheckScreen_Global(c_UM.Title, c_UM.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point5);
 
-           
+            Check_Isocenter c_Isocenter = new Check_Isocenter(pinfo, context);
+            var check_point6 = new CheckScreen_Global(c_Isocenter.Title, c_Isocenter.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            window.AddCheck(check_point6);
+
+
 
             //Put here other class tests. Must be the same as Check_Algorithm class
             ////
