@@ -54,40 +54,64 @@ namespace PlanCheck_IUCT
             Item_Result origin = new Item_Result();
             origin.Label = "Isocentre et origine";
             origin.ExpectedValue = "sans objet";
-
-
-
-            // var originwasChangedTitle = "User Origin Check";
-            //var originwasChangedResult = "OK";
-            //   var originwasChangedComment = "";
             var image = _ctx.PlanSetup.StructureSet.Image;
             if (!image.HasUserOrigin)
             {
                 origin.setToWARNING();
-                //originwasChangedResult = "Warning";
-                //originwasChangedComment += "Origine = Dicom origine";
                 origin.MeasuredValue = "origine = isocentre";
                 origin.Infobulle = "L'origine et l'isocentre sont confondus. Ce qui peut signifier que l'origine n'a pas été placée. A vérifier.";
             }
             else
             {
                 origin.setToTRUE();
-                //originwasChangedResult = "OK";
-                //originwasChangedComment += "origine différente de l'origine DICOM";
                 origin.MeasuredValue = "Origine différente de l'isocentre";
                 origin.Infobulle = "L'origine et l'isocentre ne sont pas confondus. Dans le cas contraire cela peut signifier que l'origine n'a pas été placée";
             }
 
-            //var checkScreenOrigin = new CheckScreen(originwasChangedTitle, originwasChangedResult, originwasChangedComment);
-
-
-
-
-            
-            
-
             this._result.Add(origin);
             #endregion
+
+
+            #region Tous les champs ont le même iso
+            Item_Result allFieldsSameIso = new Item_Result();
+            int numberOfIso = 0;
+            double myx = 999999.0;
+            double myy = 999999.0;
+            double myz = 999999.0;
+            allFieldsSameIso.Label = "Unicité de l'isocentre";
+            allFieldsSameIso.ExpectedValue = "1";
+
+            foreach (Beam b in _ctx.PlanSetup.Beams)
+            {
+                if ((myx != b.IsocenterPosition.x) || (myy != b.IsocenterPosition.y) || (myz != b.IsocenterPosition.z))
+                {
+                    myx = b.IsocenterPosition.x;
+                    myy = b.IsocenterPosition.y;
+                    myz = b.IsocenterPosition.z;
+                    numberOfIso++;
+                }
+            }
+
+
+            if (numberOfIso > 1)
+            {
+                allFieldsSameIso.setToFALSE();
+                allFieldsSameIso.MeasuredValue = "Plusieurs isocentres";
+            }
+            else
+            {
+                allFieldsSameIso.setToTRUE();
+                allFieldsSameIso.MeasuredValue = "Un seul isocentre";
+            }
+
+
+            allFieldsSameIso.Infobulle = "Tous les champs du plan doivent avoir le même isocentre, sauf plan multi-socentres";
+
+
+            this._result.Add(allFieldsSameIso);
+            #endregion
+
+
 
 
         }
