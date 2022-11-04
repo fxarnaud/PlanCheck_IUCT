@@ -108,18 +108,18 @@ namespace PlanCheck_IUCT
                 sexForegroundColor = System.Windows.Media.Brushes.Blue;
                 strPatientDOB = "Né le " + _pinfo.PatientDOB; // for tooltip only
             }
-            PatientFullName = "    "+_pinfo.PatientName + " " + sex + "/" + years.ToString();
+            PatientFullName = _pinfo.PatientName + " " + sex + "/" + years.ToString() ;
             #endregion
             
             #region course and plan ID format:  PlanID (CourseID)
 
-            PlanAndCourseID = "    " + _pinfo.PlanName + " (" + _pinfo.CourseName + ")";
+            PlanAndCourseID =  _pinfo.PlanName + " (" + _pinfo.CourseName + ")" ;
 
             #endregion
             
             #region creator name
 
-            PlanCreatorName = _pinfo.PlanCreator.UserFirstName + " " + _pinfo.PlanCreator.UserFamilyName;
+            PlanCreatorName = "    "+_pinfo.PlanCreator.UserFirstName + " " + _pinfo.PlanCreator.UserFamilyName;
             PlanCreatorBackgroundColor = _pinfo.PlanCreator.UserBackgroundColor;
             PlanCreatorForegroundColor = _pinfo.PlanCreator.UserForeGroundColor;
             #endregion
@@ -133,11 +133,11 @@ namespace PlanCheck_IUCT
             #region doctor in the prescription
             if (_pcontext.PlanSetup.RTPrescription != null)
             {
-                DoctorName = "Dr " + _pinfo.Doctor.UserFamilyName;
+                DoctorName = "    "+ "Dr " + _pinfo.Doctor.UserFamilyName + "    ";
                 DoctorBackgroundColor = _pinfo.Doctor.UserBackgroundColor; //System.Windows.Media.Brushes.DeepPink; // _pinfo.Doctor.DoctorBackgroundColor;
                 DoctorForegroundColor = _pinfo.Doctor.UserForeGroundColor;// System.Windows.Media.Brushes.Wheat; // _pinfo.Doctor.DoctorForeGroundColor;
             }
-            else DoctorName = "Pas de prescripteur";
+            else DoctorName = "    "+ "Pas de prescripteur";
             #endregion
             
             #region prescription comment
@@ -146,7 +146,7 @@ namespace PlanCheck_IUCT
                 prescriptionComment = _pcontext.PlanSetup.RTPrescription.Name;
                 prescriptionComment += " (R" + _pcontext.PlanSetup.RTPrescription.RevisionNumber + "): ";
                 if (_pcontext.PlanSetup.RTPrescription.Notes.Length == 0)
-                    prescriptionComment += "Pas de commentaire dans la presciption.";
+                    prescriptionComment += "Pas de commentaire dans la presciption." ;
                 else
                 {
 
@@ -158,7 +158,7 @@ namespace PlanCheck_IUCT
                 }
             }
             else
-                prescriptionComment = "pas de prescription";
+                prescriptionComment = "pas de prescription" ;
             #endregion
             
             #region machine and fields
@@ -193,6 +193,7 @@ namespace PlanCheck_IUCT
                 
 
             }
+           
             theMachine = "    " + machineName;
 
             #region color the machines first theme
@@ -325,9 +326,9 @@ namespace PlanCheck_IUCT
             #endregion
 
             if (machineName != "TOM")
-                theFields = TreatmentFieldNumber + " champs " + myMLCtype + " et " + setupFieldNumber + " champs de set-up";
+                theFields = TreatmentFieldNumber + " champs " + myMLCtype + " et " + setupFieldNumber + " champs de set-up" ;
             else
-                theFields = "Helicoidal Tomo Field";
+                theFields = "Helicoidal Tomo Field" ;
             //MessageBox.Show(machineAndFields);
             #endregion
             
