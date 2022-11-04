@@ -108,12 +108,12 @@ namespace PlanCheck_IUCT
                 sexForegroundColor = System.Windows.Media.Brushes.Blue;
                 strPatientDOB = "Né le " + _pinfo.PatientDOB; // for tooltip only
             }
-            PatientFullName = _pinfo.PatientName + " " + sex + "/" + years.ToString();
+            PatientFullName = "    "+_pinfo.PatientName + " " + sex + "/" + years.ToString();
             #endregion
             
             #region course and plan ID format:  PlanID (CourseID)
 
-            PlanAndCourseID = _pinfo.PlanName + " (" + _pinfo.CourseName + ")";
+            PlanAndCourseID = "    " + _pinfo.PlanName + " (" + _pinfo.CourseName + ")";
 
             #endregion
             
@@ -122,7 +122,10 @@ namespace PlanCheck_IUCT
             PlanCreatorName = _pinfo.PlanCreator.UserFirstName + " " + _pinfo.PlanCreator.UserFamilyName;
             PlanCreatorBackgroundColor = _pinfo.PlanCreator.UserBackgroundColor;
             PlanCreatorForegroundColor = _pinfo.PlanCreator.UserForeGroundColor;
-            CurrentUserName = _pinfo.CurrentUser.UserFirstName + " " + _pinfo.CurrentUser.UserFamilyName;
+            #endregion
+
+            #region User
+            CurrentUserName = "    " + _pinfo.CurrentUser.UserFirstName + " " + _pinfo.CurrentUser.UserFamilyName;
             CurrentUserBackgroundColor = _pinfo.CurrentUser.UserBackgroundColor;
             CurrentUserForegroundColor = _pinfo.CurrentUser.UserForeGroundColor;
             #endregion
@@ -190,10 +193,10 @@ namespace PlanCheck_IUCT
                 
 
             }
-            theMachine = machineName;
+            theMachine = "    " + machineName;
 
             #region color the machines first theme
-            /*
+            
             // see palette at https://learn.microsoft.com/fr-fr/dotnet/api/system.windows.media.brushes?view=windowsdesktop-6.0
 
             
@@ -227,6 +230,11 @@ namespace PlanCheck_IUCT
                 machineBackgroundColor = "Yellow";
                 machineForegroundColor = "Black";
             }
+            else if (machineName == "NOVA SBRT")
+            {
+                machineBackgroundColor = "Gold";
+                machineForegroundColor = "Blue";
+            }
             else if (machineName == "HALCYON6")
             {
                 machineBackgroundColor = "LightBlue";
@@ -247,11 +255,12 @@ namespace PlanCheck_IUCT
                 machineBackgroundColor = "Gray";
                 machineForegroundColor = "White";
             }
-            */
+            
             #endregion
 
 
             #region color the machines second theme
+            /*
             // see palette at https://learn.microsoft.com/fr-fr/dotnet/api/system.windows.media.brushes?view=windowsdesktop-6.0
 
             String machineBGcolor1 = "Wheat";
@@ -287,6 +296,11 @@ namespace PlanCheck_IUCT
                 machineBackgroundColor = machineBGcolor1;
                 machineForegroundColor = machineFGcolor1;
             }
+            else if (machineName == "NOVA SBRT")
+            {
+                machineBackgroundColor = machineBGcolor1;
+                machineForegroundColor = machineFGcolor1;
+            }
             else if (machineName == "HALCYON6")
             {
                 machineBackgroundColor = machineBGcolor1;
@@ -307,6 +321,7 @@ namespace PlanCheck_IUCT
                 machineBackgroundColor = machineBGcolor1;
                 machineForegroundColor = machineFGcolor1;
             }
+            */
             #endregion
 
             if (machineName != "TOM")

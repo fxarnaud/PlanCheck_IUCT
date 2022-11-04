@@ -5,6 +5,7 @@ using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using VMS.TPS.Common.Model.API;
+using System.Windows;
 
 namespace PlanCheck_IUCT
 {
@@ -56,14 +57,18 @@ namespace PlanCheck_IUCT
             n_um_per_gray = Math.Round(n_um_per_gray / 100, 3);
             um.MeasuredValue = n_um.ToString() + " UM (" + n_um_per_gray + " UM/cGy)";
 
+           // MessageBox.Show(n_um_per_gray.ToString("N2") + myMLCType);
 
-            if (myMLCType == "DoseDynamic")
+            if (myMLCType == "VMAT")
             {
-
+                um.setToTRUE();
                 if (n_um_per_gray > 3.5)
+                    um.setToWARNING();
+                
+                if (n_um_per_gray > 4.5)
                     um.setToFALSE();
-                else
-                    um.setToTRUE();
+
+                
             }
             else
             {
@@ -77,7 +82,7 @@ namespace PlanCheck_IUCT
 
 
 
-            um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT, < 3.5 en VMAT. A noter que pour H8 pelvis on accepte < 4.5 et pour les RA vertebre < 5";
+            um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT. En VMAT warning si > 3.5 et ERREUR si > 4.5. A noter que pour H8 pelvis on accepte < 4.5 et pour les RA vertebre < 5";
 
 
             // um.Infobulle = thereIsAFieldWithaWedge;

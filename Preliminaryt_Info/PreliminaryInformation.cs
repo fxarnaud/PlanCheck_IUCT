@@ -23,6 +23,7 @@ namespace PlanCheck_IUCT
         private IUCT_User _doctor;
         private string _algoname;
         private string _mlctype;
+        
         private string[] calculoptions;
 
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
@@ -45,14 +46,16 @@ namespace PlanCheck_IUCT
             
             calculoptions = new string[ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.Count];
             calculoptions = ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.ToArray();
-           
+
+             
+
             //MessageBox.Show(string.Format("test = {0}", calculoptions[0]));
             //MessageBox.Show(string.Format("test = {0}", calculoptions[1]));
             //_calculationgridsize = calculoptions[0];
             //SELON L'ALGO ON A DES OPTIONS ET UN NOMBRE D'OPTIONS DIFFERENT. METTRE DES IF !
 
             //MessageBox.Show(string.Format("Date image = {0}", ctx.Image.CreationDateTime));         
-           
+
 
         }
 

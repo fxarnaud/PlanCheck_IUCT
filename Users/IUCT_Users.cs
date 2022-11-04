@@ -17,7 +17,7 @@ namespace PlanCheck_IUCT.Users
             #region planners   
             #region color theme 1
             
-            IUCT_User carillo = new IUCT_User() { UserFirstName = "Fabienne", UserFamilyName = "Carillo", Gender = "F", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.Gold, UserForeGroundColor = System.Windows.Media.Brushes.Navy };
+            IUCT_User carillo = new IUCT_User() { UserFirstName = "Fabienne", UserFamilyName = "Carillo", Gender = "F", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.Gold, UserForeGroundColor = System.Windows.Media.Brushes.DeepPink };
             _users_list.Add(carillo);
             IUCT_User recordon = new IUCT_User() { UserFirstName = "Frédérique", UserFamilyName = "Recordon", Gender = "F", Function = "Dosimetriste", UserBackgroundColor = System.Windows.Media.Brushes.Salmon, UserForeGroundColor = System.Windows.Media.Brushes.Navy };
             _users_list.Add(recordon);
@@ -54,7 +54,7 @@ namespace PlanCheck_IUCT.Users
 
             #region physicists
             #region color scheme 1 whith background
-            /*
+            
             IUCT_User arnaud = new IUCT_User() { UserFirstName = "FXavier", UserFamilyName = "Arnaud", Gender = "H",  Function = "Physicien", UserBackgroundColor = System.Windows.Media.Brushes.ForestGreen, UserForeGroundColor = System.Windows.Media.Brushes.Navy };
             _users_list.Add(arnaud);
 
@@ -81,11 +81,11 @@ namespace PlanCheck_IUCT.Users
 
             IUCT_User tournier = new IUCT_User() { UserFirstName = "Aurélie", UserFamilyName = "Tournier", Gender = "F", Function = "Physicien", UserBackgroundColor = System.Windows.Media.Brushes.DarkTurquoise, UserForeGroundColor = System.Windows.Media.Brushes.AntiqueWhite };
             _users_list.Add(tournier);
-            */
+            
             #endregion
 
             #region color scheme 2
-
+            /*
             System.Windows.Media.SolidColorBrush phyBGcolor1 = System.Windows.Media.Brushes.AntiqueWhite;
             System.Windows.Media.SolidColorBrush phyFGcolor1 = System.Windows.Media.Brushes.MidnightBlue;
 
@@ -115,6 +115,7 @@ namespace PlanCheck_IUCT.Users
 
             IUCT_User tournier = new IUCT_User() { UserFirstName = "Aurélie", UserFamilyName = "Tournier", Gender = "F", Function = "Physicien", UserBackgroundColor = phyBGcolor1, UserForeGroundColor = phyFGcolor1 };
             _users_list.Add(tournier);
+            */
             #endregion
             #endregion
 
@@ -128,7 +129,7 @@ namespace PlanCheck_IUCT.Users
             IUCT_User chira = new IUCT_User() { UserFirstName = "Ciprian", UserFamilyName = "Chira", Gender = "H", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.Orange, UserForeGroundColor = System.Windows.Media.Brushes.Black };
             _users_list.Add(chira);
 
-            IUCT_User couarde = new IUCT_User() { UserFirstName = "Laetitia", UserFamilyName = "Couarde", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.DeepPink, UserForeGroundColor = System.Windows.Media.Brushes.AntiqueWhite };
+            IUCT_User couarde = new IUCT_User() { UserFirstName = "Laetitia", UserFamilyName = "Couarde", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.DeepPink, UserForeGroundColor = System.Windows.Media.Brushes.Blue };
             _users_list.Add(couarde);
 
             IUCT_User dalmasso = new IUCT_User() { UserFirstName = "Céline", UserFamilyName = "Dalmasso", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.IndianRed, UserForeGroundColor = System.Windows.Media.Brushes.AntiqueWhite };

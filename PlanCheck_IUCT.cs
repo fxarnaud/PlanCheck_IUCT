@@ -36,7 +36,7 @@ namespace VMS.TPS
                 MessageBox.Show("Ce plan n'est lié à aucune prescription");
             Perform(planSetup, context);
         }
-
+        
         public static void Perform(PlanSetup planSetup, ScriptContext context)
         {
             
