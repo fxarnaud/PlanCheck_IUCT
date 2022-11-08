@@ -21,9 +21,9 @@ using System.Drawing;
 
 namespace PlanCheck_IUCT
 {
-    internal class Check_Algorithm
+    internal class Check_Plan
     {
-        public Check_Algorithm(PreliminaryInformation pinfo, ScriptContext context)  //Constructor
+        public Check_Plan(PreliminaryInformation pinfo, ScriptContext context)  //Constructor
         {
             // _testpartlabel = "Algorithme";
             _pinfo = pinfo;
