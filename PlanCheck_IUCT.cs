@@ -21,6 +21,7 @@ namespace VMS.TPS
 {
     public class Script
     {
+        // this is a test
         public Script()
         {
         }
