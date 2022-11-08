@@ -50,27 +50,6 @@ namespace PlanCheck_IUCT
         {
 
 
-            #region Origine vs Iso
-            Item_Result origin = new Item_Result();
-            origin.Label = "Isocentre et origine";
-            origin.ExpectedValue = "sans objet";
-            var image = _ctx.PlanSetup.StructureSet.Image;
-            if (!image.HasUserOrigin)
-            {
-                origin.setToWARNING();
-                origin.MeasuredValue = "origine = isocentre";
-                origin.Infobulle = "L'origine et l'isocentre sont confondus. Ce qui peut signifier que l'origine n'a pas été placée. A vérifier.";
-            }
-            else
-            {
-                origin.setToTRUE();
-                origin.MeasuredValue = "Origine différente de l'isocentre";
-                origin.Infobulle = "L'origine et l'isocentre ne sont pas confondus. Dans le cas contraire cela peut signifier que l'origine n'a pas été placée";
-            }
-
-            this._result.Add(origin);
-            #endregion
-
 
             #region Tous les champs ont le même iso
             Item_Result allFieldsSameIso = new Item_Result();
@@ -112,6 +91,31 @@ namespace PlanCheck_IUCT
             #endregion
 
 
+
+
+            #region Iso au centre du PTV
+            Item_Result isoAtCenterOfPTV = new Item_Result();
+
+            isoAtCenterOfPTV.Label = "Poisition de l'isocentre"; 
+            isoAtCenterOfPTV.ExpectedValue = "1";
+
+            // position isocentre
+            myx = myx + 0;
+            myy = myy + 0;
+            myz = myz + 0;
+
+            Structure largestPTV = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower().Contains("ptv"));
+                       
+
+            isoAtCenterOfPTV.setToFALSE();
+            isoAtCenterOfPTV.MeasuredValue = "Plusieurs isocentres";
+
+
+            isoAtCenterOfPTV.Infobulle = "Tous les champs du plan doivent avoir le même isocentre, sauf plan multi-isocentres";
+
+
+            this._result.Add(allFieldsSameIso);
+            #endregion
 
 
         }

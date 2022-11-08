@@ -43,7 +43,8 @@ namespace PlanCheck_IUCT
 
 
             //if there is one status false then global result is false and if there is one variation but no false then global status is variation
-            if (_items.Any(i=>i.ResultStatus.Item1 == "X"))
+            /*
+             * if (_items.Any(i=>i.ResultStatus.Item1 == "X"))
             {
                 _globalresult_status = res.False;
             }
@@ -51,6 +52,23 @@ namespace PlanCheck_IUCT
             {
                 _globalresult_status = res.Variation;
             }
+            */
+            int isChecked = 0;
+             _globalresult_status = res.True;
+            foreach (Item_Result i in _items)
+            {
+                if (isChecked == 0)
+                {
+                    if (i.ResultStatus.Item1 == "X")
+                    {
+                        _globalresult_status = res.False;
+                        isChecked = 1;
+                    }
+                    if (i.ResultStatus.Item1 == "WARNING")
+                        _globalresult_status = res.Variation;
+                }
+            }
+
 
             //Fill user control list to display it
             foreach (Item_Result item in _items)

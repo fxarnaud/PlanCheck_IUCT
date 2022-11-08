@@ -58,6 +58,29 @@ namespace PlanCheck_IUCT
             this._result.Add(CT_age);
             #endregion
 
+
+            #region Origine placée
+            Item_Result origin = new Item_Result();
+            origin.Label = "Origine modifiée";
+            origin.ExpectedValue = "sans objet";
+            var image = _context.PlanSetup.StructureSet.Image;
+            if (!image.HasUserOrigin)
+            {
+                origin.setToWARNING();
+                origin.MeasuredValue = "Origine non modifiée";
+                origin.Infobulle = "L'origine est confondue avec l'origine DICOM. Ce qui peut signifier que l'origine n'a pas été placée. A vérifier.";
+            }
+            else
+            {
+                origin.setToTRUE();
+                origin.MeasuredValue = "Origine modifiée";
+                origin.Infobulle = "L'origine n'est pas confondue avec l'origine DICOM. Dans le cas contraire cela peut signifier que l'origine n'a pas été placée";
+            }
+
+            this._result.Add(origin);
+            #endregion
+
+
             #region Epaisseur de coupes
             Item_Result sliceThickness = new Item_Result();
             sliceThickness.Label = "Epaisseur de coupes (mm)";
