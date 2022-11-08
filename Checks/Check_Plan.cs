@@ -34,7 +34,7 @@ namespace PlanCheck_IUCT
         private List<Item_Result> _result = new List<Item_Result>();
         private PreliminaryInformation _pinfo;
         private ScriptContext _pcontext;
-        private string _title = "Algorithme";
+        private string _title = "Plan";
 
         public void Check()
         {
