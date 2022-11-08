@@ -81,7 +81,7 @@ namespace PlanCheck_IUCT.Users
 
             IUCT_User tournier = new IUCT_User() { UserFirstName = "Aurélie", UserFamilyName = "Tournier", Gender = "F", Function = "Physicien", UserBackgroundColor = System.Windows.Media.Brushes.DarkTurquoise, UserForeGroundColor = System.Windows.Media.Brushes.AntiqueWhite };
             _users_list.Add(tournier);
-            
+
             #endregion
 
             #region color scheme 2
@@ -122,6 +122,8 @@ namespace PlanCheck_IUCT.Users
             #region oncologists 
 
             #region color scheme 1
+            IUCT_User undefined = new IUCT_User() { UserFirstName = "indefini", UserFamilyName = "indefini", Gender = "F", Function = "indefini", UserBackgroundColor = doctorBGcolor1, UserForeGroundColor = doctorFGcolor1 };
+            _users_list.Add(undefined);
 
             IUCT_User attal = new IUCT_User() { UserFirstName = "Justine", UserFamilyName = "Attal", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.LightPink, UserForeGroundColor = System.Windows.Media.Brushes.Black };
             _users_list.Add(attal);
@@ -140,6 +142,9 @@ namespace PlanCheck_IUCT.Users
 
             IUCT_User ducassou = new IUCT_User() { UserFirstName = "Anne", UserFamilyName = "Ducassou", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.HotPink, UserForeGroundColor = System.Windows.Media.Brushes.AntiqueWhite };
             _users_list.Add(ducassou);
+
+            IUCT_User glemarec = new IUCT_User() { UserFirstName = "Gauthier", UserFamilyName = "Glemarec", Gender = "H", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.LightCoral, UserForeGroundColor = System.Windows.Media.Brushes.Navy };
+            _users_list.Add(glemarec);
 
             IUCT_User izar = new IUCT_User() { UserFirstName = "Françoise", UserFamilyName = "Izar", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.Yellow, UserForeGroundColor = System.Windows.Media.Brushes.Black };
             _users_list.Add(izar);
