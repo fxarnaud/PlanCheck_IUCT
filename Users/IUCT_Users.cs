@@ -122,7 +122,7 @@ namespace PlanCheck_IUCT.Users
             #region oncologists 
 
             #region color scheme 1
-            IUCT_User undefined = new IUCT_User() { UserFirstName = "indefini", UserFamilyName = "indefini", Gender = "F", Function = "indefini", UserBackgroundColor = doctorBGcolor1, UserForeGroundColor = doctorFGcolor1 };
+            IUCT_User undefined = new IUCT_User() { UserFirstName = "indefini", UserFamilyName = "indefini", Gender = "F", Function = "indefini", UserBackgroundColor = System.Windows.Media.Brushes.White, UserForeGroundColor = System.Windows.Media.Brushes.Black };
             _users_list.Add(undefined);
 
             IUCT_User attal = new IUCT_User() { UserFirstName = "Justine", UserFamilyName = "Attal", Gender = "F", Function = "Radiothérapeute", UserBackgroundColor = System.Windows.Media.Brushes.LightPink, UserForeGroundColor = System.Windows.Media.Brushes.Black };
