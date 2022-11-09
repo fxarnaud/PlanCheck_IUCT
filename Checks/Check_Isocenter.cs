@@ -96,25 +96,79 @@ namespace PlanCheck_IUCT
             #region Iso au centre du PTV
             Item_Result isoAtCenterOfPTV = new Item_Result();
 
-            isoAtCenterOfPTV.Label = "Poisition de l'isocentre"; 
+            isoAtCenterOfPTV.Label = "Position de l'isocentre";
             isoAtCenterOfPTV.ExpectedValue = "1";
+            isoAtCenterOfPTV.setToTRUE();
 
-            // position isocentre
-            myx = myx + 0;
-            myy = myy + 0;
-            myz = myz + 0;
+            // Listing the PTVs
+            List<Structure> ptvlist = new List<Structure>();
+            foreach (Structure s in _ctx.StructureSet.Structures)
+            {
+                if (s.Id.ToLower().Substring(0, 3) == "ptv") // look for structures for which ID starts by "PTV" (i.e. excludes rectum-PTV)
+                {
+                    ptvlist.Add(s);
+                }
+            }
 
-            Structure largestPTV = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToLower().Contains("ptv"));
-                       
+            // looking for max volume PTV
+            double maxVolume = 0.0;
+            Structure maxPTV = null;
+            foreach (Structure s in ptvlist)
+            {
+                if (!s.IsEmpty)
+                    if (s.Volume > maxVolume)
+                    {
+                        maxVolume = s.Volume;
+                        maxPTV = s;
+                    }
+            }
 
-            isoAtCenterOfPTV.setToFALSE();
-            isoAtCenterOfPTV.MeasuredValue = "Plusieurs isocentres";
+            // looking if isocenter is close to the ptv center
+            // Coordinates are in DICOM ref 
 
+            double tolerance = 0.1; // 0.1 means that we expect the isocenter in a region  from + or -10% around the center of PTV
 
-            isoAtCenterOfPTV.Infobulle = "Tous les champs du plan doivent avoir le même isocentre, sauf plan multi-isocentres";
+            double centerPTVxmin = maxPTV.MeshGeometry.Bounds.X + (0.5 - tolerance) * (maxPTV.MeshGeometry.Bounds.SizeX);
+            double centerPTVymin = maxPTV.MeshGeometry.Bounds.Y + (0.5 - tolerance) * (maxPTV.MeshGeometry.Bounds.SizeY);
+            double centerPTVzmin = maxPTV.MeshGeometry.Bounds.Z + (0.5 - tolerance) * (maxPTV.MeshGeometry.Bounds.SizeZ);
 
+            double centerPTVxmax = maxPTV.MeshGeometry.Bounds.X + (0.5 + tolerance) * (maxPTV.MeshGeometry.Bounds.SizeX);
+            double centerPTVymax = maxPTV.MeshGeometry.Bounds.Y + (0.5 + tolerance) * (maxPTV.MeshGeometry.Bounds.SizeY);
+            double centerPTVzmax = maxPTV.MeshGeometry.Bounds.Z + (0.5 + tolerance) * (maxPTV.MeshGeometry.Bounds.SizeZ);
+            int iswrong = 0;
+            if ((myx > centerPTVxmax) || (myx < centerPTVxmin))
+            {
+                
+                iswrong = 1;
+                
+            }
+            if ((myy > centerPTVymax) || (myy < centerPTVymin))
+            {
+                
+                iswrong = 1;
+                
+            }
+            if ((myz > centerPTVzmax) || (myz < centerPTVzmin))
+            {
+                
+                iswrong = 1;
+                
+            }
+            if (iswrong == 1)
+            {
+                isoAtCenterOfPTV.MeasuredValue = " Mauvais positionnement  de l'isocentre dans le " + maxPTV.Id;
+                isoAtCenterOfPTV.setToFALSE();
+            }
+            else
+            {
+                isoAtCenterOfPTV.MeasuredValue = " Isocentre proche du centre de " + maxPTV.Id;
+                isoAtCenterOfPTV.setToTRUE();
+            }
 
-            this._result.Add(allFieldsSameIso);
+            isoAtCenterOfPTV.Infobulle = "L'isocentre doit être proche du centre de " + maxPTV.Id;
+            isoAtCenterOfPTV.Infobulle += "\n(plus grande structure dont les trois premières lettres sont PTV)";
+            isoAtCenterOfPTV.Infobulle += "\navec une tolérance de " + (tolerance*100).ToString("N1") + "% dans chaque direction.";
+            this._result.Add(isoAtCenterOfPTV);
             #endregion
 
 

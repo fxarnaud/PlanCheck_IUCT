@@ -63,7 +63,7 @@ namespace VMS.TPS
                 window.AddCheck(check_point3);           
             }
 
-            Check_Algorithm c_algo = new Check_Algorithm(pinfo,context);
+            Check_Plan c_algo = new Check_Plan(pinfo,context);
             var check_point4 = new CheckScreen_Global(c_algo.Title, c_algo.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point4);
             
@@ -75,9 +75,26 @@ namespace VMS.TPS
             var check_point6 = new CheckScreen_Global(c_Isocenter.Title, c_Isocenter.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point6);
 
+            
+            Check_contours c_Contours = new Check_contours(pinfo, context);
+            var check_point7 = new CheckScreen_Global(c_Contours.Title, c_Contours.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            window.AddCheck(check_point7);
+            
+            Check_beams c_Beams = new Check_beams(pinfo, context);
+            var check_point8 = new CheckScreen_Global(c_Beams.Title, c_Beams.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            window.AddCheck(check_point8);
+
+            Check_doseDistribution c_doseDistribution = new Check_doseDistribution(pinfo, context);
+            var check_point9 = new CheckScreen_Global(c_doseDistribution.Title, c_doseDistribution.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            window.AddCheck(check_point9);
+
+            Check_finalisation c_Finalisation = new Check_finalisation(pinfo, context);
+            var check_point10 = new CheckScreen_Global(c_Finalisation.Title, c_Finalisation.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            window.AddCheck(check_point10);
+            
 
 
-            //Put here other class tests. Must be the same as Check_Algorithm class
+            //Put here other class tests. Must be the same as Check_Plan class
             ////
 
             window.ShowDialog();
