@@ -30,7 +30,7 @@
                                 <Ellipse Grid.Row="0" Grid.Column ="0"  Fill="{Binding DoctorBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left" StrokeThickness="2" Stroke="{Binding DoctorForegroundColor}" ToolTip="couleur RT"/>
 
                                 <!-- PATIENT -->
-                                <TextBlock Grid.Row="0" Grid.Column ="1" FontSize="15" FontWeight="Bold" Text="{Binding PatientFullName}" Background="{Binding sexBackgroundColor}" Foreground="{Binding  sexForegroundColor}" ToolTip="{Binding strPatientDOB}" TextAlignment="Right"></TextBlock>
+                                <TextBlock Grid.Row="0" Grid.Column ="1" FontSize="15" FontWeight="Bold" Text="{Binding PatientFullName}" Background="Wheat" Foreground="{Binding  sexForegroundColor}" ToolTip="{Binding strPatientDOB}" TextAlignment="Right"></TextBlock>
 
                                 <!-- Plan creator -->
                                 <TextBlock  Grid.Row="1" Grid.Column ="0" FontSize="15" Text="{Binding PlanCreatorName}" Background="AntiqueWhite" Foreground="MidnightBlue" ToolTip="créateur du plan"  TextAlignment="Left"></TextBlock>

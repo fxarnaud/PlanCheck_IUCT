@@ -52,17 +52,17 @@ namespace PlanCheck_IUCT
         }
         public void setToFALSE()
         {
-            this.ResultStatus = ("X", new SolidColorBrush(Colors.Red));// .Red ?  fx -- LightSalmon
+            this.ResultStatus = ("X", new SolidColorBrush(Color.FromArgb(200, 255, 50, 50)));// .Red ?  fx -- LightSalmon
         }
         public void setToINFO()
         {
             this.ResultStatus = ("INFO", new SolidColorBrush(Colors.LightYellow));//LightGray
-            }
+        }
         public void setToWARNING()
         {
             this.ResultStatus = ("WARNING", new SolidColorBrush(Colors.LightSalmon)); // .Light Salmon ? LightYellow
-            }
+        }
 
-       
+
     }
 }
