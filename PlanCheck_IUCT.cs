@@ -14,7 +14,8 @@ using System.Runtime.Remoting.Contexts;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Windows.Navigation;
-
+using Excel = Microsoft.Office.Interop.Excel;       
+// Do "Add reference" in reference manager --> COM tab --> Microsoft Excel 16 object
 
 [assembly: AssemblyVersion("1.0.0.1")]
 namespace VMS.TPS
@@ -46,8 +47,64 @@ namespace VMS.TPS
             PreliminaryInformation pinfo = new PreliminaryInformation(context);
            
             //Generate Main Window
-            var window = new MainWindow(planSetup, pinfo,context); //passer pinfo dans main window
-          
+            var window = new MainWindow(planSetup, pinfo,context); //passer pinfo dans main window ...
+
+
+            string pathpath = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\protocole-prostate.xlsx";
+            read_check_protocol _rcp = new read_check_protocol(pathpath);
+
+            #region exemple fx
+
+            /*
+             * bool _DebugMode = false;  //Modify this to debug mode
+
+            var directorypath = @"\\srv015\radiotherapie\SCRIPTS_ECLIPSE\Opt_Structures\";
+            //var directorypath = @"\\srv015\SF_COM\LACAZE T\Opt_Structures\";
+
+            Patient mypatient = context.Patient;
+            mypatient.BeginModifications();   //Mandatory to write in DataBase
+            
+            //   Check if a patient and a structure set is loaded
+            if (context.Patient == null || context.StructureSet == null)
+            {
+                MessageBox.Show("Please load a patient, 3D image, and structure set before running this script.", "Opt_strucutres", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+            }
+
+            //Let the user choose csv file using a browser
+            string file;
+
+            if (!System.IO.Directory.Exists(directorypath))
+            {
+                MessageBox.Show(String.Format("The default template file directory {0} defined by the script does not exist", directorypath));
+                return;
+            }
+            var fileDialog = new Microsoft.Win32.OpenFileDialog();
+            fileDialog.DefaultExt = "csv";
+            fileDialog.InitialDirectory = directorypath;
+            fileDialog.Multiselect = false;
+            fileDialog.Title = "Selection du template a appliquer";
+            fileDialog.ShowReadOnly = true;
+            fileDialog.Filter = "CSV files (*.csv)|*.csv";
+            fileDialog.FilterIndex = 0;
+            fileDialog.CheckFileExists = true;
+            if (fileDialog.ShowDialog() == false)
+            {
+                return;    // user canceled
+            }
+            file = fileDialog.FileName;
+
+            if (!System.IO.File.Exists(file))
+            {
+                MessageBox.Show(string.Format("The template file '{0}' chosen does not exist.", file));
+                return;
+            }         
+            
+            //Reading protocol instructions and detect each bloc 
+            Protocol_Datas protocol_structures = new Protocol_Datas(file, context.StructureSet);
+             */
+            #endregion
+
             Check_Course c_course = new Check_Course(pinfo, context);
             var check_point1 = new CheckScreen_Global(c_course.Title, c_course.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point1);
