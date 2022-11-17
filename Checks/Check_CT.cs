@@ -20,9 +20,10 @@ namespace PlanCheck_IUCT
 {
     internal class Check_CT
     {
-        public Check_CT(PreliminaryInformation pinfo, ScriptContext ctx)  //Constructor
+        public Check_CT(PreliminaryInformation pinfo, ScriptContext ctx, read_check_protocol rcp)  //Constructor
         {
             // _testpartlabel = "Algorithme";
+            _rcp = rcp;
             _context = ctx;
             _pinfo = pinfo;
             Check();
@@ -31,6 +32,7 @@ namespace PlanCheck_IUCT
         private List<Item_Result> _result = new List<Item_Result>();
         private PreliminaryInformation _pinfo;
         private ScriptContext _context;
+        private read_check_protocol _rcp;
         private string _title = "CT";
 
         public void Check()
@@ -84,12 +86,12 @@ namespace PlanCheck_IUCT
             #region Epaisseur de coupes
             Item_Result sliceThickness = new Item_Result();
             sliceThickness.Label = "Epaisseur de coupes (mm)";
-            sliceThickness.ExpectedValue = "2.5";//XXXXX TO GET         
+            sliceThickness.ExpectedValue = _rcp.CTslicewidth.ToString();// "2.5";//XXXXX TO GET         
             sliceThickness.MeasuredValue =  _context.Image.ZRes.ToString();          
             //sliceThickness.Comparator = "=";
             sliceThickness.Infobulle = "L'épaisseur de coupe doit être "+ sliceThickness.ExpectedValue+" comme spécfifié dans le fichier Protocole";
 
-            if(sliceThickness.ExpectedValue == sliceThickness.MeasuredValue)
+            if(_rcp.CTslicewidth == _context.Image.ZRes)
                 sliceThickness.setToTRUE();
             else
                 sliceThickness.setToWARNING();

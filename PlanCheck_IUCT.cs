@@ -51,7 +51,7 @@ namespace VMS.TPS
 
 
             string pathpath = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\protocole-prostate.xlsx";
-            read_check_protocol _rcp = new read_check_protocol(pathpath);
+            read_check_protocol rcp = new read_check_protocol(pathpath);
 
             #region exemple fx
 
@@ -109,7 +109,7 @@ namespace VMS.TPS
             var check_point1 = new CheckScreen_Global(c_course.Title, c_course.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point1);
             
-            Check_CT c_CT = new Check_CT(pinfo, context);
+            Check_CT c_CT = new Check_CT(pinfo, context, rcp);
             var check_point2 = new CheckScreen_Global(c_CT.Title, c_CT.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point2);
             

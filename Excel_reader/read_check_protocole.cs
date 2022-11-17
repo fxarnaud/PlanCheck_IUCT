@@ -22,7 +22,7 @@ namespace PlanCheck_IUCT
 {
     public class read_check_protocol
     {
-
+        private double _CTslicewidth;
         public read_check_protocol(string pathToProtocolCheck)  //Constructor
         {
 
@@ -35,21 +35,33 @@ namespace PlanCheck_IUCT
             Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(pathToProtocolCheck);
 
             // open the sheet 1
-            Excel._Worksheet xlWorksheet = xlWorkbook.Sheets[1];
-            
-            // get the cells
-            Excel.Range xlRange = xlWorksheet.UsedRange;
+            Excel._Worksheet xlWorksheet1 = xlWorkbook.Sheets[1];           
+            // get the cells 1
+            Excel.Range xlRange1 = xlWorksheet1.UsedRange;
 
-            // open the sheet 1
+            // open the sheet 2
             Excel._Worksheet xlWorksheet2 = xlWorkbook.Sheets[2];
-            // get the cells
+            // get the cells 2
             Excel.Range xlRange2 = xlWorksheet2.UsedRange;
 
-            
-            //MessageBox.Show(xlRange.Cells[2, 2].Value2.ToString() + "\t");
+            // open the sheet 3
+            Excel._Worksheet xlWorksheet3 = xlWorkbook.Sheets[3];
+            // get the cells 3
+            Excel.Range xlRange3 = xlWorksheet3.UsedRange;
+
+
+
+            _CTslicewidth = xlRange1.Cells[2, 2].Value2;
+            //MessageBox.Show(CTslicewidth.ToString());
+            // Exemple de lecture de cellules 1
+            //MessageBox.Show(xlRange1.Cells[2, 2].Value2.ToString() + "\t");
             //MessageBox.Show(xlRange2.Cells[2, 2].Value2.ToString() + "\t");
+
             //excel is not zero based!!
-         /*   for (int i = 1; i <= 2; i++)
+
+
+            // Exemple de lecture de cellules 2
+            /*   for (int i = 1; i <= 2; i++)
             {
                 for (int j = 1; j <= 2; j++)
                 {
@@ -67,13 +79,22 @@ namespace PlanCheck_IUCT
             //cleanup excel
             GC.Collect();
             GC.WaitForPendingFinalizers();
-            Marshal.ReleaseComObject(xlRange);
-            Marshal.ReleaseComObject(xlWorksheet);
+            Marshal.ReleaseComObject(xlRange1);
+            Marshal.ReleaseComObject(xlRange2);
+            Marshal.ReleaseComObject(xlRange3);
+            Marshal.ReleaseComObject(xlWorksheet1);
+            Marshal.ReleaseComObject(xlWorksheet2);
+            Marshal.ReleaseComObject(xlWorksheet3);
             xlWorkbook.Close();
             Marshal.ReleaseComObject(xlWorkbook);
             xlApp.Quit();
             Marshal.ReleaseComObject(xlApp);
 
         }
+        public double CTslicewidth
+        {
+            get { return _CTslicewidth; }
+        }
+
     }
 }
