@@ -5,7 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PlanCheck_IUCT"
         mc:Ignorable="d"
-        Title="PlanCheck_IUCT" Height="900" Width="1400">
+        Title="PlanCheck_IUCT"
+        WindowState="Maximized">
+    <!--  Background="Aquamarine" -->
+    <!-- Title="PlanCheck_IUCT" Height="900" Width="1400" /-->
     <Grid>
         <ScrollViewer>
             <StackPanel  Orientation="Vertical">
