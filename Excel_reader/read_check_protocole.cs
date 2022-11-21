@@ -22,20 +22,24 @@ namespace PlanCheck_IUCT
 {
     public class read_check_protocol
     {
+        private string _protocolName;
         private double _CTslicewidth;
+        private string _algoName;
+        private double _gridsize;
+        private List<string> _optionComp = new List<string>();
         public read_check_protocol(string pathToProtocolCheck)  //Constructor
         {
 
 
-
+            #region open xls file, get the cells
             // open excel
             Excel.Application xlApp = new Excel.Application();
-           
+
             // open file
             Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(pathToProtocolCheck);
 
             // open the sheet 1
-            Excel._Worksheet xlWorksheet1 = xlWorkbook.Sheets[1];           
+            Excel._Worksheet xlWorksheet1 = xlWorkbook.Sheets[1];
             // get the cells 1
             Excel.Range xlRange1 = xlWorksheet1.UsedRange;
 
@@ -48,19 +52,36 @@ namespace PlanCheck_IUCT
             Excel._Worksheet xlWorksheet3 = xlWorkbook.Sheets[3];
             // get the cells 3
             Excel.Range xlRange3 = xlWorksheet3.UsedRange;
+            #endregion
 
-
-
+            _protocolName = xlRange1.Cells[1, 2].Value2;
             _CTslicewidth = xlRange1.Cells[2, 2].Value2;
-            //MessageBox.Show(CTslicewidth.ToString());
-            // Exemple de lecture de cellules 1
+            _algoName = xlRange1.Cells[3, 2].Value2;
+            int optnumber = 3;
+            //string[] optionComp = null;
+            String tempo1;
+            String tempo2;
+            while (xlRange1.Cells[3, optnumber].Text != "") // parse the excel line from col 3 to first empty cell
+            {
+                tempo1 = xlRange1.Cells[3, optnumber].Text;
+                tempo2 = tempo1.Replace(',','.');// replace , by .
+                _optionComp.Add(tempo2);
+                
+                optnumber++;
+            }
+
+            _gridsize = xlRange1.Cells[4, 2].Value2;
+
+
+
+
+            #region Exemple de lecture de cellules 1
+            //excel is not zero based!!
             //MessageBox.Show(xlRange1.Cells[2, 2].Value2.ToString() + "\t");
             //MessageBox.Show(xlRange2.Cells[2, 2].Value2.ToString() + "\t");
+            #endregion
 
-            //excel is not zero based!!
-
-
-            // Exemple de lecture de cellules 2
+            #region Exemple de lecture de cellules 2
             /*   for (int i = 1; i <= 2; i++)
             {
                 for (int j = 1; j <= 2; j++)
@@ -76,7 +97,9 @@ namespace PlanCheck_IUCT
                     //add useful things here!   
                 }
             }*/
-            //cleanup excel
+            #endregion
+
+            #region cleanup excel
             GC.Collect();
             GC.WaitForPendingFinalizers();
             Marshal.ReleaseComObject(xlRange1);
@@ -89,11 +112,28 @@ namespace PlanCheck_IUCT
             Marshal.ReleaseComObject(xlWorkbook);
             xlApp.Quit();
             Marshal.ReleaseComObject(xlApp);
+            #endregion
 
         }
         public double CTslicewidth
         {
             get { return _CTslicewidth; }
+        }
+        public string protocolName
+        {
+            get { return _protocolName; }
+        }
+        public string algoName
+        {
+            get { return _algoName; }
+        }
+        public double gridSize
+        {
+            get { return _gridsize; }
+        }
+        public List<string> optionComp
+        {
+            get { return _optionComp; }
         }
 
     }

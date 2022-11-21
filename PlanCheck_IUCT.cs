@@ -120,7 +120,7 @@ namespace VMS.TPS
                 window.AddCheck(check_point3);           
             }
 
-            Check_Plan c_algo = new Check_Plan(pinfo,context);
+            Check_Plan c_algo = new Check_Plan(pinfo,context,rcp);
             var check_point4 = new CheckScreen_Global(c_algo.Title, c_algo.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point4);
             

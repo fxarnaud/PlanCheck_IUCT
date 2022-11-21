@@ -89,7 +89,7 @@ namespace PlanCheck_IUCT
             sliceThickness.ExpectedValue = _rcp.CTslicewidth.ToString();// "2.5";//XXXXX TO GET         
             sliceThickness.MeasuredValue =  _context.Image.ZRes.ToString();          
             //sliceThickness.Comparator = "=";
-            sliceThickness.Infobulle = "L'épaisseur de coupe doit être "+ sliceThickness.ExpectedValue+" comme spécfifié dans le fichier Protocole";
+            sliceThickness.Infobulle = "L'épaisseur de coupe doit être "+ sliceThickness.ExpectedValue+" mm comme spécfifié dans le fichier Protocole: " + _rcp.protocolName;
 
             if(_rcp.CTslicewidth == _context.Image.ZRes)
                 sliceThickness.setToTRUE();
