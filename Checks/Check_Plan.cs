@@ -41,6 +41,7 @@ namespace PlanCheck_IUCT
         {
             Comparator testing = new Comparator();
 
+  
             #region Nom de l'algo
             Item_Result algo_name = new Item_Result();
             algo_name.Label = "Algorithme de calcul";
@@ -48,6 +49,7 @@ namespace PlanCheck_IUCT
             algo_name.MeasuredValue = _pinfo.AlgoName;
             algo_name.Comparator = "=";
             algo_name.Infobulle = "Algorithme attendu pour le protocole " + _rcp.protocolName + " : " + algo_name.ExpectedValue;
+            algo_name.Infobulle += "\nLes options de calcul ne sont pas vérifiées si l'algorithme n'est pas celui attendu";
             algo_name.ResultStatus = testing.CompareDatas(algo_name.ExpectedValue, algo_name.MeasuredValue, algo_name.Comparator);
             this._result.Add(algo_name);
             #endregion
@@ -63,42 +65,49 @@ namespace PlanCheck_IUCT
             this._result.Add(algo_grid);
             #endregion
 
-            #region LES OPTIONS DE CALCUL
-            Item_Result options = new Item_Result();
-            options.Label = "Autres options du modèle de calcul";
+
             
-            options.ExpectedValue = "N/A";// TO GET IN PRTOCOLE
-
-            options.Comparator = "=";
-           
-            int optionsAreOK = 1;
-            int myOpt = 0;
-            foreach (string s in _pinfo.Calculoptions)
+            #region LES OPTIONS DE CALCUL
+            if (algo_name.ResultStatus.Item1 != "X")// options are not checked if the algo is not the same
             {
-               
-                if (s != _rcp.optionComp[myOpt]) // if one computation option is different test is error
+                Item_Result options = new Item_Result();
+                options.Label = "Autres options du modèle de calcul";
+
+                options.ExpectedValue = "N/A";// TO GET IN PRTOCOLE
+
+                options.Comparator = "=";
+
+                int optionsAreOK = 1;
+                int myOpt = 0;
+
+                foreach (string s in _pinfo.Calculoptions)
                 {
-                    options.Infobulle = "Une option de calcul est différente du protocole " + _rcp.protocolName;
-                    options.MeasuredValue = s + " (options de calcul du plan) vs. " + _rcp.optionComp[myOpt]+ " (attendu pour ce protocole) ";
-                    optionsAreOK = 0;
+                    if (s != _rcp.optionComp[myOpt]) // if one computation option is different test is error
+                    {
+                        options.Infobulle = "Une option de calcul est différente du protocole " + _rcp.protocolName;
+                        options.MeasuredValue = s + " (options de calcul du plan) vs. " + _rcp.optionComp[myOpt] + " (attendu pour ce protocole) ";
+                        optionsAreOK = 0;
+                    }
+                    myOpt++;
                 }
-                myOpt++;
-            }
-            if (optionsAreOK == 0)
-            {
-                options.setToFALSE();
-            }
-            else
-            {
-                options.setToTRUE();
-                options.Infobulle = "Les " + myOpt + " options du modèle calcul sont en accord avec le protocole: " + _rcp.protocolName;
-                options.MeasuredValue = "OK";
 
-            }
+                if (optionsAreOK == 0)
+                {
+                    options.setToFALSE();
+                }
+                else
+                {
+                    options.setToTRUE();
+                    options.Infobulle = "Les " + myOpt + " options du modèle calcul sont en accord avec le protocole: " + _rcp.protocolName;
+                    options.MeasuredValue = "OK";
 
-            this._result.Add(options);
+                }
+
+                this._result.Add(options);
+            }
             #endregion
 
+  
         }
 
 

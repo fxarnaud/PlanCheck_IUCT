@@ -43,10 +43,12 @@ namespace PlanCheck_IUCT
                 {
                     if (b.Meterset.Value < 20.0)
                         if (b.Wedges.Count() > 0)
-                            uncorrFieldWithaWedge++;//= b.Id;
-                    if (b.Meterset.Value < 10.0)
-                        FieldWithLessThan10UM++;// = b.Id;
-
+                            uncorrFieldWithaWedge++;
+                    if (b.Meterset.Value < 9.5)
+                    {
+                        FieldWithLessThan10UM++;
+                        //MessageBox.Show(b.Id + b.Meterset.Value.ToString());
+                    }
                     myMLCType = b.MLCPlanType.ToString();
                     n_um = n_um + Math.Round(b.Meterset.Value, 1);
                 }

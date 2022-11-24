@@ -87,11 +87,11 @@ namespace PlanCheck_IUCT
             Item_Result sliceThickness = new Item_Result();
             sliceThickness.Label = "Epaisseur de coupes (mm)";
             sliceThickness.ExpectedValue = _rcp.CTslicewidth.ToString();// "2.5";//XXXXX TO GET         
-            sliceThickness.MeasuredValue =  _context.Image.ZRes.ToString();          
+            sliceThickness.MeasuredValue = _context.Image.ZRes.ToString();
             //sliceThickness.Comparator = "=";
-            sliceThickness.Infobulle = "L'épaisseur de coupe doit être "+ sliceThickness.ExpectedValue+" mm comme spécfifié dans le fichier Protocole: " + _rcp.protocolName;
+            sliceThickness.Infobulle = "L'épaisseur de coupe doit être " + sliceThickness.ExpectedValue + " mm comme spécfifié dans le fichier Protocole: " + _rcp.protocolName;
 
-            if(_rcp.CTslicewidth == _context.Image.ZRes)
+            if (_rcp.CTslicewidth == _context.Image.ZRes)
                 sliceThickness.setToTRUE();
             else
                 sliceThickness.setToWARNING();
@@ -105,12 +105,12 @@ namespace PlanCheck_IUCT
             Item_Result HUcurve = new Item_Result();
             String courbeHU = _context.Image.Series.ImagingDeviceId;
             String expectedHUcurve;
-            
+
             if ((myToday - (DateTime)_context.Patient.DateOfBirth).Days < (14 * 365))
                 expectedHUcurve = "Scan_IUC_100kV";
             else
                 expectedHUcurve = "TDMRT";
-            
+
             HUcurve.Label = "Courbe HU";
             HUcurve.ExpectedValue = expectedHUcurve;
             HUcurve.MeasuredValue = courbeHU;
@@ -136,7 +136,7 @@ namespace PlanCheck_IUCT
             #endregion
 
             #region date dans le nom imaged 3d
-            
+
             Item_Result image3Dnaming = new Item_Result();
 
             image3Dnaming.Label = "Nom de l'image 3D";
@@ -144,20 +144,30 @@ namespace PlanCheck_IUCT
             // get the CT date in format: ddmmyy
             String imageDate = ((DateTime)_context.Image.CreationDateTime).ToString("dd");
             imageDate += ((DateTime)_context.Image.CreationDateTime).ToString("MM");
-            imageDate += ((DateTime)_context.Image.CreationDateTime).ToString("yy");       
+            imageDate += ((DateTime)_context.Image.CreationDateTime).ToString("yy");
+
+            // get the CT date in format: ddmmyyyy
+            String imageDate2 = ((DateTime)_context.Image.CreationDateTime).ToString("dd");
+            imageDate2 += ((DateTime)_context.Image.CreationDateTime).ToString("MM");
+            imageDate2 += ((DateTime)_context.Image.CreationDateTime).ToString("yyyy");
+
 
             if (_context.Image.Id.Contains(imageDate))
             {
-                image3Dnaming.setToTRUE();                
+                image3Dnaming.setToTRUE();
+            }
+            else if (_context.Image.Id.Contains(imageDate2))
+            {
+                image3Dnaming.setToTRUE();
             }
             else
             {
-                image3Dnaming.setToWARNING();                
+                image3Dnaming.setToWARNING();
             }
 
             image3Dnaming.ExpectedValue = imageDate;
             image3Dnaming.MeasuredValue = _context.Image.Id;
-             image3Dnaming.Infobulle = "Le nom de l'image 3D doit contenir la date du CT au format jjmmaa ("+imageDate+")";
+            image3Dnaming.Infobulle = "Le nom de l'image 3D doit contenir la date du CT au format jjmmaa (" + imageDate + ") ou jjmmaaa";
             //image3Dnaming.ResultStatus = testing.CompareDatas(image3Dnaming.ExpectedValue, image3Dnaming.MeasuredValue, image3Dnaming.Comparator);
             //image3Dnaming.Comparator = "=";
             this._result.Add(image3Dnaming);

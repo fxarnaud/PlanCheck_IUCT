@@ -33,6 +33,25 @@ namespace PlanCheck_IUCT
         public void Check()
         {
 
+            #region ACTUAL COURSE
+            Item_Result currentCourseStatus = new Item_Result();
+            currentCourseStatus.Label = "Course " + _ctx.Course.Id + " (Course ouvert)";
+            currentCourseStatus.ExpectedValue = "EN COURS";
+            if (_ctx.Course.CompletedDateTime == null)
+            {
+                currentCourseStatus.MeasuredValue = "EN COURS";
+                currentCourseStatus.setToTRUE();
+            }
+            else
+            {
+                currentCourseStatus.MeasuredValue = "TERMINE";
+                currentCourseStatus.setToFALSE();
+            }
+            currentCourseStatus.Infobulle = "L'état du course actuel doit être EN COURS";
+            this._result.Add(currentCourseStatus);
+            #endregion
+
+
             #region Plan approuvé ? 
             Item_Result approve = new Item_Result();
             approve.Label = "Statut d'approbation du plan";
@@ -67,33 +86,15 @@ namespace PlanCheck_IUCT
             #endregion
 
 
-            #region ACTUAL COURSE
-            Item_Result currentCourseStatus = new Item_Result();
-            currentCourseStatus.Label = "Course " + _ctx.Course.Id +" (Course ouvert)";
-            currentCourseStatus.ExpectedValue = "EN COURS";
-            if (_ctx.Course.CompletedDateTime == null)
-            {
-                currentCourseStatus.MeasuredValue = "EN COURS";
-                currentCourseStatus.setToTRUE();
-            }
-            else
-            {
-                currentCourseStatus.MeasuredValue = "TERMINE";
-                currentCourseStatus.setToFALSE();
-            }
-            currentCourseStatus.Infobulle = "L'état du course actuel doit être EN COURS";
-            this._result.Add(currentCourseStatus);
-            #endregion
-
             #region other courses
             foreach (Course courseN in _ctx.Patient.Courses) // loop on the courses
             {
                 Item_Result myCourseStatus = new Item_Result();
                 myCourseStatus.ExpectedValue = "TERMINE";
                 //myCourseStatus.Comparator = "=";
-                myCourseStatus.Infobulle = "OK si TERMINE ou si course avec plan CQ en cours depuis < " + maxNumberOfDays + " jours";
-                myCourseStatus.Infobulle += "\nWARNING si ne contient pas de plan CQ et en cours depuis < " + maxNumberOfDays;
-                myCourseStatus.Infobulle += "\nErreur sinon (en cours depuis > "+ maxNumberOfDays + " jours)";
+                myCourseStatus.Infobulle = "Les courses doivent être TERMINE ou, si ils contiennent un plan CQ, en cours depuis < " + maxNumberOfDays + " jours";
+                myCourseStatus.Infobulle += "\nWARNING si le course est en cours depuis moins de "+ maxNumberOfDays + " jours et ne contient pas de plan CQ " ;
+                myCourseStatus.Infobulle += "\nErreur si le course est en cours depuis > "+ maxNumberOfDays + " jours";
                 //Comparator testing = new Comparator();
                 myCourseStatus.Label = "Autre course : " + courseN.Id;
 
@@ -127,7 +128,7 @@ namespace PlanCheck_IUCT
                             else
                             {
                                 myCourseStatus.setToTRUE();
-                                myCourseStatus.MeasuredValue = "Contient un plan CQ < " + nDays.ToString() + " jours";
+                                myCourseStatus.MeasuredValue = "En cours depuis  " + nDays.ToString() + " jours (plan CQ)";
                             }
                         }
                         else
@@ -144,6 +145,8 @@ namespace PlanCheck_IUCT
                     }
             }
             #endregion
+
+
         }
         public string Title
         {

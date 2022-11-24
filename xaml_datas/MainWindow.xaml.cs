@@ -108,18 +108,18 @@ namespace PlanCheck_IUCT
                 sexForegroundColor = System.Windows.Media.Brushes.Blue;
                 strPatientDOB = "Né le " + _pinfo.PatientDOB; // for tooltip only
             }
-            PatientFullName = _pinfo.PatientName + " " + sex + "/" + years.ToString() ;
+            PatientFullName = _pinfo.PatientName + " " + sex + "/" + years.ToString();
             #endregion
-            
+
             #region course and plan ID format:  PlanID (CourseID)
 
-            PlanAndCourseID =  _pinfo.PlanName + " (" + _pinfo.CourseName + ")" ;
+            PlanAndCourseID = _pinfo.PlanName + " (" + _pinfo.CourseName + ")";
 
             #endregion
-            
+
             #region creator name
 
-            PlanCreatorName = "    "+_pinfo.PlanCreator.UserFirstName + " " + _pinfo.PlanCreator.UserFamilyName;
+            PlanCreatorName = "    " + _pinfo.PlanCreator.UserFirstName + " " + _pinfo.PlanCreator.UserFamilyName;
             PlanCreatorBackgroundColor = _pinfo.PlanCreator.UserBackgroundColor;
             PlanCreatorForegroundColor = _pinfo.PlanCreator.UserForeGroundColor;
             #endregion
@@ -129,24 +129,24 @@ namespace PlanCheck_IUCT
             CurrentUserBackgroundColor = _pinfo.CurrentUser.UserBackgroundColor;
             CurrentUserForegroundColor = _pinfo.CurrentUser.UserForeGroundColor;
             #endregion
-            
+
             #region doctor in the prescription
             if (_pcontext.PlanSetup.RTPrescription != null)
             {
-                DoctorName = "    "+ "Dr " + _pinfo.Doctor.UserFamilyName + "    ";
+                DoctorName = "    " + "Dr " + _pinfo.Doctor.UserFamilyName + "    ";
                 DoctorBackgroundColor = _pinfo.Doctor.UserBackgroundColor; //System.Windows.Media.Brushes.DeepPink; // _pinfo.Doctor.DoctorBackgroundColor;
                 DoctorForegroundColor = _pinfo.Doctor.UserForeGroundColor;// System.Windows.Media.Brushes.Wheat; // _pinfo.Doctor.DoctorForeGroundColor;
             }
-            else DoctorName = "    "+ "Pas de prescripteur";
+            else DoctorName = "    " + "Pas de prescripteur";
             #endregion
-            
+
             #region prescription comment
             if (_pcontext.PlanSetup.RTPrescription != null)
             {
                 prescriptionComment = _pcontext.PlanSetup.RTPrescription.Name;
                 prescriptionComment += " (R" + _pcontext.PlanSetup.RTPrescription.RevisionNumber + "): ";
                 if (_pcontext.PlanSetup.RTPrescription.Notes.Length == 0)
-                    prescriptionComment += "Pas de commentaire dans la presciption." ;
+                    prescriptionComment += "Pas de commentaire dans la presciption.";
                 else
                 {
 
@@ -158,49 +158,63 @@ namespace PlanCheck_IUCT
                 }
             }
             else
-                prescriptionComment = "pas de prescription" ;
+                prescriptionComment = "pas de prescription";
             #endregion
-            
+
             #region machine and fields
             String machineName = null;
-            String myMLCtype = null;
+            String treatmentType = null;
             int setupFieldNumber = 0;
             int TreatmentFieldNumber = 0;
             //String monTypeMLC = null;
             foreach (Beam b in _pcontext.PlanSetup.Beams)
             {
 
-                if (b.IsSetupField)
+                if (b.IsSetupField)  // count set up
                 {
-                    
                     setupFieldNumber++;
                 }
                 else
                 {
-                    if(b.Technique.Id == "STATIC")
-                       myMLCtype = "RTC" ;
-                    else
-                        myMLCtype = "VMAT";
                     TreatmentFieldNumber++;
                     machineName = b.TreatmentUnit.Id;
 
-                    if (b.MLCPlanType.ToString() == "Static")
-                        myMLCtype += " (MLC fixe)";
-                    else
-                        myMLCtype += " (MLC dynamique)";
+
+                    if (b.MLCPlanType.ToString() == "VMAT")
+                    {
+                        treatmentType = "VMAT";
+                        
+                    }
+                    else if (b.MLCPlanType.ToString() == "ArcDynamic")
+                        treatmentType = "DCA";
+                    else if (b.MLCPlanType.ToString() == "DoseDynamic")
+                        treatmentType = "IMRT";
+                    else if (b.MLCPlanType.ToString() == "Static")
+                        treatmentType = "RTC (MLC)";
+                    else if (b.MLCPlanType.ToString() == "NotDefined")
+                    {
+                        if (b.Technique.Id == "STATIC")  // can be TOMO, Electrons or 3DCRT without MLC
+                        {
+                            if (machineName == "TOM")
+                                treatmentType = "Tomotherapy";
+                            else if (b.EnergyModeDisplayName.Contains("E"))
+                                treatmentType = "Electrons";
+                            else
+                                treatmentType = "RTC (sans MLC)";
+                        }
+                        else
+                            treatmentType = "Technique non statique inconnue : pas de MLC !";
+                    }
                 }
-
-                
-
             }
-           
+
             theMachine = "    " + machineName;
 
             #region color the machines first theme
-            
+
             // see palette at https://learn.microsoft.com/fr-fr/dotnet/api/system.windows.media.brushes?view=windowsdesktop-6.0
 
-            
+
             if (machineName == "V4")
             {
                 machineBackgroundColor = "PowderBlue";
@@ -256,82 +270,24 @@ namespace PlanCheck_IUCT
                 machineBackgroundColor = "Gray";
                 machineForegroundColor = "White";
             }
-            
+
             #endregion
 
 
-            #region color the machines second theme
-            /*
-            // see palette at https://learn.microsoft.com/fr-fr/dotnet/api/system.windows.media.brushes?view=windowsdesktop-6.0
-
-            String machineBGcolor1 = "Wheat";
-            String machineFGcolor1 = "Black";
-
-            if (machineName == "V4")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else if (machineName == "TOM")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else if (machineName == "TOMO2")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else if (machineName == "NOVA3")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else if (machineName == "TOMO4")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else if (machineName == "NOVA5")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else if (machineName == "NOVA SBRT")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else if (machineName == "HALCYON6")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else if (machineName == "TOMO7")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else if (machineName == "HALCYON8")
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            else
-            {
-                machineBackgroundColor = machineBGcolor1;
-                machineForegroundColor = machineFGcolor1;
-            }
-            */
-            #endregion
 
             if (machineName != "TOM")
-                theFields = TreatmentFieldNumber + " champs " + myMLCtype + " et " + setupFieldNumber + " champs de set-up" ;
+            {
+                if (TreatmentFieldNumber == 1)
+                    theFields = treatmentType + " : " + TreatmentFieldNumber + " champ + " + setupFieldNumber + " set-up";
+                else
+                    theFields = treatmentType + " : " + TreatmentFieldNumber + " champs + " + setupFieldNumber + " set-up";
+                // theFields = TreatmentFieldNumber + " champs " + treatmentType + " et " + setupFieldNumber + " champs de set-up" ;
+            }
             else
-                theFields = "Helicoidal Tomo Field" ;
+                theFields = "Tomotherapy";
             //MessageBox.Show(machineAndFields);
             #endregion
-            
+
             #region other infos
             //Plans infos
             CalculationOptions = _plan.PhotonCalculationOptions.Select(e => e.Key + " : " + e.Value);
@@ -340,7 +296,7 @@ namespace PlanCheck_IUCT
             OptimizationModel = _plan.GetCalculationModel(CalculationType.PhotonVMATOptimization);
             ListChecks = new List<UserControl>();
             #endregion
-            
+
         }
         public void AddCheck(UserControl checkScreen)
         {

@@ -5,6 +5,8 @@ using System.Runtime.Remoting.Contexts;
 using System.Text;
 using System.Threading.Tasks;
 using VMS.TPS.Common.Model.API;
+using System.Windows;
+using System.Windows.Navigation;
 
 namespace PlanCheck_IUCT
 {
@@ -12,11 +14,12 @@ namespace PlanCheck_IUCT
     {
         private ScriptContext _ctx;
         private PreliminaryInformation _pinfo;
-
-        public Check_beams(PreliminaryInformation pinfo, ScriptContext ctx)  //Constructor
+        private read_check_protocol _rcp;
+        public Check_beams(PreliminaryInformation pinfo, ScriptContext ctx, read_check_protocol rcp)  //Constructor
         {
             _ctx = ctx;
             _pinfo = pinfo;
+            _rcp = rcp;
             Check();
 
         }
@@ -28,16 +31,27 @@ namespace PlanCheck_IUCT
         public void Check()
         {
 
-            #region A FAIRE ? 
-            Item_Result approve = new Item_Result();
-            approve.Label = "en cours";
-            approve.ExpectedValue = "EN COURS";
+            #region Technique 
+            Item_Result technique = new Item_Result();
+            string myTech = null;
+            bool differentTech = false;
+            foreach (Beam b in _ctx.PlanSetup.Beams)
+                if (!b.IsSetupField)
+                    if (myTech == null)
+                        myTech = b.Technique.Id; // first beam technique
+                    else if (myTech != b.Technique.Id)
+                        differentTech = true; // check if there are several technique
 
-            approve.setToTRUE();
-            approve.MeasuredValue = "en cours";// "Différent de Planning Approved";
 
-            approve.Infobulle = "en cours";
-            this._result.Add(approve);
+
+            technique.Label = "Technique";
+            technique.ExpectedValue = "NA";
+
+            technique.setToTRUE();
+            technique.MeasuredValue = myTech;// "Différent de Planning Approved";
+
+            technique.Infobulle = "en cours";
+            this._result.Add(technique);
             #endregion
 
 

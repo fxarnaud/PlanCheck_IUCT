@@ -26,7 +26,13 @@ namespace PlanCheck_IUCT
         private double _CTslicewidth;
         private string _algoName;
         private double _gridsize;
+
         private List<string> _optionComp = new List<string>();
+
+        private String _prescriptionPercentage;
+        private String _normalisationMode;
+
+        
         public read_check_protocol(string pathToProtocolCheck)  //Constructor
         {
 
@@ -57,6 +63,8 @@ namespace PlanCheck_IUCT
             _protocolName = xlRange1.Cells[1, 2].Value2;
             _CTslicewidth = xlRange1.Cells[2, 2].Value2;
             _algoName = xlRange1.Cells[3, 2].Value2;
+            
+            
             int optnumber = 3;
             //string[] optionComp = null;
             String tempo1;
@@ -72,6 +80,8 @@ namespace PlanCheck_IUCT
 
             _gridsize = xlRange1.Cells[4, 2].Value2;
 
+            _prescriptionPercentage = xlRange1.Cells[5, 2].Text;
+            _normalisationMode = xlRange1.Cells[6, 2].Text;
 
 
 
@@ -135,6 +145,13 @@ namespace PlanCheck_IUCT
         {
             get { return _optionComp; }
         }
-
+        public string prescriptionPercentage
+        {
+            get { return _prescriptionPercentage; }
+        }
+        public string normalisationMode
+        {
+            get { return _normalisationMode; }
+        }
     }
 }

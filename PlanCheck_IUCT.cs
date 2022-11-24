@@ -29,14 +29,33 @@ namespace VMS.TPS
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void Execute(ScriptContext context)
         {
-            if (context == null) 
-                MessageBox.Show("Merci de charger un plan");
+            bool validPlanWithDoseisLoaded = true;
+
+            if(context == null)
+            {
+               MessageBox.Show("Merci de charger un plan");
+               validPlanWithDoseisLoaded = false;
+            }
+
             var planSetup = context.PlanSetup;
-            if (planSetup == null) 
+            if(planSetup == null)
+            {
                 MessageBox.Show("Merci de charger un plan");
-            if(planSetup.RTPrescription == null)
-                MessageBox.Show("Ce plan n'est lié à aucune prescription");
-            Perform(planSetup, context);
+                validPlanWithDoseisLoaded = false;
+            }
+            if(!planSetup.IsDoseValid)
+            {
+                MessageBox.Show("Merci de charger un plan avec une dose");
+                validPlanWithDoseisLoaded = false;
+            }
+
+            if (planSetup.RTPrescription == null)
+                MessageBox.Show("Ce plan n'est lié à aucune prescription"); // run anyway even if there is no prescription
+
+//            throw new ApplicationException("Please load an external beam plan that will be verified.");
+            if(validPlanWithDoseisLoaded)
+                Perform(planSetup, context);
+       
         }
         
         public static void Perform(PlanSetup planSetup, ScriptContext context)
@@ -52,6 +71,9 @@ namespace VMS.TPS
 
             string pathpath = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\protocole-prostate.xlsx";
             read_check_protocol rcp = new read_check_protocol(pathpath);
+
+
+           // MessageBox.Show("INFO READ");
 
             #region exemple fx
 
@@ -112,22 +134,25 @@ namespace VMS.TPS
             Check_CT c_CT = new Check_CT(pinfo, context, rcp);
             var check_point2 = new CheckScreen_Global(c_CT.Title, c_CT.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point2);
-            
+
+ 
             if (planSetup.RTPrescription != null)
             {
-                Check_Prescription c_prescri = new Check_Prescription(pinfo, context);
+                Check_Prescription c_prescri = new Check_Prescription(pinfo, context,rcp);
                 var check_point3 = new CheckScreen_Global(c_prescri.Title, c_prescri.Result);
                 window.AddCheck(check_point3);           
             }
 
-            Check_Plan c_algo = new Check_Plan(pinfo,context,rcp);
+            Check_Plan c_algo = new Check_Plan(pinfo,context,rcp);            
             var check_point4 = new CheckScreen_Global(c_algo.Title, c_algo.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point4);
             
+
             Check_UM c_UM = new Check_UM(pinfo, context);
             var check_point5 = new CheckScreen_Global(c_UM.Title, c_UM.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point5);
-
+            
+  
             Check_Isocenter c_Isocenter = new Check_Isocenter(pinfo, context);
             var check_point6 = new CheckScreen_Global(c_Isocenter.Title, c_Isocenter.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point6);
@@ -137,9 +162,10 @@ namespace VMS.TPS
             var check_point7 = new CheckScreen_Global(c_Contours.Title, c_Contours.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point7);
             
-            Check_beams c_Beams = new Check_beams(pinfo, context);
+            Check_beams c_Beams = new Check_beams(pinfo, context,rcp);
             var check_point8 = new CheckScreen_Global(c_Beams.Title, c_Beams.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point8);
+            
 
             Check_doseDistribution c_doseDistribution = new Check_doseDistribution(pinfo, context);
             var check_point9 = new CheckScreen_Global(c_doseDistribution.Title, c_doseDistribution.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite

@@ -18,11 +18,12 @@ namespace PlanCheck_IUCT
     {
         private ScriptContext _ctx;
         private PreliminaryInformation _pinfo;
-
-        public Check_Prescription(PreliminaryInformation pinfo, ScriptContext ctx)  //Constructor
+        private read_check_protocol _rcp;
+        public Check_Prescription(PreliminaryInformation pinfo, ScriptContext ctx, read_check_protocol rcp)  //Constructor
         {
             _ctx = ctx;
             _pinfo = pinfo;
+            _rcp = rcp;
             Check();
 
         }
@@ -75,7 +76,7 @@ namespace PlanCheck_IUCT
                 }
             }
 
-            fractionation.Label = "Fractionnement de la cible principal (" + PrescriptionName + ")";
+            fractionation.Label = "Fractionnement de la cible principale (" + PrescriptionName + ")";
             fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction + " Gy";
             fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.Dose.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
 
@@ -89,6 +90,81 @@ namespace PlanCheck_IUCT
                 " : " + nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
             this._result.Add(fractionation);
             #endregion
+
+
+            // pas réussi à attraper le % dans la prescription (que dans le plan)
+            #region POURCENTAGE DE LA PRESCRIPTION
+
+            Item_Result percentage = new Item_Result();
+            double myTreatPercentage = _ctx.PlanSetup.TreatmentPercentage;
+            myTreatPercentage = 100 * myTreatPercentage;
+            percentage.Label = "Pourcentage de traitement";
+            percentage.ExpectedValue = _rcp.prescriptionPercentage;
+            percentage.MeasuredValue = myTreatPercentage.ToString() + "%";
+            if (percentage.ExpectedValue == percentage.MeasuredValue)
+                percentage.setToTRUE();
+            else
+                percentage.setToFALSE();
+            percentage.Infobulle = "Le pourcentage de traitement (onglet Dose) doit être en accord avec";
+            percentage.Infobulle += "\nla valeur de pourcentage du protocole " + _rcp.protocolName + " (" + _rcp.prescriptionPercentage + ")";
+            this._result.Add(percentage);
+            #endregion
+
+
+
+            #region NORMALISATION DU PLAN
+            Item_Result normalisation = new Item_Result();
+            //string normMethod = _ctx.PlanSetup.PlanNormalizationMethod;
+            normalisation.Label = "Mode de normalisation du plan";
+            normalisation.ExpectedValue = _rcp.normalisationMode;
+            normalisation.MeasuredValue = _ctx.PlanSetup.PlanNormalizationMethod;
+
+            if (normalisation.MeasuredValue.Contains("volume")) // si le mode de normalisation contient le mot volume
+            {
+                if (normalisation.ExpectedValue == normalisation.MeasuredValue)
+                    normalisation.setToTRUE();
+                else
+                    normalisation.setToFALSE();
+
+                normalisation.MeasuredValue += ": " + _ctx.PlanSetup.TargetVolumeID; // afficher ce volume
+
+            }
+            if (normalisation.MeasuredValue.Contains("point"))
+            {
+                if (normalisation.MeasuredValue.Contains("100% au point de référence"))
+                {
+                    if (normalisation.ExpectedValue.Contains("100% au point de référence"))
+                        normalisation.setToTRUE();
+                    else
+                        normalisation.setToFALSE();
+
+                    if (normalisation.MeasuredValue.Contains("principal"))
+                        normalisation.MeasuredValue += " (" + _ctx.PlanSetup.PrimaryReferencePoint.Id + ")";
+
+                }
+                else
+                {
+                    normalisation.setToFALSE();
+                }
+            }
+
+                //if (normMethod == "100.00% couvre 50.00% du volume cible")
+                //  normalisation.MeasuredValue = normMethod + " au " + _ctx.PlanSetup.TargetVolumeID;
+                //else if (normMethod == "100% au point de référence principal")
+                //  normalisation.MeasuredValue = normMethod + " au point " + _ctx.PlanSetup.PrimaryReferencePoint.Id;
+
+
+
+                normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le protocole. Cet item est en WARNING si Aucune normalisation";
+
+
+
+            if (normalisation.MeasuredValue == "Aucune normalisation de plan")
+                normalisation.setToWARNING();
+
+            this._result.Add(normalisation);
+            #endregion
+
 
             #region LISTE DES CIBLES DE LA PRESCRIPTION
             Item_Result prescriptionVolumes = new Item_Result();
@@ -105,52 +181,12 @@ namespace PlanCheck_IUCT
             }
 
             prescriptionVolumes.ExpectedValue = "info";
-            prescriptionVolumes.Label = " "+targetNumber + " cible(s) dans la prescription : ";
+            prescriptionVolumes.Label = " " + targetNumber + " cible(s) dans la prescription : ";
             prescriptionVolumes.setToINFO();
-            
+
             this._result.Add(prescriptionVolumes);
 
             #endregion
-
-            // pas réussi à attraper le % dans la prescription (que dans le plan)
-            #region POURCENTAGE DE LA PRESCRIPTION
-
-            Item_Result percentage = new Item_Result();
-            double myTreatPercentage = _ctx.PlanSetup.TreatmentPercentage;
-            myTreatPercentage = 100 * myTreatPercentage;
-            percentage.Label = "Pourcentage de traitement";
-            percentage.ExpectedValue = "VOIR PROTOCOLE";
-            //MessageBox.Show("toto " + percentage.ExpectedValue);
-            percentage.MeasuredValue = myTreatPercentage.ToString() + "%";
-            percentage.setToINFO(); // 
-            percentage.Infobulle = "Le pourcentage de traitement (onglet Dose) doit être en accord avec la prescription ou le protocole";
-            this._result.Add(percentage);
-            #endregion
-
-
-            #region NORMALISATION DU PLAN
-            Item_Result normalisation = new Item_Result();
-            string normMethod = _ctx.PlanSetup.PlanNormalizationMethod;
-            normalisation.Label = "Mode de normalisation du plan";
-            normalisation.ExpectedValue = "VOIR PROTOCOLE";
-            normalisation.MeasuredValue = normMethod;
-
-            if (normMethod == "100.00% couvre 50.00% du volume cible")
-                normalisation.MeasuredValue = normMethod + " au " + _ctx.PlanSetup.TargetVolumeID;
-            else if (normMethod == "100% au point de référence principal")
-                normalisation.MeasuredValue = normMethod + " au point " + _ctx.PlanSetup.PrimaryReferencePoint.Id;
-
-            if (normMethod == "Aucune normalisation de plan")
-                normalisation.setToWARNING();
-            else
-                normalisation.setToINFO();
-
-
-
-            normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le protocole. Cet item est en WARNING si Aucune normalisation";
-            this._result.Add(normalisation);
-            #endregion 
-
 
         }
         public string Title
