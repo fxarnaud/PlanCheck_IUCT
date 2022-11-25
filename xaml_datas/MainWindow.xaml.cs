@@ -46,14 +46,11 @@ namespace PlanCheck_IUCT
         public Color UserColor { get; set; }
         public string theMachine { get; set; }
         public string theFields { get; set; }
-        public string theProtocol { get; set; }
-        
+        public string theProtocol { get; set; }        
         public string myFullFilename { get; set; }
         public string PhotonModel { get; set; }
         public IEnumerable<string> CalculationOptions { get; set; }
-
         public string OptimizationModel { get; set; }
-
         public List<UserControl> ListChecks { get; set; }
 
         #endregion
@@ -66,9 +63,11 @@ namespace PlanCheck_IUCT
             _pinfo = pinfo;
             _plan = pcontext.PlanSetup;
             _pcontext = pcontext;
-            theProtocol = "ma valeur par défaut";
-            myFullFilename = "default_path";
 
+           // myFullFilename = getIntelligentDefaultValue(_pcontext);
+
+            myFullFilename = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocol\prostate.xlsx"; //default_path";
+            theProtocol = "Check-protocol: prostate";
 
             FillHeaderInfos(); //Filling datas binded to xaml
 
@@ -304,11 +303,11 @@ namespace PlanCheck_IUCT
         }
         private void Choose_file_button_Click(object sender, RoutedEventArgs e)
         {
-            
+            OK_button.IsEnabled = true;
             //String myFileName;
             var fileDialog = new Microsoft.Win32.OpenFileDialog();
             fileDialog.DefaultExt = "xlsx";
-            fileDialog.InitialDirectory = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocole\";
+            fileDialog.InitialDirectory = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocol\";
             if (!Directory.Exists(fileDialog.InitialDirectory))
             {
                 MessageBox.Show(fileDialog.InitialDirectory + "n'existe pas.");
@@ -316,7 +315,7 @@ namespace PlanCheck_IUCT
             }
 
             fileDialog.Multiselect = false;
-            fileDialog.Title = "Selection du protocole";
+            fileDialog.Title = "Selection du check-protocol";
             fileDialog.ShowReadOnly = true;
             fileDialog.Filter = "XLSX files (*.xlsx)|*.xlsx";
             fileDialog.FilterIndex = 0;
@@ -328,16 +327,16 @@ namespace PlanCheck_IUCT
             myFullFilename = fileDialog.FileName; // full absolute path                                                  
             if (!System.IO.File.Exists(myFullFilename))
             {
-                MessageBox.Show(string.Format("Le protocole '{0}'  n'existe pas ", theProtocol));
+                MessageBox.Show(string.Format("Le check-protocol '{0}'  n'existe pas ", theProtocol));
                 return;
             }
             //myFileName = Path.GetFileName(myFullFilename); // a method to get the file name only
-            theProtocol = Path.GetFileNameWithoutExtension(myFullFilename);// a method to get the file name only (ne extension)
+            theProtocol = "Check-protocol: "+Path.GetFileNameWithoutExtension(myFullFilename);// a method to get the file name only (ne extension)
             defaultProtocol.Text = theProtocol; // refresh display of default value
         }
         private void OK_button_click(object sender, RoutedEventArgs e)
         {
-
+            OK_button.IsEnabled = false;// Visibility.Collapsed;
             read_check_protocol rcp = new read_check_protocol(myFullFilename);
 
 
@@ -392,7 +391,8 @@ namespace PlanCheck_IUCT
             var check_point10 = new CheckScreen_Global(c_Finalisation.Title, c_Finalisation.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point10);
             #endregion
-            OK_button.Visibility = Visibility.Collapsed;
+
+            
             CheckList.Visibility = Visibility.Visible;
 
         }

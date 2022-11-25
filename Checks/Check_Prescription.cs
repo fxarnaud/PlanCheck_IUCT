@@ -106,7 +106,7 @@ namespace PlanCheck_IUCT
             else
                 percentage.setToFALSE();
             percentage.Infobulle = "Le pourcentage de traitement (onglet Dose) doit être en accord avec";
-            percentage.Infobulle += "\nla valeur de pourcentage du protocole " + _rcp.protocolName + " (" + _rcp.prescriptionPercentage + ")";
+            percentage.Infobulle += "\nla valeur de pourcentage du check-protocol " + _rcp.protocolName + " (" + _rcp.prescriptionPercentage + ")";
             this._result.Add(percentage);
             #endregion
 
@@ -155,7 +155,7 @@ namespace PlanCheck_IUCT
 
 
 
-                normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le protocole. Cet item est en WARNING si Aucune normalisation";
+                normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le check-protocol. Cet item est en WARNING si Aucune normalisation";
 
 
 

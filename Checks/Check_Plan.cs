@@ -48,7 +48,7 @@ namespace PlanCheck_IUCT
             algo_name.ExpectedValue = _rcp.algoName;
             algo_name.MeasuredValue = _pinfo.AlgoName;
             algo_name.Comparator = "=";
-            algo_name.Infobulle = "Algorithme attendu pour le protocole " + _rcp.protocolName + " : " + algo_name.ExpectedValue;
+            algo_name.Infobulle = "Algorithme attendu pour le check-protocol " + _rcp.protocolName + " : " + algo_name.ExpectedValue;
             algo_name.Infobulle += "\nLes options de calcul ne sont pas vérifiées si l'algorithme n'est pas celui attendu";
             algo_name.ResultStatus = testing.CompareDatas(algo_name.ExpectedValue, algo_name.MeasuredValue, algo_name.Comparator);
             this._result.Add(algo_name);
@@ -60,7 +60,7 @@ namespace PlanCheck_IUCT
             algo_grid.ExpectedValue = _rcp.gridSize.ToString();//"1.25";// TO GET IN PRTOCOLE
             algo_grid.MeasuredValue = _pcontext.PlanSetup.Dose.XRes.ToString();
             algo_grid.Comparator = "=";
-            algo_grid.Infobulle = "Grille de calcul attendue pour le protocole " + _rcp.protocolName + " " + algo_grid.ExpectedValue + " mm";
+            algo_grid.Infobulle = "Grille de calcul attendue pour le check-protocol " + _rcp.protocolName + " " + algo_grid.ExpectedValue + " mm";
             algo_grid.ResultStatus = testing.CompareDatas(algo_grid.ExpectedValue, algo_grid.MeasuredValue, algo_grid.Comparator);
             this._result.Add(algo_grid);
             #endregion
@@ -84,8 +84,8 @@ namespace PlanCheck_IUCT
                 {
                     if (s != _rcp.optionComp[myOpt]) // if one computation option is different test is error
                     {
-                        options.Infobulle = "Une option de calcul est différente du protocole " + _rcp.protocolName;
-                        options.MeasuredValue = s + " (options de calcul du plan) vs. " + _rcp.optionComp[myOpt] + " (attendu pour ce protocole) ";
+                        options.Infobulle = "Une option de calcul est différente du check-protocol " + _rcp.protocolName;
+                        options.MeasuredValue = s + " (options de calcul du plan) vs. " + _rcp.optionComp[myOpt] + " (attendu pour ce check-protocol) ";
                         optionsAreOK = 0;
                     }
                     myOpt++;
@@ -98,7 +98,7 @@ namespace PlanCheck_IUCT
                 else
                 {
                     options.setToTRUE();
-                    options.Infobulle = "Les " + myOpt + " options du modèle calcul sont en accord avec le protocole: " + _rcp.protocolName;
+                    options.Infobulle = "Les " + myOpt + " options du modèle calcul sont en accord avec le check-protocol: " + _rcp.protocolName;
                     options.MeasuredValue = "OK";
 
                 }
