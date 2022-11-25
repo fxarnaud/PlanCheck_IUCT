@@ -72,8 +72,9 @@ namespace VMS.TPS
             string pathpath = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocole\protocole-prostate.xlsx";
             read_check_protocol rcp = new read_check_protocol(pathpath);
 
+            // marche pas: 
+            // read_check_protocol rcp = new read_check_protocol(window.myFullFilename);
 
-           // MessageBox.Show("INFO READ");
 
             #region exemple fx
 

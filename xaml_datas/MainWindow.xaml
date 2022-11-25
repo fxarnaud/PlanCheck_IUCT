@@ -93,7 +93,7 @@
                 </StackPanel>
 
                 <StackPanel>
-                    <ListView HorizontalAlignment="Center" x:Name="CheckList">
+                    <ListView HorizontalAlignment="Center" x:Name="CheckList" Visibility="Hidden">
                     </ListView>
                 </StackPanel>
             </StackPanel>

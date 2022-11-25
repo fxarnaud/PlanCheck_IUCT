@@ -34,6 +34,7 @@ namespace PlanCheck_IUCT
             #region Technique 
             Item_Result technique = new Item_Result();
             string myTech = null;
+            /* comment to be finsish 
             bool differentTech = false;
             foreach (Beam b in _ctx.PlanSetup.Beams)
                 if (!b.IsSetupField)
@@ -42,7 +43,7 @@ namespace PlanCheck_IUCT
                     else if (myTech != b.Technique.Id)
                         differentTech = true; // check if there are several technique
 
-
+            */
 
             technique.Label = "Technique";
             technique.ExpectedValue = "NA";

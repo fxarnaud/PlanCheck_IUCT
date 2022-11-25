@@ -47,6 +47,8 @@ namespace PlanCheck_IUCT
         public string theMachine { get; set; }
         public string theFields { get; set; }
         public string theProtocol { get; set; }
+        
+        public string myFullFilename { get; set; }
         public string PhotonModel { get; set; }
         public IEnumerable<string> CalculationOptions { get; set; }
 
@@ -56,7 +58,7 @@ namespace PlanCheck_IUCT
 
         #endregion
 
-
+        
 
         public MainWindow(PlanSetup plan, PreliminaryInformation pinfo, ScriptContext pcontext) //Constructeur
         {
@@ -298,13 +300,11 @@ namespace PlanCheck_IUCT
         }
         private void Choose_file_button_Click(object sender, RoutedEventArgs e)
         {
-            String myFullFilename;
-            String myFileName;
+            
+            //String myFileName;
             var fileDialog = new Microsoft.Win32.OpenFileDialog();
             fileDialog.DefaultExt = "xlsx";
             fileDialog.InitialDirectory = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocole\";
-
-
             if (!Directory.Exists(fileDialog.InitialDirectory))
             {
                 MessageBox.Show(fileDialog.InitialDirectory + "n'existe pas.");
@@ -321,34 +321,20 @@ namespace PlanCheck_IUCT
             {
                 return;    // user canceled
             }
-            myFullFilename = fileDialog.FileName; // full absolute path
-                                                  
+            myFullFilename = fileDialog.FileName; // full absolute path                                                  
             if (!System.IO.File.Exists(myFullFilename))
             {
                 MessageBox.Show(string.Format("Le protocole '{0}'  n'existe pas ", theProtocol));
                 return;
             }
-            myFileName = Path.GetFileName(myFullFilename); // a method to get the file name only
+            //myFileName = Path.GetFileName(myFullFilename); // a method to get the file name only
             theProtocol = Path.GetFileNameWithoutExtension(myFullFilename);// a method to get the file name only (ne extension)
-
-            MessageBox.Show("file is " + theProtocol);
-            
-           
-            defaultProtocol.Text = theProtocol;
-            /*
-            //Instance main class for comparison.
-            ResultsGenerator checkgenerator = new ResultsGenerator(_context);
-            _totalresults = checkgenerator.GenerateResults(_pinfo);
-            //Calling function to display results
-            GenerateAndFillListViews();*/
+            defaultProtocol.Text = theProtocol; // refresh display of default value
         }
         private void OK_button_click(object sender, RoutedEventArgs e)
-        {/*
-            //Instance main class for comparison.
-            ResultsGenerator checkgenerator = new ResultsGenerator(_context);
-            _totalresults = checkgenerator.GenerateResults(_pinfo);
-            //Calling function to display results
-            GenerateAndFillListViews();*/
+        {
+            CheckList.Visibility = Visibility.Visible;
+
         }
     }
 }
