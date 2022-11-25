@@ -60,20 +60,24 @@ namespace PlanCheck_IUCT
 
         
 
-        public MainWindow(PlanSetup plan, PreliminaryInformation pinfo, ScriptContext pcontext) //Constructeur
+        public MainWindow(PreliminaryInformation pinfo, ScriptContext pcontext) //Constructeur
         {
             DataContext = this;
             _pinfo = pinfo;
-            _plan = plan;
+            _plan = pcontext.PlanSetup;
             _pcontext = pcontext;
             theProtocol = "ma valeur par défaut";
+            myFullFilename = "default_path";
 
-            //Filling datas binded to xaml
-            FillPreliminarytInfos();
-            InitializeComponent();
+
+            FillHeaderInfos(); //Filling datas binded to xaml
+
+            InitializeComponent(); // not clear what is done here
+           
+
         }
 
-        public void FillPreliminarytInfos()
+        public void FillHeaderInfos()
         {
             //Patient, plan and others infos to bind to xml
 
@@ -333,6 +337,62 @@ namespace PlanCheck_IUCT
         }
         private void OK_button_click(object sender, RoutedEventArgs e)
         {
+
+            read_check_protocol rcp = new read_check_protocol(myFullFilename);
+
+
+            #region THE CHECKS
+            Check_Course c_course = new Check_Course(_pinfo, _pcontext);
+            var check_point1 = new CheckScreen_Global(c_course.Title, c_course.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+           // window.AddCheck(check_point1);
+            this.AddCheck(check_point1);
+
+
+            Check_CT c_CT = new Check_CT(_pinfo, _pcontext, rcp);
+            var check_point2 = new CheckScreen_Global(c_CT.Title, c_CT.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            this.AddCheck(check_point2);
+
+
+            if (_pcontext.PlanSetup.RTPrescription != null)
+            {
+                Check_Prescription c_prescri = new Check_Prescription(_pinfo, _pcontext, rcp);
+                var check_point3 = new CheckScreen_Global(c_prescri.Title, c_prescri.Result);
+                this.AddCheck(check_point3);
+            }
+
+            Check_Plan c_algo = new Check_Plan(_pinfo, _pcontext, rcp);
+            var check_point4 = new CheckScreen_Global(c_algo.Title, c_algo.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            this.AddCheck(check_point4);
+
+
+            Check_UM c_UM = new Check_UM(_pinfo, _pcontext);
+            var check_point5 = new CheckScreen_Global(c_UM.Title, c_UM.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            this.AddCheck(check_point5);
+
+
+            Check_Isocenter c_Isocenter = new Check_Isocenter(_pinfo, _pcontext);
+            var check_point6 = new CheckScreen_Global(c_Isocenter.Title, c_Isocenter.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            this.AddCheck(check_point6);
+
+
+            Check_contours c_Contours = new Check_contours(_pinfo, _pcontext);
+            var check_point7 = new CheckScreen_Global(c_Contours.Title, c_Contours.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            this.AddCheck(check_point7);
+
+            Check_beams c_Beams = new Check_beams(_pinfo, _pcontext, rcp);
+            var check_point8 = new CheckScreen_Global(c_Beams.Title, c_Beams.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            this.AddCheck(check_point8);
+
+
+            Check_doseDistribution c_doseDistribution = new Check_doseDistribution(_pinfo, _pcontext);
+            var check_point9 = new CheckScreen_Global(c_doseDistribution.Title, c_doseDistribution.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            this.AddCheck(check_point9);
+
+            Check_finalisation c_Finalisation = new Check_finalisation(_pinfo, _pcontext);
+            var check_point10 = new CheckScreen_Global(c_Finalisation.Title, c_Finalisation.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
+            this.AddCheck(check_point10);
+            #endregion
+            OK_button.Visibility = Visibility.Collapsed;
             CheckList.Visibility = Visibility.Visible;
 
         }

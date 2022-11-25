@@ -29,105 +29,59 @@ namespace VMS.TPS
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void Execute(ScriptContext context)
         {
-            bool validPlanWithDoseisLoaded = true;
 
+            #region check if a plan with dose is loaded
+            bool validPlanWithDoseisLoaded = true;
             if(context == null)
             {
                MessageBox.Show("Merci de charger un plan");
                validPlanWithDoseisLoaded = false;
             }
-
-            var planSetup = context.PlanSetup;
-            if(planSetup == null)
+           
+            if(context.PlanSetup == null)
             {
                 MessageBox.Show("Merci de charger un plan");
                 validPlanWithDoseisLoaded = false;
             }
-            if(!planSetup.IsDoseValid)
+            if(!context.PlanSetup.IsDoseValid)
             {
                 MessageBox.Show("Merci de charger un plan avec une dose");
                 validPlanWithDoseisLoaded = false;
             }
 
-            if (planSetup.RTPrescription == null)
+            if (context.PlanSetup.RTPrescription == null)
                 MessageBox.Show("Ce plan n'est lié à aucune prescription"); // run anyway even if there is no prescription
+            #endregion
 
-//            throw new ApplicationException("Please load an external beam plan that will be verified.");
-            if(validPlanWithDoseisLoaded)
-                Perform(planSetup, context);
+            
+            if (validPlanWithDoseisLoaded)
+                Perform(context);
        
         }
         
-        public static void Perform(PlanSetup planSetup, ScriptContext context)
+        public static void Perform(ScriptContext context)
         {
-            // 
+            
+            var planSetup = context.PlanSetup;
+            
+            PreliminaryInformation pinfo = new PreliminaryInformation(context);    //Get Plan information...      
 
-            //Get Plan information...
-            PreliminaryInformation pinfo = new PreliminaryInformation(context);
-           
-            //Generate Main Window
-            var window = new MainWindow(planSetup, pinfo,context); //passer pinfo dans main window ...
+            var window = new MainWindow(pinfo,context); //passer pinfo dans main window ...
+
+            window.ShowDialog(); /// AFFICHE LA FENETRE
 
 
-            string pathpath = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocole\protocole-prostate.xlsx";
-            read_check_protocol rcp = new read_check_protocol(pathpath);
+
+            //string pathpath = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocole\protocole-prostate.xlsx";
+            //read_check_protocol rcp = new read_check_protocol(pathpath);
 
             // marche pas: 
             // read_check_protocol rcp = new read_check_protocol(window.myFullFilename);
+            
 
 
-            #region exemple fx
-
+            #region Liste des checks
             /*
-             * bool _DebugMode = false;  //Modify this to debug mode
-
-            var directorypath = @"\\srv015\radiotherapie\SCRIPTS_ECLIPSE\Opt_Structures\";
-            //var directorypath = @"\\srv015\SF_COM\LACAZE T\Opt_Structures\";
-
-            Patient mypatient = context.Patient;
-            mypatient.BeginModifications();   //Mandatory to write in DataBase
-            
-            //   Check if a patient and a structure set is loaded
-            if (context.Patient == null || context.StructureSet == null)
-            {
-                MessageBox.Show("Please load a patient, 3D image, and structure set before running this script.", "Opt_strucutres", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-                return;
-            }
-
-            //Let the user choose csv file using a browser
-            string file;
-
-            if (!System.IO.Directory.Exists(directorypath))
-            {
-                MessageBox.Show(String.Format("The default template file directory {0} defined by the script does not exist", directorypath));
-                return;
-            }
-            var fileDialog = new Microsoft.Win32.OpenFileDialog();
-            fileDialog.DefaultExt = "csv";
-            fileDialog.InitialDirectory = directorypath;
-            fileDialog.Multiselect = false;
-            fileDialog.Title = "Selection du template a appliquer";
-            fileDialog.ShowReadOnly = true;
-            fileDialog.Filter = "CSV files (*.csv)|*.csv";
-            fileDialog.FilterIndex = 0;
-            fileDialog.CheckFileExists = true;
-            if (fileDialog.ShowDialog() == false)
-            {
-                return;    // user canceled
-            }
-            file = fileDialog.FileName;
-
-            if (!System.IO.File.Exists(file))
-            {
-                MessageBox.Show(string.Format("The template file '{0}' chosen does not exist.", file));
-                return;
-            }         
-            
-            //Reading protocol instructions and detect each bloc 
-            Protocol_Datas protocol_structures = new Protocol_Datas(file, context.StructureSet);
-             */
-            #endregion
-
             Check_Course c_course = new Check_Course(pinfo, context);
             var check_point1 = new CheckScreen_Global(c_course.Title, c_course.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point1);
@@ -175,13 +129,11 @@ namespace VMS.TPS
             Check_finalisation c_Finalisation = new Check_finalisation(pinfo, context);
             var check_point10 = new CheckScreen_Global(c_Finalisation.Title, c_Finalisation.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             window.AddCheck(check_point10);
-            
+            */
+            #endregion
 
+            //window.ShowDialog(); /// AFFICHE LA FENETRE
 
-            //Put here other class tests. Must be the same as Check_Plan class
-            ////
-
-            window.ShowDialog();
         }
     }
 }

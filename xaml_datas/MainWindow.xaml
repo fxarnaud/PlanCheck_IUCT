@@ -81,7 +81,7 @@
                            
                             <Button Grid.Row="0" Grid.Column ="1" x:Name="Verif_button" Content="Modifier..." Width="110" Height="32" Click="Choose_file_button_Click" RenderTransformOrigin="-0.734,0.136"/>
 
-                            <Button Grid.Row="0" Grid.Column ="2" x:Name="Verif_button3" Content="OK" Width="110" Height="32" Click="OK_button_click" RenderTransformOrigin="-0.734,0.136"/>
+                            <Button Grid.Row="0" Grid.Column ="2" x:Name="OK_button" Content="OK" Width="110" Height="32" Click="OK_button_click" RenderTransformOrigin="-0.734,0.136"/>
 
                         </Grid>
                     </Border>
