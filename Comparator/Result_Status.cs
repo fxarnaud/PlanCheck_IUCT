@@ -16,7 +16,7 @@ namespace PlanCheck_IUCT
         (string, SolidColorBrush) _true = ("OK", new SolidColorBrush(Colors.LightGreen));
         (string, SolidColorBrush) _false = ("X", new SolidColorBrush(Color.FromArgb(200, 255, 50, 50))); // used to be red
         (string, SolidColorBrush) _variation = ("WARNING", new SolidColorBrush(Colors.LightSalmon));
-        (string, SolidColorBrush) _informatif = ("INFORMATIF", new SolidColorBrush(Colors.LightYellow));
+        (string, SolidColorBrush) _INFO = ("INFO", new SolidColorBrush(Colors.LightYellow));
 
 
 
@@ -32,9 +32,9 @@ namespace PlanCheck_IUCT
         {
             get { return _variation; }
         }
-        public (string, SolidColorBrush) Informatif
+        public (string, SolidColorBrush) INFO
         {
-            get { return _informatif; }
+            get { return _INFO; }
         }
     }
 }

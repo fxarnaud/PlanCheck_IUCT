@@ -26,7 +26,7 @@ namespace PlanCheck_IUCT
 
         private List<Item_Result> _result = new List<Item_Result>();
         // private PreliminaryInformation _pinfo;
-        private string _title = "Faisceaux";
+        private string _title = "Faisceaux (en cours)";
 
         public void Check()
         {
@@ -48,8 +48,8 @@ namespace PlanCheck_IUCT
             technique.Label = "Technique";
             technique.ExpectedValue = "NA";
 
-            technique.setToTRUE();
-            technique.MeasuredValue = myTech;// "Différent de Planning Approved";
+            technique.setToINFO();
+            technique.MeasuredValue = "pas encore de test (en cours)";// myTech;// "Différent de Planning Approved";
 
             technique.Infobulle = "en cours";
             this._result.Add(technique);

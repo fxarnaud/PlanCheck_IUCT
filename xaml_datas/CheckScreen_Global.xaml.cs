@@ -54,21 +54,40 @@ namespace PlanCheck_IUCT
             }
             */
             int isChecked = 0;
+            int nTrue = 0;
+            int nFalse = 0;
+            int nWarning = 0;
+            int nInfo = 0;
+
              _globalresult_status = res.True;
-            foreach (Item_Result i in _items)
+            foreach (Item_Result i in _items)                                 
             {
+                if (i.ResultStatus.Item1 == "X") nFalse++;
+                if (i.ResultStatus.Item1 == "WARNING") nWarning++;
+                if (i.ResultStatus.Item1 == "OK") nTrue++;
+                if (i.ResultStatus.Item1 == "INFO") nInfo++;
+/*
                 if (isChecked == 0)
                 {
                     if (i.ResultStatus.Item1 == "X")
                     {
-                        _globalresult_status = res.False;
+                       _globalresult_status = res.False;
                         isChecked = 1;
                     }
                     if (i.ResultStatus.Item1 == "WARNING")
                         _globalresult_status = res.Variation;
-                }
+                    if (i.ResultStatus.Item1 == "INFO")
+                        _globalresult_status = res.INFO;
+                }*/
             }
-
+            if (nFalse > 0)  // si un item faux, global faux
+                _globalresult_status = res.False;
+            else if (nWarning > 0)
+                _globalresult_status = res.Variation;
+            else if (nTrue > 0)
+                _globalresult_status = res.True;
+            else
+                _globalresult_status = res.INFO;
 
             //Fill user control list to display it
             foreach (Item_Result item in _items)

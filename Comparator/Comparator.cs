@@ -11,10 +11,10 @@ namespace PlanCheck_IUCT
     {
         public (string, SolidColorBrush) CompareDatas(string expectedV, string measuredV, string comparator)
         {
-            //METTRE ICI LES AUTRES CAS POSSIBLES SI ON A DES VARIATIONS OU SI C'EST JUSTE INFORMATIF
+            //METTRE ICI LES AUTRES CAS POSSIBLES SI ON A DES VARIATIONS OU SI C'EST JUSTE INFO
 
             Result_Status result = new Result_Status();
-            (string, SolidColorBrush) res = result.Informatif;
+            (string, SolidColorBrush) res = result.INFO;
 
             if (comparator == "=")  //equality condition for string and numbers
             {

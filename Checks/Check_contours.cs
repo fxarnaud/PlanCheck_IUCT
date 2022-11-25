@@ -23,7 +23,7 @@ namespace PlanCheck_IUCT
 
         private List<Item_Result> _result = new List<Item_Result>();
         // private PreliminaryInformation _pinfo;
-        private string _title = "Contours";
+        private string _title = "Contours (en cours)";
 
         public void Check()
         {
@@ -33,8 +33,8 @@ namespace PlanCheck_IUCT
             approve.Label = "en cours";
             approve.ExpectedValue = "EN COURS";
 
-            approve.setToTRUE();
-            approve.MeasuredValue = "en cours";// "Différent de Planning Approved";
+            approve.setToINFO();
+            approve.MeasuredValue = "pas encore de test (en cours)";// "Différent de Planning Approved";
 
             approve.Infobulle = "en cours";
             this._result.Add(approve);
