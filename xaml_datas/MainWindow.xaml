@@ -15,56 +15,83 @@
                 <StackPanel>
                     <DockPanel>
                         <StackPanel Width="1000">
-                            <Grid Margin="10" Background="AntiqueWhite">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <!-- ColumnDefinition Width="30" /-->
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
+                                <Grid Margin="10" Background="AntiqueWhite">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <!-- ColumnDefinition Width="30" /-->
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
 
-                                <!-- DOCTEUR -->
-                                <TextBlock Grid.Row="0" Grid.Column ="0" FontSize="15" Text="{Binding DoctorName}" Background="Wheat" Foreground="Black" TextAlignment="Left" ToolTip="Prescripteur"></TextBlock>
-                                <Ellipse Grid.Row="0" Grid.Column ="0"  Fill="{Binding DoctorBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left" StrokeThickness="2" Stroke="{Binding DoctorForegroundColor}" ToolTip="couleur RT"/>
+                                    <!-- DOCTEUR -->
+                                    <TextBlock Grid.Row="0" Grid.Column ="0" FontSize="15" Text="{Binding DoctorName}" Background="Wheat" Foreground="Black" TextAlignment="Left" ToolTip="Prescripteur"></TextBlock>
+                                    <Ellipse Grid.Row="0" Grid.Column ="0"  Fill="{Binding DoctorBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left" StrokeThickness="2" Stroke="{Binding DoctorForegroundColor}" ToolTip="couleur RT"/>
 
-                                <!-- PATIENT -->
-                                <TextBlock Grid.Row="0" Grid.Column ="1" FontSize="15" FontWeight="Bold" Text="{Binding PatientFullName}" Background="Wheat" Foreground="{Binding  sexForegroundColor}" ToolTip="{Binding strPatientDOB}" TextAlignment="Right"></TextBlock>
+                                    <!-- PATIENT -->
+                                    <TextBlock Grid.Row="0" Grid.Column ="1" FontSize="15" FontWeight="Bold" Text="{Binding PatientFullName}" Background="Wheat" Foreground="{Binding  sexForegroundColor}" ToolTip="{Binding strPatientDOB}" TextAlignment="Right"></TextBlock>
 
-                                <!-- Plan creator -->
-                                <TextBlock  Grid.Row="1" Grid.Column ="0" FontSize="15" Text="{Binding PlanCreatorName}" Background="AntiqueWhite" Foreground="MidnightBlue" ToolTip="créateur du plan"  TextAlignment="Left"></TextBlock>
-                                <Ellipse Grid.Row="1" Grid.Column ="0"  Fill="{Binding PlanCreatorBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left"  StrokeThickness="2" Stroke="{Binding PlanCreatorForegroundColor}" ToolTip="couleur dosimétriste" />
+                                    <!-- Plan creator -->
+                                    <TextBlock  Grid.Row="1" Grid.Column ="0" FontSize="15" Text="{Binding PlanCreatorName}" Background="AntiqueWhite" Foreground="MidnightBlue" ToolTip="créateur du plan"  TextAlignment="Left"></TextBlock>
+                                    <Ellipse Grid.Row="1" Grid.Column ="0"  Fill="{Binding PlanCreatorBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left"  StrokeThickness="2" Stroke="{Binding PlanCreatorForegroundColor}" ToolTip="couleur dosimétriste" />
 
-                                <!-- Plan ID -->
-                                <TextBlock Grid.Row="1" Grid.Column ="1" FontSize="15" Text="{Binding PlanAndCourseID}" Background="AntiqueWhite" Foreground="MidnightBlue" ToolTip="planID (CourseID)" TextAlignment="Right" VerticalAlignment="Center"></TextBlock>
+                                    <!-- Plan ID -->
+                                    <TextBlock Grid.Row="1" Grid.Column ="1" FontSize="15" Text="{Binding PlanAndCourseID}" Background="AntiqueWhite" Foreground="MidnightBlue" ToolTip="planID (CourseID)" TextAlignment="Right" VerticalAlignment="Center"></TextBlock>
 
-                                <!-- Machine -->
-                                <TextBlock  Grid.Row="2" Grid.Column ="0" FontSize="15" Text="{Binding theMachine}" Background="Wheat" Foreground="Black"  ToolTip="Nom de la machine" TextAlignment="Left" VerticalAlignment="Center"></TextBlock>
-                                <Ellipse Grid.Row="2" Grid.Column ="0"  Fill="{Binding machineBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left"  StrokeThickness="2" Stroke="{Binding machineForegroundColor}" ToolTip="couleur user" />
+                                    <!-- Machine -->
+                                    <TextBlock  Grid.Row="2" Grid.Column ="0" FontSize="15" Text="{Binding theMachine}" Background="Wheat" Foreground="Black"  ToolTip="Nom de la machine" TextAlignment="Left" VerticalAlignment="Center"></TextBlock>
+                                    <Ellipse Grid.Row="2" Grid.Column ="0"  Fill="{Binding machineBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left"  StrokeThickness="2" Stroke="{Binding machineForegroundColor}" ToolTip="couleur user" />
 
-                                <!-- Champs -->
-                                <TextBlock  Grid.Row="2" Grid.Column ="1" TextWrapping="WrapWithOverflow" FontSize="15" Text="{Binding theFields}" TextAlignment="Right"  Background="Wheat" Foreground="Black" ToolTip="Description des champs"></TextBlock>
+                                    <!-- Champs -->
+                                    <TextBlock  Grid.Row="2" Grid.Column ="1" TextWrapping="WrapWithOverflow" FontSize="15" Text="{Binding theFields}" TextAlignment="Right"  Background="Wheat" Foreground="Black" ToolTip="Description des champs"></TextBlock>
 
-                                <!-- User -->
-                                <TextBlock  Grid.Row="3" Grid.Column ="0" FontSize="15" Text="{Binding CurrentUserName}" Background="AntiqueWhite" Foreground="MidnightBlue" TextAlignment="Left" VerticalAlignment="Center" ToolTip="user name"></TextBlock>
-                                <Ellipse Grid.Row="3" Grid.Column ="0"  Fill="{Binding CurrentUserBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left"  StrokeThickness="2" Stroke="{Binding CurrentUserForegroundColor}" ToolTip="couleur user" />
+                                    <!-- User -->
+                                    <TextBlock  Grid.Row="3" Grid.Column ="0" FontSize="15" Text="{Binding CurrentUserName}" Background="AntiqueWhite" Foreground="MidnightBlue" TextAlignment="Left" VerticalAlignment="Center" ToolTip="user name"></TextBlock>
+                                    <Ellipse Grid.Row="3" Grid.Column ="0"  Fill="{Binding CurrentUserBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left"  StrokeThickness="2" Stroke="{Binding CurrentUserForegroundColor}" ToolTip="couleur user" />
 
-                                <!-- Commentaire prescription -->
-                                <TextBlock Grid.Row="3" Grid.Column ="1" FontStyle="Italic" TextWrapping="WrapWithOverflow" FontSize="15" Text="{Binding prescriptionComment}" Background="AntiqueWhite"  Foreground="MidnightBlue" ToolTip="Nom, version et commentaire de la prescription" TextAlignment="Right"></TextBlock>
-
-                            </Grid>
-                        </StackPanel>
+                                    <!-- Commentaire prescription -->
+                                    <TextBlock Grid.Row="3" Grid.Column ="1" FontStyle="Italic" TextWrapping="WrapWithOverflow" FontSize="15" Text="{Binding prescriptionComment}" Background="AntiqueWhite"  Foreground="MidnightBlue" ToolTip="Nom, version et commentaire de la prescription" TextAlignment="Right"></TextBlock>
+                                </Grid>
+                        
+                </StackPanel>
+                        
                     </DockPanel>
                 </StackPanel>
-               
+                <DockPanel Width="980">
+                    <Border CornerRadius="3" BorderBrush="LightBlue" Background="White" BorderThickness="3" DockPanel.Dock="Top">
+                        <Grid Width="980">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="730" />
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="120" />
+                               
+                                <!-- ColumnDefinition Width="30" /-->
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="33" />
+                            </Grid.RowDefinitions>
+
+                            <!--StackPanel Grid.Row="0" Grid.Column ="0" Width="730" Height="33" HorizontalAlignment="Right" Background="White"-->
+
+                            <TextBlock x:Name="defaultProtocol" Grid.Row="0" Grid.Column ="0" FontSize="16"  Background="White"  Foreground="DarkBlue" FontWeight="Bold" ToolTip="Protocole proposé" VerticalAlignment="Center" Text="{Binding theProtocol}" HorizontalAlignment="Center"></TextBlock>
+                           
+                            <Button Grid.Row="0" Grid.Column ="1" x:Name="Verif_button" Content="Modifier..." Width="110" Height="32" Click="Choose_file_button_Click" RenderTransformOrigin="-0.734,0.136"/>
+
+                            <Button Grid.Row="0" Grid.Column ="2" x:Name="Verif_button3" Content="OK" Width="110" Height="32" Click="OK_button_click" RenderTransformOrigin="-0.734,0.136"/>
+
+                        </Grid>
+                    </Border>
+                </DockPanel>
+
+
                 <StackPanel Height="30">
                     <!-- ADD A SPACING -->
                 </StackPanel>
-                
+
                 <StackPanel>
                     <ListView HorizontalAlignment="Center" x:Name="CheckList">
                     </ListView>

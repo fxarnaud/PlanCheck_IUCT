@@ -1,24 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Contexts;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
-using System.Windows.Navigation;
-using VMS.TPS;
-using System.Drawing;
+using System.IO;
+using System.Text;
 
 
 
@@ -57,6 +46,7 @@ namespace PlanCheck_IUCT
         public Color UserColor { get; set; }
         public string theMachine { get; set; }
         public string theFields { get; set; }
+        public string theProtocol { get; set; }
         public string PhotonModel { get; set; }
         public IEnumerable<string> CalculationOptions { get; set; }
 
@@ -74,6 +64,8 @@ namespace PlanCheck_IUCT
             _pinfo = pinfo;
             _plan = plan;
             _pcontext = pcontext;
+            theProtocol = "ma valeur par défaut";
+
             //Filling datas binded to xaml
             FillPreliminarytInfos();
             InitializeComponent();
@@ -183,7 +175,7 @@ namespace PlanCheck_IUCT
                     if (b.MLCPlanType.ToString() == "VMAT")
                     {
                         treatmentType = "VMAT";
-                        
+
                     }
                     else if (b.MLCPlanType.ToString() == "ArcDynamic")
                         treatmentType = "DCA";
@@ -304,6 +296,59 @@ namespace PlanCheck_IUCT
             CheckList.ItemsSource = new List<UserControl>();
             CheckList.ItemsSource = ListChecks;
         }
+        private void Choose_file_button_Click(object sender, RoutedEventArgs e)
+        {
+            String myFullFilename;
+            String myFileName;
+            var fileDialog = new Microsoft.Win32.OpenFileDialog();
+            fileDialog.DefaultExt = "xlsx";
+            fileDialog.InitialDirectory = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocole\";
 
+
+            if (!Directory.Exists(fileDialog.InitialDirectory))
+            {
+                MessageBox.Show(fileDialog.InitialDirectory + "n'existe pas.");
+                fileDialog.InitialDirectory = @"C:\";
+            }
+
+            fileDialog.Multiselect = false;
+            fileDialog.Title = "Selection du protocole";
+            fileDialog.ShowReadOnly = true;
+            fileDialog.Filter = "XLSX files (*.xlsx)|*.xlsx";
+            fileDialog.FilterIndex = 0;
+            fileDialog.CheckFileExists = true;
+            if (fileDialog.ShowDialog() == false)
+            {
+                return;    // user canceled
+            }
+            myFullFilename = fileDialog.FileName; // full absolute path
+                                                  
+            if (!System.IO.File.Exists(myFullFilename))
+            {
+                MessageBox.Show(string.Format("Le protocole '{0}'  n'existe pas ", theProtocol));
+                return;
+            }
+            myFileName = Path.GetFileName(myFullFilename); // a method to get the file name only
+            theProtocol = Path.GetFileNameWithoutExtension(myFullFilename);// a method to get the file name only (ne extension)
+
+            MessageBox.Show("file is " + theProtocol);
+            
+           
+            defaultProtocol.Text = theProtocol;
+            /*
+            //Instance main class for comparison.
+            ResultsGenerator checkgenerator = new ResultsGenerator(_context);
+            _totalresults = checkgenerator.GenerateResults(_pinfo);
+            //Calling function to display results
+            GenerateAndFillListViews();*/
+        }
+        private void OK_button_click(object sender, RoutedEventArgs e)
+        {/*
+            //Instance main class for comparison.
+            ResultsGenerator checkgenerator = new ResultsGenerator(_context);
+            _totalresults = checkgenerator.GenerateResults(_pinfo);
+            //Calling function to display results
+            GenerateAndFillListViews();*/
+        }
     }
 }

@@ -69,7 +69,7 @@ namespace VMS.TPS
             var window = new MainWindow(planSetup, pinfo,context); //passer pinfo dans main window ...
 
 
-            string pathpath = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\protocole-prostate.xlsx";
+            string pathpath = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocole\protocole-prostate.xlsx";
             read_check_protocol rcp = new read_check_protocol(pathpath);
 
 
