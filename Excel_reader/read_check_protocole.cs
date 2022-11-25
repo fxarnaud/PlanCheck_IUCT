@@ -31,8 +31,8 @@ namespace PlanCheck_IUCT
 
         private String _prescriptionPercentage;
         private String _normalisationMode;
+        private String _enableGating;
 
-        
         public read_check_protocol(string pathToProtocolCheck)  //Constructor
         {
 
@@ -83,7 +83,7 @@ namespace PlanCheck_IUCT
             _prescriptionPercentage = xlRange1.Cells[5, 2].Text;
             _normalisationMode = xlRange1.Cells[6, 2].Text;
 
-
+            _enableGating = xlRange1.Cells[7, 2].Text;
 
             #region Exemple de lecture de cellules 1
             //excel is not zero based!!
@@ -152,6 +152,10 @@ namespace PlanCheck_IUCT
         public string normalisationMode
         {
             get { return _normalisationMode; }
+        }
+        public string enebleGating
+        {
+            get { return _enableGating; }
         }
     }
 }
