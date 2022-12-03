@@ -7,7 +7,7 @@
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PlanCheck_IUCT</RootNamespace>
-    <AssemblyName>PlanCheck_IUCT_Beta_v0562.esapi</AssemblyName>
+    <AssemblyName>PlanCheck_IUCT_Beta_v0570.esapi</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>\\Srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\</OutputPath>
+    <OutputPath>.\Plancheck</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -50,10 +50,16 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="VMS.TPS.Common.Model.API">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Varian\Vision\API 15.6\VMS.TPS.Common.Model.API.dll</HintPath>
+      <HintPath>references\VMS.TPS.Common.Model.API.dll</HintPath>
+    </Reference>
+    <Reference Include="VMS.TPS.Common.Model.Interface">
+      <HintPath>references\VMS.TPS.Common.Model.Interface.dll</HintPath>
     </Reference>
     <Reference Include="VMS.TPS.Common.Model.Types">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Varian\Vision\API 15.6\VMS.TPS.Common.Model.Types.dll</HintPath>
+      <HintPath>references\VMS.TPS.Common.Model.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="VMS.TPS.PlanningModelLibrary.Interface">
+      <HintPath>references\VMS.TPS.PlanningModelLibrary.Interface.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -87,7 +93,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="PlanCheck_IUCT.cs" />
-    <Compile Include="Preliminaryt_Info\PreliminaryInformation.cs" />
+    <Compile Include="Preliminary_Info\PreliminaryInformation.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="xaml_datas\CheckScreen_Global.xaml">

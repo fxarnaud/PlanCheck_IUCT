@@ -33,7 +33,7 @@ namespace PlanCheck_IUCT
 
             #region Technique 
             Item_Result technique = new Item_Result();
-            string myTech = null;
+            //string myTech = null;
             /* comment to be finsish 
             bool differentTech = false;
             foreach (Beam b in _ctx.PlanSetup.Beams)

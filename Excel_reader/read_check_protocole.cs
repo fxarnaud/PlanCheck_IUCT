@@ -28,7 +28,8 @@ namespace PlanCheck_IUCT
         private double _gridsize;
 
         private List<string> _optionComp = new List<string>();
-
+        private List<string> _couchStructuresInProtocol = new List<string>();
+        private List<string> _HUcouchStructuresInProtocol = new List<string>();
         private String _prescriptionPercentage;
         private String _normalisationMode;
         private String _enableGating;
@@ -58,8 +59,14 @@ namespace PlanCheck_IUCT
             Excel._Worksheet xlWorksheet3 = xlWorkbook.Sheets[3];
             // get the cells 3
             Excel.Range xlRange3 = xlWorksheet3.UsedRange;
+
+            // open the sheet 4
+            Excel._Worksheet xlWorksheet4 = xlWorkbook.Sheets[4];
+            // get the cells 4
+            Excel.Range xlRange4 = xlWorksheet4.UsedRange;
             #endregion
 
+            #region feuille 1 General
             _protocolName = xlRange1.Cells[1, 2].Value2;
             _CTslicewidth = xlRange1.Cells[2, 2].Value2;
             _algoName = xlRange1.Cells[3, 2].Value2;
@@ -84,6 +91,38 @@ namespace PlanCheck_IUCT
             _normalisationMode = xlRange1.Cells[6, 2].Text;
 
             _enableGating = xlRange1.Cells[7, 2].Text;
+            #endregion
+            int line = 0;
+
+            #region feuille 2 clinical structures
+            line = 2;
+            //           _protocolName = xlRange1.Cells[1, 2].Value2;
+            //         _CTslicewidth = xlRange1.Cells[2, 2].Value2;
+            #endregion
+
+
+            #region feuille 3 opt structures
+            line = 2;
+            //           _protocolName = xlRange1.Cells[1, 2].Value2;
+            //         _CTslicewidth = xlRange1.Cells[2, 2].Value2;
+            #endregion
+
+            #region feuille 4 Couch structures
+
+            line = 2;
+            while(xlRange4.Cells[line, 1].Text != "")
+            {
+               
+                    _couchStructuresInProtocol.Add(xlRange4.Cells[line,1].Text);
+                    _HUcouchStructuresInProtocol.Add(xlRange4.Cells[line, 2].Text);
+                    //MessageBox.Show(xlRange4.Cells[line, 1].Text + "  " + xlRange4.Cells[line, 2].Text);
+                    line++;
+               
+            }
+
+            //           _protocolName = xlRange4.Cells[1, 2].Value2;
+            //         _CTslicewidth = xlRange1.Cells[2, 2].Value2;
+            #endregion
 
             #region Exemple de lecture de cellules 1
             //excel is not zero based!!
@@ -156,6 +195,14 @@ namespace PlanCheck_IUCT
         public string enebleGating
         {
             get { return _enableGating; }
+        }
+        public List<string> couchStructInProtocol
+        {
+            get { return _couchStructuresInProtocol; }
+        }
+        public List<string> HUcouchStructInProtocol
+        {
+            get { return _HUcouchStructuresInProtocol; }
         }
     }
 }

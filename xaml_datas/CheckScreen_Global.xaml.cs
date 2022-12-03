@@ -41,19 +41,6 @@ namespace PlanCheck_IUCT
             _globalresult_status = res.True;
 
 
-
-            //if there is one status false then global result is false and if there is one variation but no false then global status is variation
-            /*
-             * if (_items.Any(i=>i.ResultStatus.Item1 == "X"))
-            {
-                _globalresult_status = res.False;
-            }
-            if (_items.Any(i => i.ResultStatus.Item1 == "WARNING" && i.ResultStatus.Item1 !="X" ))
-            {
-                _globalresult_status = res.Variation;
-            }
-            */
-            int isChecked = 0;
             int nTrue = 0;
             int nFalse = 0;
             int nWarning = 0;
@@ -66,19 +53,7 @@ namespace PlanCheck_IUCT
                 if (i.ResultStatus.Item1 == "WARNING") nWarning++;
                 if (i.ResultStatus.Item1 == "OK") nTrue++;
                 if (i.ResultStatus.Item1 == "INFO") nInfo++;
-/*
-                if (isChecked == 0)
-                {
-                    if (i.ResultStatus.Item1 == "X")
-                    {
-                       _globalresult_status = res.False;
-                        isChecked = 1;
-                    }
-                    if (i.ResultStatus.Item1 == "WARNING")
-                        _globalresult_status = res.Variation;
-                    if (i.ResultStatus.Item1 == "INFO")
-                        _globalresult_status = res.INFO;
-                }*/
+
             }
             if (nFalse > 0)  // si un item faux, global faux
                 _globalresult_status = res.False;

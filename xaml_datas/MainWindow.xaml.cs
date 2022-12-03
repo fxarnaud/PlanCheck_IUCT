@@ -360,7 +360,7 @@ namespace PlanCheck_IUCT
             this.AddCheck(check_point_ct);
 
 
-            Check_contours c_Contours = new Check_contours(_pinfo, _pcontext);
+            Check_contours c_Contours = new Check_contours(_pinfo, _pcontext,rcp);
             var check_point_contours = new CheckScreen_Global(c_Contours.Title, c_Contours.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_contours);
 

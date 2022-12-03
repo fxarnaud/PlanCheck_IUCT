@@ -24,7 +24,6 @@ namespace PlanCheck_IUCT
             _ctx = ctx;
             _pinfo = pinfo;
             Check();
-
         }
 
         private List<Item_Result> _result = new List<Item_Result>();
@@ -57,9 +56,6 @@ namespace PlanCheck_IUCT
             this._result.Add(gating);
             #endregion
 
-
-
-
         }
         public string Title
         {
@@ -70,7 +66,5 @@ namespace PlanCheck_IUCT
             get { return _result; }
             set { _result = value; }
         }
-
-
     }
 }

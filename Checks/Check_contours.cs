@@ -12,9 +12,11 @@ namespace PlanCheck_IUCT
     {
         private ScriptContext _ctx;
         private PreliminaryInformation _pinfo;
+        private read_check_protocol _rcp;
 
-        public Check_contours(PreliminaryInformation pinfo, ScriptContext ctx)  //Constructor
+        public Check_contours(PreliminaryInformation pinfo, ScriptContext ctx,read_check_protocol rcp)  //Constructor
         {
+            _rcp = rcp;
             _ctx = ctx;
             _pinfo = pinfo;
             Check();
@@ -28,16 +30,30 @@ namespace PlanCheck_IUCT
         public void Check()
         {
 
-            #region A FAIRE ? 
-            Item_Result approve = new Item_Result();
-            approve.Label = "en cours";
-            approve.ExpectedValue = "EN COURS";
+            #region COUCH STRUCTURES 
+            Item_Result couchStructExist = new Item_Result();
+            couchStructExist.Label = "Structures de table";
+            couchStructExist.ExpectedValue = "EN COURS";
+            
+               
 
-            approve.setToINFO();
-            approve.MeasuredValue = "pas encore de test (en cours)";// "Différent de Planning Approved";
 
-            approve.Infobulle = "en cours";
-            this._result.Add(approve);
+            
+//  .Where(w => w.StartsWith("a"))
+
+
+            foreach (String s in _rcp.couchStructInProtocol) /// list of couch structures un protocol
+            {
+              //  Structure sp = _ctx.StructureSet.Structures.Where(_ctx.StructureSet.Structures.Id == s)
+
+
+            }
+
+            couchStructExist.setToINFO();
+            couchStructExist.MeasuredValue = "pas encore de test (en cours)";// "Différent de Planning Approved";
+
+            couchStructExist.Infobulle = "en cours";
+            this._result.Add(couchStructExist);
             #endregion
 
 
