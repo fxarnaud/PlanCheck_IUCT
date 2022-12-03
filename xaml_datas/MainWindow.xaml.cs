@@ -66,7 +66,7 @@ namespace PlanCheck_IUCT
 
            // myFullFilename = getIntelligentDefaultValue(_pcontext);
 
-            myFullFilename = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocol\prostate.xlsx"; //default_path";
+            myFullFilename = @".\protocol_check\prostate.xlsx"; //default_path";
             theProtocol = "Check-protocol: prostate";
 
             FillHeaderInfos(); //Filling datas binded to xaml
