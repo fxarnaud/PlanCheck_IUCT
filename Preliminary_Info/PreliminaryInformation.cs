@@ -50,8 +50,7 @@ namespace PlanCheck_IUCT
 
             if (ctx.PlanSetup.RTPrescription != null)
                 _doctor = GetUser("doctor");
-            else
-                _doctor = "no doctor";
+            
             if (_ctx.PlanSetup.PhotonCalculationModel != null)
                 _algoname = ctx.PlanSetup.PhotonCalculationModel;
             else

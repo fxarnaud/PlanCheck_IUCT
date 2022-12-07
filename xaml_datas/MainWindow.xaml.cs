@@ -68,7 +68,7 @@ namespace PlanCheck_IUCT
             // an intelligent default protocol must be chosen. Still to code
             // myFullFilename = getIntelligentDefaultValue(_pcontext);
 
-            myFullFilename = Directory.GetCurrentDirectory() + @"\protocol_check\prostate.xlsx";           
+            myFullFilename = Directory.GetCurrentDirectory() + @"\protocol_check\prostate.xlsx";
             theProtocol = "Check-protocol: prostate"; // theProtocol is not a file name. It s a string that display the file name with no extension
             FillHeaderInfos(); //Filling datas binded to xaml
             InitializeComponent(); // not clear what is done here
@@ -79,7 +79,7 @@ namespace PlanCheck_IUCT
             //Patient, plan and others infos to bind to xml
 
             #region PATIENT NAME, SEX AND AGE
-            
+
             DateTime PatientDOB = (DateTime)_pinfo.PatientDOB_dt;// .Patient.DateOfBirth;         
             DateTime zeroTime = new DateTime(1, 1, 1);
             DateTime myToday = DateTime.Today;
@@ -132,6 +132,7 @@ namespace PlanCheck_IUCT
                 DoctorName = "    " + "Dr " + _pinfo.Doctor.UserFamilyName + "    ";
                 DoctorBackgroundColor = _pinfo.Doctor.UserBackgroundColor; //System.Windows.Media.Brushes.DeepPink; // _pinfo.Doctor.DoctorBackgroundColor;
                 DoctorForegroundColor = _pinfo.Doctor.UserForeGroundColor;// System.Windows.Media.Brushes.Wheat; // _pinfo.Doctor.DoctorForeGroundColor;
+
             }
             else DoctorName = "    " + "Pas de prescripteur";
             #endregion
@@ -139,18 +140,34 @@ namespace PlanCheck_IUCT
             #region prescription comment
             if (_pcontext.PlanSetup.RTPrescription != null)
             {
-                prescriptionComment = _pcontext.PlanSetup.RTPrescription.Name;
-                prescriptionComment += " (R" + _pcontext.PlanSetup.RTPrescription.RevisionNumber + "): ";
+                //prescriptionComment = _pcontext.PlanSetup.RTPrescription.Name;
+                // prescriptionComment += " (R" + _pcontext.PlanSetup.RTPrescription.RevisionNumber + "): ";
+
+                int nFractions = 0;
+                List<double> nDosePerFraction = new List<double>();
+                foreach (var target in _pcontext.PlanSetup.RTPrescription.Targets) //boucle sur les différents niveaux de dose de la prescription
+                {
+                    nFractions = target.NumberOfFractions;
+                    nDosePerFraction.Add(target.DosePerFraction.Dose);
+                }
+                string listOfDoses = nFractions.ToString() + " x " + nDosePerFraction[0];
+                for (int i= 1; i < nDosePerFraction.Count(); i++)
+                    if (nDosePerFraction[i] != nDosePerFraction[i-1])
+                        listOfDoses += "/" + nDosePerFraction[i];
+
+                listOfDoses += " Gy (";
+                prescriptionComment = listOfDoses;
+
                 if (_pcontext.PlanSetup.RTPrescription.Notes.Length == 0)
-                    prescriptionComment += "Pas de commentaire dans la presciption.";
+                    prescriptionComment += "Pas de commentaire dans la presciption)";
                 else
                 {
+                    string noEndline = _pcontext.PlanSetup.RTPrescription.Notes.Replace("\n", "").Replace("\r"," - "); // replace newline by -
+                    prescriptionComment += noEndline  + ")";
 
-                    prescriptionComment += _pcontext.PlanSetup.RTPrescription.Notes;
-
+                    // Just in case but revision name and number are not useful
                     //+ _pcontext.PlanSetup.RTPrescription.RevisionNumber + ": " + ": " + _pcontext.PlanSetup.RTPrescription.Id + ": " + _pcontext.PlanSetup.RTPrescription.Notes;
                     //prescriptionComment = "Commentaire de la presciption : " + _pcontext.PlanSetup.RTPrescription.Notes;
-
                 }
             }
             else

@@ -54,7 +54,7 @@
                                     <Ellipse Grid.Row="3" Grid.Column ="0"  Fill="{Binding CurrentUserBackgroundColor}" Width="15" Height="15" HorizontalAlignment="Left"  StrokeThickness="2" Stroke="{Binding CurrentUserForegroundColor}" ToolTip="couleur user" />
 
                                     <!-- Commentaire prescription -->
-                                    <TextBlock Grid.Row="3" Grid.Column ="1" FontStyle="Italic" TextWrapping="WrapWithOverflow" FontSize="15" Text="{Binding prescriptionComment}" Background="AntiqueWhite"  Foreground="MidnightBlue" ToolTip="Nom, version et commentaire de la prescription" TextAlignment="Right"></TextBlock>
+                                    <TextBlock Grid.Row="3" Grid.Column ="1" FontStyle="Italic" TextWrapping="WrapWithOverflow" FontSize="15" Text="{Binding prescriptionComment}" Background="AntiqueWhite"  Foreground="MidnightBlue" ToolTip="Fractionnement et commentaire de la prescription" TextAlignment="Right"></TextBlock>
                                 </Grid>
                         
                 </StackPanel>

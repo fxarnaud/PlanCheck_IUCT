@@ -30,7 +30,7 @@ namespace VMS.TPS
         public void Execute(ScriptContext context)
         {
 
-            #region check if a plan with dose is loaded
+            #region check if a plan with dose is loaded, no verification plan allowed
 
             if (context == null)
             {
@@ -41,6 +41,11 @@ namespace VMS.TPS
             if (context.PlanSetup == null)
             {
                 MessageBox.Show("Merci de charger un plan");
+                return;
+            }          
+            if (context.PlanSetup.PlanIntent == "VERIFICATION")
+            {
+                MessageBox.Show("Merci de charger un plan qui ne soit pas un plan de vérification");
                 return;
             }
             if (!context.PlanSetup.IsDoseValid)
