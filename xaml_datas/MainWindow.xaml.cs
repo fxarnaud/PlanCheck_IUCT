@@ -64,17 +64,14 @@ namespace PlanCheck_IUCT
             _plan = pcontext.PlanSetup;
             _pcontext = pcontext;
 
+
+            // an intelligent default protocol must be chosen. Still to code
             // myFullFilename = getIntelligentDefaultValue(_pcontext);
 
-            myFullFilename = Directory.GetCurrentDirectory() + @"\protocol_check\prostate.xlsx";
-            //@".\protocol_check\prostate.xlsx"; //default_path";
-            theProtocol = "Check-protocol: prostate";
-
+            myFullFilename = Directory.GetCurrentDirectory() + @"\protocol_check\prostate.xlsx";           
+            theProtocol = "Check-protocol: prostate"; // theProtocol is not a file name. It s a string that display the file name with no extension
             FillHeaderInfos(); //Filling datas binded to xaml
-
             InitializeComponent(); // not clear what is done here
-
-
         }
 
         public void FillHeaderInfos()
@@ -82,6 +79,7 @@ namespace PlanCheck_IUCT
             //Patient, plan and others infos to bind to xml
 
             #region PATIENT NAME, SEX AND AGE
+            
             DateTime PatientDOB = (DateTime)_pinfo.PatientDOB_dt;// .Patient.DateOfBirth;         
             DateTime zeroTime = new DateTime(1, 1, 1);
             DateTime myToday = DateTime.Today;
@@ -354,7 +352,7 @@ namespace PlanCheck_IUCT
             {
                 Check_Prescription c_prescri = new Check_Prescription(_pinfo, _pcontext, rcp);
                 var check_point_prescription = new CheckScreen_Global(c_prescri.Title, c_prescri.Result);
-                this.AddCheck(check_point_prescription); ////
+                this.AddCheck(check_point_prescription);
             }
 
 

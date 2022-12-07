@@ -23,31 +23,46 @@ namespace PlanCheck_IUCT
         private IUCT_User _doctor;
         private string _algoname;
         private string _mlctype;
-        
+
         private string[] calculoptions;
 
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
             _ctx = ctx;
-            _patientname = ctx.Patient.Name;
-            _patientdob_dt = (DateTime)ctx.Patient.DateOfBirth;
-            _patientdob = _patientdob_dt.Day+"/"+ _patientdob_dt.Month + "/" + _patientdob_dt.Year;
+           
+            if (_ctx.Patient.Name != null)
+                _patientname = _ctx.Patient.Name;
+            else
+                _patientname = "no name";
+
+            if (_ctx.Patient.DateOfBirth.HasValue)
+            {
+                _patientdob_dt = (DateTime)_ctx.Patient.DateOfBirth;
+                _patientdob = _patientdob_dt.Day + "/" + _patientdob_dt.Month + "/" + _patientdob_dt.Year;
+            }
+            else
+                _patientdob = "no DoB";
+
             _coursename = ctx.Course.Id;
-
-
-            _planname = ctx.PlanSetup.Id; 
-            _plancreator = GetUser("creator"); 
+            _planname = ctx.PlanSetup.Id;
+            _plancreator = GetUser("creator");
             _currentuser = GetUser("currentuser");
-            if(ctx.PlanSetup.RTPrescription != null)
+
+            if (ctx.PlanSetup.RTPrescription != null)
                 _doctor = GetUser("doctor");
-            
-            _algoname = ctx.PlanSetup.PhotonCalculationModel;
+            else
+                _doctor = "no doctor";
+            if (_ctx.PlanSetup.PhotonCalculationModel != null)
+                _algoname = ctx.PlanSetup.PhotonCalculationModel;
+            else
+                _algoname = "no photon calculation model";
+
             _mlctype = Check_mlc_type(ctx.PlanSetup);
-            
+
             calculoptions = new string[ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.Count];
             calculoptions = ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.ToArray();
 
-             
+
 
             //MessageBox.Show(string.Format("test = {0}", calculoptions[0]));
             //MessageBox.Show(string.Format("test = {0}", calculoptions[1]));
@@ -72,9 +87,9 @@ namespace PlanCheck_IUCT
                     tocheck = _ctx.PlanSetup.CreationUserName;
                     break;
                 default:
-                    tocheck = _ctx.CurrentUser.Name;                    
+                    tocheck = _ctx.CurrentUser.Name;
                     break;
-            }            
+            }
 
 
             //Generate Users list
@@ -85,22 +100,17 @@ namespace PlanCheck_IUCT
             foreach (IUCT_User user_tmp in iuct_users.UsersList)
             {
 
-                //MessageBox.Show(tocheck.ToLower() + " vs " + user_tmp.UserFamilyName.ToLower());
+                
                 if (tocheck.ToLower().Contains(user_tmp.UserFamilyName.ToLower()))
                 {
                     user = user_tmp;
-                   
+
                 }
             }
 
-            //MessageBox.Show(string.Format("J'ai le current user {0}", tocheck));
-            //IUCT_User user = iuct_users.UsersList.Where(tocheck.Contains(name=>name.UserFamilyName)).FirstOrDefault();
-            //if (user==null)
-            //{
-            //    user = iuct_users.UsersList.Where(name => name.UserFamilyName == "indefini").FirstOrDefault();
-            //}
+           
 
-            return user;             
+            return user;
         }
 
         private string Check_mlc_type(PlanSetup plan)
