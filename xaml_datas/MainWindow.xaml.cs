@@ -46,7 +46,7 @@ namespace PlanCheck_IUCT
         public Color UserColor { get; set; }
         public string theMachine { get; set; }
         public string theFields { get; set; }
-        public string theProtocol { get; set; }        
+        public string theProtocol { get; set; }
         public string myFullFilename { get; set; }
         public string PhotonModel { get; set; }
         public IEnumerable<string> CalculationOptions { get; set; }
@@ -55,7 +55,7 @@ namespace PlanCheck_IUCT
 
         #endregion
 
-        
+
 
         public MainWindow(PreliminaryInformation pinfo, ScriptContext pcontext) //Constructeur
         {
@@ -64,15 +64,16 @@ namespace PlanCheck_IUCT
             _plan = pcontext.PlanSetup;
             _pcontext = pcontext;
 
-           // myFullFilename = getIntelligentDefaultValue(_pcontext);
+            // myFullFilename = getIntelligentDefaultValue(_pcontext);
 
-            myFullFilename = @".\protocol_check\prostate.xlsx"; //default_path";
+            myFullFilename = Directory.GetCurrentDirectory() + @"\protocol_check\prostate.xlsx";
+            //@".\protocol_check\prostate.xlsx"; //default_path";
             theProtocol = "Check-protocol: prostate";
 
             FillHeaderInfos(); //Filling datas binded to xaml
 
             InitializeComponent(); // not clear what is done here
-           
+
 
         }
 
@@ -304,10 +305,12 @@ namespace PlanCheck_IUCT
         private void Choose_file_button_Click(object sender, RoutedEventArgs e)
         {
             OK_button.IsEnabled = true;
-            //String myFileName;
+
             var fileDialog = new Microsoft.Win32.OpenFileDialog();
             fileDialog.DefaultExt = "xlsx";
-            fileDialog.InitialDirectory = @"\\srv015\SF_COM\ARNAUD_FX\ECLIPSE_SCRIPTING\Plan_Check_new\check_protocol\";
+
+            fileDialog.InitialDirectory = Directory.GetCurrentDirectory() + @"\protocol_check\";
+
             if (!Directory.Exists(fileDialog.InitialDirectory))
             {
                 MessageBox.Show(fileDialog.InitialDirectory + "n'existe pas.");
@@ -330,8 +333,8 @@ namespace PlanCheck_IUCT
                 MessageBox.Show(string.Format("Le check-protocol '{0}'  n'existe pas ", theProtocol));
                 return;
             }
-            //myFileName = Path.GetFileName(myFullFilename); // a method to get the file name only
-            theProtocol = "Check-protocol: "+Path.GetFileNameWithoutExtension(myFullFilename);// a method to get the file name only (ne extension)
+
+            theProtocol = "Check-protocol: " + Path.GetFileNameWithoutExtension(myFullFilename);// a method to get the file name only (no extension)
             defaultProtocol.Text = theProtocol; // refresh display of default value
         }
         private void OK_button_click(object sender, RoutedEventArgs e)
@@ -343,7 +346,7 @@ namespace PlanCheck_IUCT
             #region THE CHECKS
             Check_Course c_course = new Check_Course(_pinfo, _pcontext);
             var check_point_course = new CheckScreen_Global(c_course.Title, c_course.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
-           // window.AddCheck(check_point1);
+                                                                                              // window.AddCheck(check_point1);
             this.AddCheck(check_point_course);
 
 
@@ -360,7 +363,7 @@ namespace PlanCheck_IUCT
             this.AddCheck(check_point_ct);
 
 
-            Check_contours c_Contours = new Check_contours(_pinfo, _pcontext,rcp);
+            Check_contours c_Contours = new Check_contours(_pinfo, _pcontext, rcp);
             var check_point_contours = new CheckScreen_Global(c_Contours.Title, c_Contours.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_contours);
 
@@ -369,7 +372,7 @@ namespace PlanCheck_IUCT
             var check_point_iso = new CheckScreen_Global(c_Isocenter.Title, c_Isocenter.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_iso);
 
-            Check_Plan c_Plan = new Check_Plan(_pinfo, _pcontext,rcp);
+            Check_Plan c_Plan = new Check_Plan(_pinfo, _pcontext, rcp);
             var check_point_plan = new CheckScreen_Global(c_Plan.Title, c_Plan.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_plan);
 
@@ -397,7 +400,7 @@ namespace PlanCheck_IUCT
             this.AddCheck(check_point_finalisation);
             #endregion
 
-            
+
             CheckList.Visibility = Visibility.Visible;
 
         }
