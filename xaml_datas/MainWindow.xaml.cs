@@ -354,7 +354,7 @@ namespace PlanCheck_IUCT
             {
                 Check_Prescription c_prescri = new Check_Prescription(_pinfo, _pcontext, rcp);
                 var check_point_prescription = new CheckScreen_Global(c_prescri.Title, c_prescri.Result);
-                this.AddCheck(check_point_prescription);
+                this.AddCheck(check_point_prescription); ////
             }
 
 

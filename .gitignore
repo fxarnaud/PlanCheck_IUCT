@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Plancheck/PlanCheck_IUCT_Beta_v0583.esapi.dll
+/Plancheck/PlanCheck_IUCT_Beta_v0582.esapi.dll
+/Plancheck/PlanCheck_IUCT_Beta_v0580.esapi.dll
+/Plancheck/PlanCheck_IUCT_Beta_v0579.esapi.dll

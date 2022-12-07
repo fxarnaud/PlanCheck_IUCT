@@ -14,7 +14,7 @@ using System.Runtime.Remoting.Contexts;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Windows.Navigation;
-using Excel = Microsoft.Office.Interop.Excel;       
+using Excel = Microsoft.Office.Interop.Excel;
 // Do "Add reference" in reference manager --> COM tab --> Microsoft Excel 16 object
 
 [assembly: AssemblyVersion("1.0.0.1")]
@@ -31,45 +31,43 @@ namespace VMS.TPS
         {
 
             #region check if a plan with dose is loaded
-            bool validPlanWithDoseisLoaded = true;
-            if(context == null)
+
+            if (context == null)
             {
-               MessageBox.Show("Merci de charger un plan");
-               validPlanWithDoseisLoaded = false;
+                MessageBox.Show("Merci de charger un patient et un plan");
+                return;
             }
-           
-            if(context.PlanSetup == null)
+
+            if (context.PlanSetup == null)
             {
                 MessageBox.Show("Merci de charger un plan");
-                validPlanWithDoseisLoaded = false;
+                return;
             }
-            if(!context.PlanSetup.IsDoseValid)
+            if (!context.PlanSetup.IsDoseValid)
             {
                 MessageBox.Show("Merci de charger un plan avec une dose");
-                validPlanWithDoseisLoaded = false;
+                return;
             }
 
             if (context.PlanSetup.RTPrescription == null)
                 MessageBox.Show("Ce plan n'est lié à aucune prescription"); // run anyway even if there is no prescription
             #endregion
 
-            
-            if (validPlanWithDoseisLoaded)
-                Perform(context);
-       
+            Perform(context);
         }
-        
+
+
         public static void Perform(ScriptContext context)
         {
-            
+
             var planSetup = context.PlanSetup;
-            
+
             PreliminaryInformation pinfo = new PreliminaryInformation(context);    //Get Plan information...      
 
-            var window = new MainWindow(pinfo,context); //passer pinfo dans main window ...
+            var window = new MainWindow(pinfo, context); //passer pinfo dans main window ...
 
             window.ShowDialog(); /// AFFICHE LA FENETRE
-         
+
         }
     }
 }
