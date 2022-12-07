@@ -15,7 +15,7 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Windows.Navigation;
 using Excel = Microsoft.Office.Interop.Excel;
-// Do "Add reference" in reference manager --> COM tab --> Microsoft Excel 16 object
+// Do "Add reference" in reference manager --> COM tab --> Microsoft Excel 16 object...
 
 [assembly: AssemblyVersion("1.0.0.1")]
 namespace VMS.TPS
@@ -64,15 +64,10 @@ namespace VMS.TPS
 
         public static void Perform(ScriptContext context)
         {
-
             var planSetup = context.PlanSetup;
-
             PreliminaryInformation pinfo = new PreliminaryInformation(context);    //Get Plan information...      
-
             var window = new MainWindow(pinfo, context); //passer pinfo dans main window ...
-
             window.ShowDialog(); /// AFFICHE LA FENETRE
-
         }
     }
 }
