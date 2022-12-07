@@ -323,7 +323,6 @@ namespace PlanCheck_IUCT
 
             var fileDialog = new Microsoft.Win32.OpenFileDialog();
             fileDialog.DefaultExt = "xlsx";
-
             fileDialog.InitialDirectory = Directory.GetCurrentDirectory() + @"\protocol_check\";
 
             if (!Directory.Exists(fileDialog.InitialDirectory))
