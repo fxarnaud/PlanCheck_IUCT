@@ -311,6 +311,14 @@ namespace PlanCheck_IUCT
             #endregion
 
         }
+
+        public void cleanList()
+        {
+            ListChecks.Clear();
+
+        }
+
+
         public void AddCheck(UserControl checkScreen)
         {
             ListChecks.Add(checkScreen);
@@ -353,6 +361,7 @@ namespace PlanCheck_IUCT
         }
         private void OK_button_click(object sender, RoutedEventArgs e)
         {
+            this.cleanList();
             OK_button.IsEnabled = false;// Visibility.Collapsed;
             read_check_protocol rcp = new read_check_protocol(myFullFilename);
 

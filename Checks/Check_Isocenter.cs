@@ -6,28 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VMS.TPS.Common.Model.API;
 using System.Windows;
-/*
- namespace PlanCheck_IUCT
-{
-    internal class Check_UM
-    {
-        private ScriptContext _ctx;
 
-        public Check_UM(PreliminaryInformation pinfo, ScriptContext ctx)  //Constructor
-        {
-            _ctx = ctx;
-            Check();
-
-        }
-
-        private List<Item_Result> _result = new List<Item_Result>();
-        // private PreliminaryInformation _pinfo;
-        private string _title = "UM";
-
-        public void Check()
-        {
-           
-*/
 namespace PlanCheck_IUCT
 {
     internal class Check_Isocenter
@@ -115,7 +94,7 @@ namespace PlanCheck_IUCT
             // looking if isocenter is close to the ptv center
             // Coordinates are in DICOM ref 
 
-            double tolerance = 0.1; // 0.1 means that we expect the isocenter in a region  from + or -10% around the center of PTV
+            double tolerance = 0.15; // 0.1 means that we expect the isocenter in a region  from + or -10% around the center of PTV
 
             double centerPTVxmin = ptvTarget.MeshGeometry.Bounds.X + (0.5 - tolerance) * (ptvTarget.MeshGeometry.Bounds.SizeX);
             double centerPTVymin = ptvTarget.MeshGeometry.Bounds.Y + (0.5 - tolerance) * (ptvTarget.MeshGeometry.Bounds.SizeY);
@@ -140,7 +119,7 @@ namespace PlanCheck_IUCT
             if (iswrong == 1)
             {
                 isoAtCenterOfPTV.MeasuredValue = " Mauvais positionnement  de l'isocentre dans le " + ptvTarget.Id;
-                isoAtCenterOfPTV.setToFALSE();
+                isoAtCenterOfPTV.setToWARNING();
             }
             else
             {
