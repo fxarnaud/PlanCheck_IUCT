@@ -15,64 +15,75 @@ namespace PlanCheck_IUCT.Users
         {
             _users_list = new List<IUCT_User>();
 
+            #region open and read xlsx file with users 
             string userListFilePath = Directory.GetParent(Directory.GetCurrentDirectory()) + @"\Users\Users-IUCT.xlsx";
-            if (System.IO.File.Exists(userListFilePath))
+
+            // If file doesn't exist open a file browser
+            if (!File.Exists(userListFilePath))  
             {
-                #region open and read xlsx file with users                              
-                Excel.Application xlApp = new Excel.Application();  // open excel                
-                Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(userListFilePath, ReadOnly:true);// open file               
-                Excel._Worksheet xlWorksheet1 = xlWorkbook.Sheets[1];   // open the sheet 1                                                       
-                Excel.Range xlRange1 = xlWorksheet1.UsedRange; // get the used cells in workshit                
-                int nRows = xlRange1.Rows.Count;// count lines
-                
-                for (int nUser = 2; nUser <= nRows; nUser++)
+                var fileDialog = new Microsoft.Win32.OpenFileDialog();
+                fileDialog.DefaultExt = "xlsx";
+                fileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+
+                if (!Directory.Exists(fileDialog.InitialDirectory))
                 {
-                    //var contentCell = xlRange1.Cells[8, 2].Value2;
-                    //MessageBox.Show(contentCell.ToString()); ;
-                    string id = xlRange1.Cells[nUser, 1].text;
-                    string firstname = xlRange1.Cells[nUser, 2].text;
-                    string lastname = xlRange1.Cells[nUser, 3].text;
-                    string sex = xlRange1.Cells[nUser, 4].text;
-                    string function = xlRange1.Cells[nUser, 5].text;
-                    
-                    string temp = xlRange1.Cells[nUser, 6].text;
-                    //MessageBox.Show("color is " + temp);
-                    //Brushes mybgcolor = (Brushes)new BrushConverter().ConvertFromString(temp);
-                    //Brushes myfgcolor = (Brushes)new BrushConverter().ConvertFromString(temp);
-                    //string temp2 = xlRange1.Cells[nUser, 7].text;
-                    SolidColorBrush mybgcolor = (SolidColorBrush)new BrushConverter().ConvertFromString(temp);
-                    SolidColorBrush myfgcolor = (SolidColorBrush)new BrushConverter().ConvertFromString(temp);
-                   // MessageBox.Show("the color is " + mybgcolor.ToString());
-
-
-                    if ((id != "")&&(id!=null))
-                    {
-                        IUCT_User myUser = new IUCT_User() { UserFirstName = firstname, UserFamilyName = lastname, Gender = sex, Function = function, UserBackgroundColor = mybgcolor, UserForeGroundColor = myfgcolor };
-                        _users_list.Add(myUser);
-                    }
+                    MessageBox.Show(fileDialog.InitialDirectory + "n'existe pas.");
+                    fileDialog.InitialDirectory = @"C:\";
                 }
-                #endregion
 
-
-
-                #region cleanup excel
-                //GC.Collect();
-                //GC.WaitForPendingFinalizers();
-                xlWorkbook.Close(0);
-                
-               // Marshal.ReleaseComObject(xlRange1);              
-                //Marshal.ReleaseComObject(xlWorksheet1);
-                //xlWorkbook.Close();
-                //Marshal.ReleaseComObject(xlWorkbook);
-                xlApp.Quit();
-                //Marshal.ReleaseComObject(xlApp);
-                #endregion
+                fileDialog.Multiselect = false;
+                fileDialog.Title = "Liste des utilisateurs";
+                fileDialog.ShowReadOnly = true;
+                fileDialog.Filter = "XLSX files (*.xlsx)|*.xlsx";
+                fileDialog.FilterIndex = 0;
+                fileDialog.CheckFileExists = true;
+                if (fileDialog.ShowDialog() == false)
+                {
+                    return;    // user canceled
+                }
+                userListFilePath = fileDialog.FileName; // full absolute path                                                  
+                if (!System.IO.File.Exists(userListFilePath))
+                {
+                    MessageBox.Show("Listes utilisateurs introuvable");
+                    return;
+                }
             }
-            else
+
+            Excel.Application xlApp = new Excel.Application();  // open excel                
+            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(userListFilePath, ReadOnly: true);// open file               
+            Excel._Worksheet xlWorksheet1 = xlWorkbook.Sheets[1];   // open the sheet 1                                                       
+            Excel.Range xlRange1 = xlWorksheet1.UsedRange; // get the used cells in workshit                
+            int nRows = xlRange1.Rows.Count;// count lines
+
+            for (int nUser = 2; nUser <= nRows; nUser++)
             {
-                MessageBox.Show("no user file found: " + userListFilePath );
-                return;
+                
+                string id = xlRange1.Cells[nUser, 1].text;
+                string firstname = xlRange1.Cells[nUser, 2].text;
+                string lastname = xlRange1.Cells[nUser, 3].text;
+                string sex = xlRange1.Cells[nUser, 4].text;
+                string function = xlRange1.Cells[nUser, 5].text;
+
+                string temp = xlRange1.Cells[nUser, 6].text;
+                string temp2 = xlRange1.Cells[nUser, 7].text;
+                SolidColorBrush mybgcolor = (SolidColorBrush)new BrushConverter().ConvertFromString(temp);
+                SolidColorBrush myfgcolor = (SolidColorBrush)new BrushConverter().ConvertFromString(temp2);
+
+
+                // see palette at https://learn.microsoft.com/fr-fr/dotnet/api/system.windows.media.brushes?view=windowsdesktop-6.0
+
+                if ((id != "") && (id != null))
+                {
+                    IUCT_User myUser = new IUCT_User() { UserFirstName = firstname, UserFamilyName = lastname, Gender = sex, Function = function, UserBackgroundColor = mybgcolor, UserForeGroundColor = myfgcolor };
+                    _users_list.Add(myUser);
+                }
             }
+
+            xlWorkbook.Close(0);
+            xlApp.Quit();
+
+            #endregion
+
 
             #region old user definition (deprecated)
             /*

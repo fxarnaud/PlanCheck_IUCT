@@ -298,7 +298,7 @@ namespace PlanCheck_IUCT
             }
             else
                 theFields = "Tomotherapy";
-            //MessageBox.Show(machineAndFields);
+            
             #endregion
 
             #region other infos

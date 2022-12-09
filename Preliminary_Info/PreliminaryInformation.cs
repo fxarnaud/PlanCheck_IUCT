@@ -43,13 +43,16 @@ namespace PlanCheck_IUCT
             else
                 _patientdob = "no DoB";
 
+
+            IUCT_Users iuct_users = new IUCT_Users();
+
             _coursename = ctx.Course.Id;
             _planname = ctx.PlanSetup.Id;
-            _plancreator = GetUser("creator");
-            _currentuser = GetUser("currentuser");
+            _plancreator = GetUser("creator",iuct_users);
+            _currentuser = GetUser("currentuser",iuct_users);
 
             if (ctx.PlanSetup.RTPrescription != null)
-                _doctor = GetUser("doctor");
+                _doctor = GetUser("doctor",iuct_users);
             
             if (_ctx.PlanSetup.PhotonCalculationModel != null)
                 _algoname = ctx.PlanSetup.PhotonCalculationModel;
@@ -74,7 +77,7 @@ namespace PlanCheck_IUCT
         }
 
 
-        private IUCT_User GetUser(string searchtype)
+        private IUCT_User GetUser(string searchtype, IUCT_Users iuct_users)
         {
             string tocheck;
             switch (searchtype)
@@ -92,7 +95,7 @@ namespace PlanCheck_IUCT
 
 
             //Generate Users list
-            IUCT_Users iuct_users = new IUCT_Users();
+            //IUCT_Users iuct_users = new IUCT_Users();
 
             IUCT_User user = new IUCT_User();
             user = iuct_users.UsersList.Where(name => name.UserFamilyName == "indefini").FirstOrDefault();

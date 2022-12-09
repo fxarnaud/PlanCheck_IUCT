@@ -33,6 +33,7 @@ namespace PlanCheck_IUCT
         private String _prescriptionPercentage;
         private String _normalisationMode;
         private String _enableGating;
+        private List<Tuple<string, string>> couchStructures = new List<Tuple<string, string>>();
 
         public read_check_protocol(string pathToProtocolCheck)  //Constructor
         {
@@ -43,7 +44,7 @@ namespace PlanCheck_IUCT
             Excel.Application xlApp = new Excel.Application();
 
             // open file
-            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(pathToProtocolCheck);
+            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(pathToProtocolCheck, ReadOnly:true);
 
             // open the sheet 1
             Excel._Worksheet xlWorksheet1 = xlWorkbook.Sheets[1];
@@ -109,14 +110,16 @@ namespace PlanCheck_IUCT
 
             #region feuille 4 Couch structures
 
-            line = 2;
-            while(xlRange4.Cells[line, 1].Text != "")
+            
+            int nRowsClinicalStruct = xlRange4.Rows.Count;
+            for (int i =2;i<=nRowsClinicalStruct;i++)              
             {
-               
-                    _couchStructuresInProtocol.Add(xlRange4.Cells[line,1].Text);
-                    _HUcouchStructuresInProtocol.Add(xlRange4.Cells[line, 2].Text);
+
+                // a mettre dans le tuple
+                    _couchStructuresInProtocol.Add(xlRange4.Cells[i,1].Text);
+                    _HUcouchStructuresInProtocol.Add(xlRange4.Cells[i, 2].Text);
                     //MessageBox.Show(xlRange4.Cells[line, 1].Text + "  " + xlRange4.Cells[line, 2].Text);
-                    line++;
+                    
                
             }
 
