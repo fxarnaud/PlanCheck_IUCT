@@ -315,7 +315,6 @@ namespace PlanCheck_IUCT
         public void cleanList()
         {
             ListChecks.Clear();
-
         }
 
 
@@ -369,8 +368,7 @@ namespace PlanCheck_IUCT
             #region THE CHECKS
 
             Check_Course c_course = new Check_Course(_pinfo, _pcontext);
-            var check_point_course = new CheckScreen_Global(c_course.Title, c_course.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
-                                                                                              // window.AddCheck(check_point1);
+            var check_point_course = new CheckScreen_Global(c_course.Title, c_course.Result);                                                                                               
             this.AddCheck(check_point_course);
 
 
