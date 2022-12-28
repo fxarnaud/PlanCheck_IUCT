@@ -28,12 +28,12 @@ namespace PlanCheck_IUCT
         private double _gridsize;
 
         private List<string> _optionComp = new List<string>();
-        private List<string> _couchStructuresInProtocol = new List<string>();
-        private List<string> _HUcouchStructuresInProtocol = new List<string>();
         private String _prescriptionPercentage;
         private String _normalisationMode;
         private String _enableGating;
-        private List<Tuple<string, string>> couchStructures = new List<Tuple<string, string>>();
+        private List<Tuple<string, double>> _couchStructures = new List<Tuple<string, double>>();
+        private List<Tuple<string, double, double, double>> _clinicalStructures = new List<Tuple<string, double, double, double>>();
+        private List<Tuple<string, double>> _optStructures = new List<Tuple<string, double>>();
 
         public read_check_protocol(string pathToProtocolCheck)  //Constructor
         {
@@ -44,7 +44,7 @@ namespace PlanCheck_IUCT
             Excel.Application xlApp = new Excel.Application();
 
             // open file
-            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(pathToProtocolCheck, ReadOnly:true);
+            Excel.Workbook xlWorkbook = xlApp.Workbooks.Open(pathToProtocolCheck, ReadOnly: true);
 
             // open the sheet 1
             Excel._Worksheet xlWorksheet1 = xlWorkbook.Sheets[1];
@@ -71,8 +71,8 @@ namespace PlanCheck_IUCT
             _protocolName = xlRange1.Cells[1, 2].Value2;
             _CTslicewidth = xlRange1.Cells[2, 2].Value2;
             _algoName = xlRange1.Cells[3, 2].Value2;
-            
-            
+
+
             int optnumber = 3;
             //string[] optionComp = null;
             String tempo1;
@@ -80,9 +80,9 @@ namespace PlanCheck_IUCT
             while (xlRange1.Cells[3, optnumber].Text != "") // parse the excel line from col 3 to first empty cell
             {
                 tempo1 = xlRange1.Cells[3, optnumber].Text;
-                tempo2 = tempo1.Replace(',','.');// replace , by .
+                tempo2 = tempo1.Replace(',', '.');// replace , by .
                 _optionComp.Add(tempo2);
-                
+
                 optnumber++;
             }
 
@@ -93,63 +93,84 @@ namespace PlanCheck_IUCT
 
             _enableGating = xlRange1.Cells[7, 2].Text;
             #endregion
-            int line = 0;
+            //nt line = 0;
 
             #region feuille 2 clinical structures
-            line = 2;
-            //           _protocolName = xlRange1.Cells[1, 2].Value2;
-            //         _CTslicewidth = xlRange1.Cells[2, 2].Value2;
+
+            int nRowsClinicalStruct = xlRange2.Rows.Count;
+            string oneClinicalStruct = null;
+            double huCS = 0;
+            for (int i = 2; i <= nRowsClinicalStruct; i++) // read all lines sheet 2
+            {
+                var temp1 = xlRange2.Cells[i, 1].Value2; // column 1
+                var temp2 = xlRange2.Cells[i, 2].Value2; // column 2
+                var temp3 = xlRange2.Cells[i, 3].Value2; // column 2
+                var temp4 = xlRange2.Cells[i, 4].Value2; // column 2
+
+                oneClinicalStruct = temp1.ToString();
+                if (temp2 != null)
+                    huCS = (double)(temp2);
+                else
+                    huCS = 9999;///9999 if no asssigned HU
+
+                double volmin = 0.0;
+                double volmax = 0.0;
+                if ((temp3 != null) && (temp4 != null))
+                {
+                     volmin = (double)(temp3);
+                     volmax = (double)(temp4);
+                }
+                else
+                {
+                     volmin = 9999;
+                     volmax = 9999;
+                }
+                Tuple<string, double, double, double> aCSElement = new Tuple<string, double, double, double>(oneClinicalStruct, huCS, volmin, volmax);
+                _clinicalStructures.Add(aCSElement);
+            }
             #endregion
 
 
             #region feuille 3 opt structures
-            line = 2;
-            //           _protocolName = xlRange1.Cells[1, 2].Value2;
-            //         _CTslicewidth = xlRange1.Cells[2, 2].Value2;
+
+            int nRowsOptlStruct = xlRange3.Rows.Count;
+            string oneOptStruct = null;
+            double huOS = 0;
+            for (int i = 2; i <= nRowsOptlStruct; i++) // read all lines sheet 2
+            {
+                var temp1 = xlRange3.Cells[i, 1].Value2; // column 1
+                var temp2 = xlRange3.Cells[i, 2].Value2; // column 2
+                oneOptStruct = temp1.ToString();
+                if (temp2 != null)
+                    huOS = (double)(temp2);
+                else
+                    huOS = 9999;///9999 if no asssigned HU
+                Tuple<string, double> aOSElement = new Tuple<string, double>(oneOptStruct, huOS);//, "cat", true);
+                _optStructures.Add(aOSElement);
+            }
+
+
             #endregion
 
             #region feuille 4 Couch structures
 
-            
-            int nRowsClinicalStruct = xlRange4.Rows.Count;
-            for (int i =2;i<=nRowsClinicalStruct;i++)              
+            int nRowsCouchStruct = xlRange4.Rows.Count;
+            string couchEl = null;
+            double huEl = 0;
+            for (int i = 2; i <= nRowsCouchStruct; i++) // read all lines sheet 4
             {
-
-                // a mettre dans le tuple
-                    _couchStructuresInProtocol.Add(xlRange4.Cells[i,1].Text);
-                    _HUcouchStructuresInProtocol.Add(xlRange4.Cells[i, 2].Text);
-                    //MessageBox.Show(xlRange4.Cells[line, 1].Text + "  " + xlRange4.Cells[line, 2].Text);
-                    
-               
+                var temp1 = xlRange4.Cells[i, 1].Value2; // column 1
+                var temp2 = xlRange4.Cells[i, 2].Value2; // column 2
+                couchEl = temp1.ToString();
+                huEl = (double)(temp2);
+                Tuple<string, double> aCouchElement = new Tuple<string, double>(couchEl, huEl);//, "cat", true);
+                _couchStructures.Add(aCouchElement);
+                // MessageBox.Show(aCouchElement.Item1 + aCouchElement.Item2.ToString());
             }
 
-            //           _protocolName = xlRange4.Cells[1, 2].Value2;
-            //         _CTslicewidth = xlRange1.Cells[2, 2].Value2;
+
             #endregion
 
-            #region Exemple de lecture de cellules 1
-            //excel is not zero based!!
-            //MessageBox.Show(xlRange1.Cells[2, 2].Value2.ToString() + "\t");
-            //MessageBox.Show(xlRange2.Cells[2, 2].Value2.ToString() + "\t");
-            #endregion
-
-            #region Exemple de lecture de cellules 2
-            /*   for (int i = 1; i <= 2; i++)
-            {
-                for (int j = 1; j <= 2; j++)
-                {
-                    //new line
-                    if (j == 1)
-                        MessageBox.Show("\r\n");
-
-                    //write the value to the console
-                    if (xlRange.Cells[i, j] != null && xlRange.Cells[i, j].Value2 != null)
-                        MessageBox.Show(xlRange.Cells[i, j].Value2.ToString() + "\t");
-
-                    //add useful things here!   
-                }
-            }*/
-            #endregion
 
             #region cleanup excel
             GC.Collect();
@@ -199,13 +220,20 @@ namespace PlanCheck_IUCT
         {
             get { return _enableGating; }
         }
-        public List<string> couchStructInProtocol
+
+        public List<Tuple<string, double>> couchStructures
         {
-            get { return _couchStructuresInProtocol; }
+            get { return _couchStructures; }
         }
-        public List<string> HUcouchStructInProtocol
+        public List<Tuple<string, double,double,double>> clinicalStructures
         {
-            get { return _HUcouchStructuresInProtocol; }
+            get { return _clinicalStructures; }
         }
+        public List<Tuple<string, double>> optStructures
+        {
+            get { return _optStructures; }
+        }
+
+
     }
 }

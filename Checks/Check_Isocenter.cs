@@ -103,6 +103,13 @@ namespace PlanCheck_IUCT
             double centerPTVxmax = ptvTarget.MeshGeometry.Bounds.X + (0.5 + tolerance) * (ptvTarget.MeshGeometry.Bounds.SizeX);
             double centerPTVymax = ptvTarget.MeshGeometry.Bounds.Y + (0.5 + tolerance) * (ptvTarget.MeshGeometry.Bounds.SizeY);
             double centerPTVzmax = ptvTarget.MeshGeometry.Bounds.Z + (0.5 + tolerance) * (ptvTarget.MeshGeometry.Bounds.SizeZ);
+
+            double fractionX = (myx - ptvTarget.MeshGeometry.Bounds.X)/ ptvTarget.MeshGeometry.Bounds.SizeX;
+            double fractionY = (myy - ptvTarget.MeshGeometry.Bounds.Y) / ptvTarget.MeshGeometry.Bounds.SizeY;
+            double fractionZ = (myz - ptvTarget.MeshGeometry.Bounds.Z) / ptvTarget.MeshGeometry.Bounds.SizeZ;
+
+
+
             int iswrong = 0;
             if ((myx > centerPTVxmax) || (myx < centerPTVxmin))
             {               
@@ -118,7 +125,7 @@ namespace PlanCheck_IUCT
             }
             if (iswrong == 1)
             {
-                isoAtCenterOfPTV.MeasuredValue = " Mauvais positionnement  de l'isocentre dans le " + ptvTarget.Id;
+                isoAtCenterOfPTV.MeasuredValue = " Positionnement non central de l'isocentre dans le " + ptvTarget.Id;
                 isoAtCenterOfPTV.setToWARNING();
             }
             else
@@ -127,9 +134,15 @@ namespace PlanCheck_IUCT
                 isoAtCenterOfPTV.setToTRUE();
             }
 
+            double tolmin = 0.5 - tolerance;
+            double tolmax = 0.5 + tolerance;
             isoAtCenterOfPTV.Infobulle = "L'isocentre doit être proche du centre de " + ptvTarget.Id;
-            isoAtCenterOfPTV.Infobulle += "\n(plus grande structure dont les trois premières lettres sont PTV)";
-            isoAtCenterOfPTV.Infobulle += "\navec une tolérance de " + (tolerance*100).ToString("N1") + "% dans chaque direction.";
+            isoAtCenterOfPTV.Infobulle += "\n(volume cible)";
+            isoAtCenterOfPTV.Infobulle += "\navec une tolérance de " + (tolerance * 100).ToString("N1") + "% dans chaque direction.";
+            isoAtCenterOfPTV.Infobulle += "\n\nPosition relative de l'isoscentre sur les axes x y et z:\n" + Math.Round(fractionX,2) + "\t" + Math.Round(fractionY, 2) + "\t" + Math.Round(fractionZ, 2);
+            isoAtCenterOfPTV.Infobulle += "\n\n0 et 1 = limites du PTV";
+            isoAtCenterOfPTV.Infobulle += "\nValeures attendues entre "+ tolmin + " et " + tolmax;
+
             this._result.Add(isoAtCenterOfPTV);
             #endregion
 

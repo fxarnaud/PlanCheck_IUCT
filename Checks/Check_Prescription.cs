@@ -35,6 +35,29 @@ namespace PlanCheck_IUCT
         public void Check()
         {
 
+            #region LISTE DES CIBLES DE LA PRESCRIPTION
+            Item_Result prescriptionVolumes = new Item_Result();
+
+            int targetNumber = 0;
+            prescriptionVolumes.MeasuredValue = "";
+            prescriptionVolumes.Infobulle = "information : liste des cibles de la prescription\n";
+            foreach (var target in _ctx.PlanSetup.RTPrescription.Targets) //boucle sur les différents niveaux de dose de la prescription
+            {
+                targetNumber++;
+                double tot = target.NumberOfFractions * target.DosePerFraction.Dose;
+                prescriptionVolumes.Infobulle += target.TargetId + " : " + target.NumberOfFractions + " x " + target.DosePerFraction.Dose + " Gy " + "(" + tot.ToString("N2") + " Gy)\n";
+                prescriptionVolumes.MeasuredValue += target.TargetId + " (" + tot.ToString("N2") + " Gy)  ";
+            }
+
+            prescriptionVolumes.ExpectedValue = "info";
+            prescriptionVolumes.Label = " " + targetNumber + " cible(s) dans la prescription : ";
+            prescriptionVolumes.setToINFO();
+
+            this._result.Add(prescriptionVolumes);
+
+            #endregion
+
+
             #region APPROBATION DE LA PRESCRIPTION
             Item_Result prescriptionStatus = new Item_Result();
             prescriptionStatus.Label = "Approbation de la prescription (" + _ctx.PlanSetup.RTPrescription.Name + ")";
@@ -165,28 +188,6 @@ namespace PlanCheck_IUCT
             this._result.Add(normalisation);
             #endregion
 
-
-            #region LISTE DES CIBLES DE LA PRESCRIPTION
-            Item_Result prescriptionVolumes = new Item_Result();
-
-            int targetNumber = 0;
-            prescriptionVolumes.MeasuredValue = "";
-            prescriptionVolumes.Infobulle = "information : liste des cibles de la prescription\n";
-            foreach (var target in _ctx.PlanSetup.RTPrescription.Targets) //boucle sur les différents niveaux de dose de la prescription
-            {
-                targetNumber++;
-                double tot = target.NumberOfFractions * target.DosePerFraction.Dose;
-                prescriptionVolumes.Infobulle += target.TargetId + " : " + target.NumberOfFractions + " x " + target.DosePerFraction.Dose + " Gy " + "(" + tot.ToString("N2") + " Gy)\n";
-                prescriptionVolumes.MeasuredValue += target.TargetId + " (" + tot.ToString("N2") + " Gy)  ";
-            }
-
-            prescriptionVolumes.ExpectedValue = "info";
-            prescriptionVolumes.Label = " " + targetNumber + " cible(s) dans la prescription : ";
-            prescriptionVolumes.setToINFO();
-
-            this._result.Add(prescriptionVolumes);
-
-            #endregion
 
         }
         public string Title
