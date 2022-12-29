@@ -66,8 +66,9 @@ namespace PlanCheck_IUCT
             // get the cells 4
             Excel.Range xlRange4 = xlWorksheet4.UsedRange;
             #endregion
+           
 
-            #region feuille 1 General
+            #region sheet 1 General
             _protocolName = xlRange1.Cells[1, 2].Value2;
             _CTslicewidth = xlRange1.Cells[2, 2].Value2;
             _algoName = xlRange1.Cells[3, 2].Value2;
@@ -92,46 +93,57 @@ namespace PlanCheck_IUCT
             _normalisationMode = xlRange1.Cells[6, 2].Text;
 
             _enableGating = xlRange1.Cells[7, 2].Text;
-            #endregion
-            //nt line = 0;
+            #endregion          
+           
 
-            #region feuille 2 clinical structures
+            #region sheet 2 clinical structures
 
             int nRowsClinicalStruct = xlRange2.Rows.Count;
             string oneClinicalStruct = null;
             double huCS = 0;
             for (int i = 2; i <= nRowsClinicalStruct; i++) // read all lines sheet 2
             {
+                
                 var temp1 = xlRange2.Cells[i, 1].Value2; // column 1
-                var temp2 = xlRange2.Cells[i, 2].Value2; // column 2
-                var temp3 = xlRange2.Cells[i, 3].Value2; // column 2
-                var temp4 = xlRange2.Cells[i, 4].Value2; // column 2
 
-                oneClinicalStruct = temp1.ToString();
-                if (temp2 != null)
-                    huCS = (double)(temp2);
-                else
-                    huCS = 9999;///9999 if no asssigned HU
+                if (temp1 != null)
+                {
+                    var temp2 = xlRange2.Cells[i, 2].Value2; // column 2
+                    var temp3 = xlRange2.Cells[i, 3].Value2; // column 2
+                    var temp4 = xlRange2.Cells[i, 4].Value2; // column 2
 
-                double volmin = 0.0;
-                double volmax = 0.0;
-                if ((temp3 != null) && (temp4 != null))
-                {
-                     volmin = (double)(temp3);
-                     volmax = (double)(temp4);
+                    oneClinicalStruct = temp1.ToString();
+                    if (temp2 != null)
+                        huCS = (double)(temp2);
+                    else
+                        huCS = 9999;///9999 if no asssigned HU
+
+                    double volmin = 0.0;
+                    double volmax = 0.0;
+                    if ((temp3 != null) && (temp4 != null))
+                    {
+
+                        volmin = (double)(temp3);
+                        volmax = (double)(temp4);
+                    }
+                    else
+                    {
+
+                        volmin = 9999;
+                        volmax = 9999;
+                    }
+
+                    Tuple<string, double, double, double> aCSElement = new Tuple<string, double, double, double>(oneClinicalStruct, huCS, volmin, volmax);
+
+                    _clinicalStructures.Add(aCSElement);
                 }
-                else
-                {
-                     volmin = 9999;
-                     volmax = 9999;
-                }
-                Tuple<string, double, double, double> aCSElement = new Tuple<string, double, double, double>(oneClinicalStruct, huCS, volmin, volmax);
-                _clinicalStructures.Add(aCSElement);
+                
             }
+           
             #endregion
+            
 
-
-            #region feuille 3 opt structures
+            #region sheet 3 opt structures
 
             int nRowsOptlStruct = xlRange3.Rows.Count;
             string oneOptStruct = null;
@@ -139,20 +151,24 @@ namespace PlanCheck_IUCT
             for (int i = 2; i <= nRowsOptlStruct; i++) // read all lines sheet 2
             {
                 var temp1 = xlRange3.Cells[i, 1].Value2; // column 1
-                var temp2 = xlRange3.Cells[i, 2].Value2; // column 2
-                oneOptStruct = temp1.ToString();
-                if (temp2 != null)
-                    huOS = (double)(temp2);
-                else
-                    huOS = 9999;///9999 if no asssigned HU
-                Tuple<string, double> aOSElement = new Tuple<string, double>(oneOptStruct, huOS);//, "cat", true);
-                _optStructures.Add(aOSElement);
+                if (temp1 != null)
+                {
+                    var temp2 = xlRange3.Cells[i, 2].Value2; // column 2
+                    oneOptStruct = temp1.ToString();
+                    if (temp2 != null)
+                        huOS = (double)(temp2);
+                    else
+                        huOS = 9999;///9999 if no asssigned HU
+                    Tuple<string, double> aOSElement = new Tuple<string, double>(oneOptStruct, huOS);//, "cat", true);
+                    _optStructures.Add(aOSElement);
+                }
             }
 
 
             #endregion
+            
 
-            #region feuille 4 Couch structures
+            #region sheet 4 Couch structures
 
             int nRowsCouchStruct = xlRange4.Rows.Count;
             string couchEl = null;
@@ -160,17 +176,20 @@ namespace PlanCheck_IUCT
             for (int i = 2; i <= nRowsCouchStruct; i++) // read all lines sheet 4
             {
                 var temp1 = xlRange4.Cells[i, 1].Value2; // column 1
-                var temp2 = xlRange4.Cells[i, 2].Value2; // column 2
-                couchEl = temp1.ToString();
-                huEl = (double)(temp2);
-                Tuple<string, double> aCouchElement = new Tuple<string, double>(couchEl, huEl);//, "cat", true);
-                _couchStructures.Add(aCouchElement);
-                // MessageBox.Show(aCouchElement.Item1 + aCouchElement.Item2.ToString());
+                if (temp1 != null)
+                {
+                    var temp2 = xlRange4.Cells[i, 2].Value2; // column 2
+                    couchEl = temp1.ToString();
+                    huEl = (double)(temp2);
+                    Tuple<string, double> aCouchElement = new Tuple<string, double>(couchEl, huEl);//, "cat", true);
+                    _couchStructures.Add(aCouchElement);
+                    // MessageBox.Show(aCouchElement.Item1 + aCouchElement.Item2.ToString());
+                }
             }
 
 
             #endregion
-
+           
 
             #region cleanup excel
             GC.Collect();

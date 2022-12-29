@@ -30,7 +30,7 @@ namespace PlanCheck_IUCT
 
         public void Check()
         {
-
+            
             #region COUCH STRUCTURES 
             Item_Result couchStructExist = new Item_Result();
             couchStructExist.Label = "Structures de table";
@@ -69,7 +69,7 @@ namespace PlanCheck_IUCT
             }
             else
             {
-                couchStructExist.setToWARNING();
+                couchStructExist.setToFALSE();
                 couchStructExist.MeasuredValue = "Absentes, vides ou UH incorrectes (voir infobulle)";
                 if (missingCouchStructures.Count > 0)
                     couchStructExist.Infobulle = "Structures attendues pour le protocole " + _rcp.protocolName + " absentes ou vides dans le plan :\n";
@@ -130,7 +130,10 @@ namespace PlanCheck_IUCT
             }
             else
             {
-                clinicalStructuresItem.setToWARNING();
+                clinicalStructuresItem.setToINFO(); // just info except if wrong HU --> warrning
+                if (wrongHUClinicalStructures.Count > 0)
+                    clinicalStructuresItem.setToWARNING();
+
                 clinicalStructuresItem.MeasuredValue = "Absentes, vides ou UH incorrectes (voir infobulle)";
                 if (missingClinicalStructures.Count > 0)
                     clinicalStructuresItem.Infobulle = "Structures attendues pour le protocole " + _rcp.protocolName + " absentes ou vides dans le plan :\n";
@@ -192,7 +195,7 @@ namespace PlanCheck_IUCT
             }
             else
             {
-                optStructuresItem.setToWARNING();
+                optStructuresItem.setToINFO();
                 optStructuresItem.MeasuredValue = "Absentes, vides ou UH incorrectes (voir infobulle)";
                 if (missingOptStructures.Count > 0)
                     optStructuresItem.Infobulle = "Structures attendues pour le protocole " + _rcp.protocolName + " absentes ou vides dans le plan :\n";
@@ -209,7 +212,7 @@ namespace PlanCheck_IUCT
             this._result.Add(optStructuresItem);
             #endregion
 
-
+            
             #region Volume Anormal
             // entre -3sigma et +3sigma >99.9% des cas
             List<string> anormalVolumeList = new List<string>();
@@ -220,7 +223,7 @@ namespace PlanCheck_IUCT
 
             foreach (Tuple<string, double, double, double> el in _rcp.clinicalStructures) // foreach couch element in the xls protocol file
             {
-                double mydouble = 0;
+               
                 Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == el.Item1); // find a structure in ss with the same name
                 if (struct1 != null) // if structure  exist 
                     if (!struct1.IsEmpty) //  and if not empty 
@@ -229,7 +232,7 @@ namespace PlanCheck_IUCT
                             if ((struct1.Volume > el.Item3) && (struct1.Volume < el.Item4)) //if volume ok
                                 normalVolumeList.Add(el.Item1);
                             else
-                                anormalVolumeList.Add(el.Item1);
+                                anormalVolumeList.Add(el.Item1 + " ("+struct1.Volume.ToString("F2")+" cc). Attendu: "+ el.Item3.ToString("F2")+" - "+el.Item4.ToString("F2") + " cc");
 
                         }
 
@@ -262,7 +265,7 @@ namespace PlanCheck_IUCT
 
             #endregion
 
-
+            
 
         }
         public string Title
