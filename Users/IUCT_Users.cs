@@ -16,7 +16,12 @@ namespace PlanCheck_IUCT.Users
             _users_list = new List<IUCT_User>();
 
             #region open and read xlsx file with users 
-            string userListFilePath = Directory.GetParent(Directory.GetCurrentDirectory()) + @"\Users\Users-IUCT.xlsx";
+            
+            //string userListFilePath = Directory.GetParent(Directory.GetCurrentDirectory()) + @".\users\Users-IUCT.xlsx";
+            string userListFilePath = Directory.GetCurrentDirectory() + @"\users\Users-IUCT.xlsx";
+            MessageBox.Show(userListFilePath);
+//            userListFilePath = Directory.GetParent(Directory.GetCurrentDirectory()).ToString();
+  //          MessageBox.Show(userListFilePath);
 
             // If file doesn't exist open a file browser
             if (!File.Exists(userListFilePath))  

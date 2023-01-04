@@ -7,8 +7,7 @@ using System.Windows.Media;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
 using System.IO;
-using System.Text;
-
+//using System.Windows.Forms;
 
 
 namespace PlanCheck_IUCT
@@ -429,5 +428,13 @@ namespace PlanCheck_IUCT
             CheckList.Visibility = Visibility.Visible;
 
         }
+
+        private void Button_Click_help(object sender, RoutedEventArgs e)
+        {
+            //System.Diagnostics.Process.Start("Chrome.exe", "https://docs.google.com/document/d/1SKk-R7JMUk4_7oHblT3idBDCOFeZwGlmQ-nVpAzsgLo");
+            //System.Diagnostics.Process.Start("https://docs.google.com/document/d/1SKk-R7JMUk4_7oHblT3idBDCOFeZwGlmQ-nVpAzsgLo");
+            System.Diagnostics.Process.Start(@"..\doc\help.pdf");
+        }
+
     }
 }

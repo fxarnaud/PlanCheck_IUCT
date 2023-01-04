@@ -96,6 +96,16 @@
                     <ListView HorizontalAlignment="Center" x:Name="CheckList" Visibility="Hidden">
                     </ListView>
                 </StackPanel>
+
+                <StackPanel Height="60">
+                    <!-- ADD A SPACING -->
+                </StackPanel>
+
+
+                <StackPanel Height="30" Width="800" VerticalAlignment="Bottom">
+                    <Button Content="?" FontSize="10" FontFamily="Bauhaus" Click="Button_Click_help" Width="15" Height="20" Background="Coral" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
+                    
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
 

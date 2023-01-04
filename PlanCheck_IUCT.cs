@@ -8,6 +8,7 @@ using VMS.TPS.Common.Model.Types;
 using System.Runtime.CompilerServices;
 using System.Reflection;
 using PlanCheck_IUCT;
+using System.IO;
 using PlanCheck_IUCT.Users;
 using System.Threading.Tasks;
 using System.Runtime.Remoting.Contexts;
@@ -42,7 +43,7 @@ namespace VMS.TPS
             {
                 MessageBox.Show("Merci de charger un plan");
                 return;
-            }          
+            }
             if (context.PlanSetup.PlanIntent == "VERIFICATION")
             {
                 MessageBox.Show("Merci de charger un plan qui ne soit pas un plan de vérification");
@@ -57,6 +58,10 @@ namespace VMS.TPS
             if (context.PlanSetup.RTPrescription == null)
                 MessageBox.Show("Ce plan n'est lié à aucune prescription"); // run anyway even if there is no prescription
             #endregion
+
+            // CHANGE THE PATH TO YOUR DIR (WHERE .dll is located)
+            Directory.SetCurrentDirectory(@"\\srv015\SF_COM\SIMON_LU\scriptsEclipse\00004-plancheck\Plancheck");
+
 
             Perform(context);
         }
