@@ -67,7 +67,7 @@ namespace PlanCheck_IUCT
             // an intelligent default protocol must be chosen. Still to code
             // myFullFilename = getIntelligentDefaultValue(_pcontext);
 
-            myFullFilename = Directory.GetCurrentDirectory() + @"\protocol_check\prostate.xlsx";
+            myFullFilename = Directory.GetCurrentDirectory() + @"\check_protocol\prostate.xlsx";
             theProtocol = "Check-protocol: prostate"; // theProtocol is not a file name. It s a string that display the file name with no extension
             FillHeaderInfos(); //Filling datas binded to xaml
             InitializeComponent(); // not clear what is done here
@@ -329,7 +329,7 @@ namespace PlanCheck_IUCT
 
             var fileDialog = new Microsoft.Win32.OpenFileDialog();
             fileDialog.DefaultExt = "xlsx";
-            fileDialog.InitialDirectory = Directory.GetCurrentDirectory() + @"\protocol_check\";
+            fileDialog.InitialDirectory = Directory.GetCurrentDirectory() + @"\check_protocol\";
 
             if (!Directory.Exists(fileDialog.InitialDirectory))
             {
