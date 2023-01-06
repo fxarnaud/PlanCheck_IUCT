@@ -100,16 +100,16 @@ namespace PlanCheck_IUCT
 
             if (uncorrFieldWithaWedge != 0)
             {
-                wedged.MeasuredValue = uncorrFieldWithaWedge.ToString() + " champs filtrés avec < 25 UM";
+                wedged.MeasuredValue = uncorrFieldWithaWedge.ToString() + " champs filtrés avec < 20 UM";
                 wedged.setToFALSE();
-                wedged.Infobulle = uncorrFieldWithaWedge.ToString() +  " champs filtrés avec moins de 25 UM";
+                wedged.Infobulle = uncorrFieldWithaWedge.ToString() +  " champs filtrés avec moins de 20 UM";
 
             }
             else
             {
                 wedged.MeasuredValue = "OK";
                 wedged.setToTRUE();
-                wedged.Infobulle = "Pas de champs filtré avec moins de 25 UM";
+                wedged.Infobulle = "Pas de champs filtré avec moins de 20 UM";
 
             }
 

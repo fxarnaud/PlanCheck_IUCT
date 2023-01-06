@@ -84,7 +84,7 @@ namespace PlanCheck_IUCT
 
             foreach (Structure s in _ctx.StructureSet.Structures)
             {
-                if (s.Id == _ctx.PlanSetup.TargetVolumeID) // look for structures for which ID starts by "PTV" (i.e. excludes rectum-PTV)
+                if (s.Id == _ctx.PlanSetup.TargetVolumeID) 
                 {
                     ptvTarget = s;
                 }

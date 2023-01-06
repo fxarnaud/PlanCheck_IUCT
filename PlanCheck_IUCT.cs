@@ -59,9 +59,15 @@ namespace VMS.TPS
                 MessageBox.Show("Ce plan n'est lié à aucune prescription"); // run anyway even if there is no prescription
             #endregion
 
-            // CHANGE THE PATH TO YOUR DIR (WHERE .dll is located)
-            Directory.SetCurrentDirectory(@"\\srv015\SF_COM\SIMON_LU\scriptsEclipse\00004-plancheck\Plancheck");
-
+            
+            //get the full location of the assembly 
+            string fullPath = Assembly.GetExecutingAssembly().Location;
+            //get the folder that's in
+            string theDirectory = Path.GetDirectoryName(fullPath);
+             // set current directory as the .dll directory
+            Directory.SetCurrentDirectory(theDirectory);
+            // hardcoded dir           Directory.SetCurrentDirectory(@"\\srv015\SF_COM\SIMON_LU\scriptsEclipse\00004-plancheck\Plancheck");
+           
 
             Perform(context);
         }

@@ -431,9 +431,10 @@ namespace PlanCheck_IUCT
 
         private void Button_Click_help(object sender, RoutedEventArgs e)
         {
+            // Chrome is not installed on citrix and if hte navigator is not specified IE is launched and can't read google doc.. So,...pdf
             //System.Diagnostics.Process.Start("Chrome.exe", "https://docs.google.com/document/d/1SKk-R7JMUk4_7oHblT3idBDCOFeZwGlmQ-nVpAzsgLo");
-            //System.Diagnostics.Process.Start("https://docs.google.com/document/d/1SKk-R7JMUk4_7oHblT3idBDCOFeZwGlmQ-nVpAzsgLo");
-            System.Diagnostics.Process.Start(@"..\doc\help.pdf");
+           // System.Diagnostics.Process.Start("https://docs.google.com/document/d/1SKk-R7JMUk4_7oHblT3idBDCOFeZwGlmQ-nVpAzsgLo");
+            System.Diagnostics.Process.Start(@".\doc\plancheckhelp.pdf");
         }
 
     }
