@@ -31,9 +31,52 @@ namespace PlanCheck_IUCT
         private String _prescriptionPercentage;
         private String _normalisationMode;
         private String _enableGating;
-        private List<Tuple<string, double>> _couchStructures = new List<Tuple<string, double>>();
-        private List<Tuple<string, double, double, double>> _clinicalStructures = new List<Tuple<string, double, double, double>>();
-        private List<Tuple<string, double>> _optStructures = new List<Tuple<string, double>>();
+        //private List<Tuple<string, double>> _couchStructures = new List<Tuple<string, double>>();
+        // private List<Tuple<string, double, double, double>> _clinicalStructures = new List<Tuple<string, double, double, double>>();
+        // private List<Tuple<string, double>> _optStructures = new List<Tuple<string, double>>();
+
+        private List<expectedStructure> _myCouchExpectedStructures = new List<expectedStructure>();
+        private List<expectedStructure> _myClinicalExpectedStructures = new List<expectedStructure>();
+        private List<expectedStructure> _myOptExpectedStructures = new List<expectedStructure>();
+
+
+        public expectedStructure readAStructRow(Excel.Range r, int row)
+        {
+            expectedStructure es = new expectedStructure();
+            var temp1 = r.Cells[row, 1].Value2;
+            if (temp1 != null)
+            {
+                var temp2 = r.Cells[row, 2].Value2; // column 2
+                var temp3 = r.Cells[row, 3].Value2; // column 2
+                var temp4 = r.Cells[row, 4].Value2; // column 2
+                var temp5 = r.Cells[row, 5].Value2; // column 2
+
+                es.Name = (r.Cells[row, 1].Value2).ToString();
+                
+                if (temp2 != null)
+                    es.HU = (double)(temp2);
+                else
+                    es.HU = 9999;
+                if (temp3 != null)
+                    es.volMin = (double)(temp3);
+                else
+                    es.volMin = 9999;
+                if (temp4 != null)
+                    es.volMax = (double)(temp4);
+                else
+                    es.volMax = 9999;
+                if (temp5 != null)
+                    es.expectedNumberOfPart = (int)(temp5);
+                else
+                    es.expectedNumberOfPart = 9999;
+
+
+            }
+            if (temp1 != null)
+                return es;
+            else
+                return null;
+        }
 
         public read_check_protocol(string pathToProtocolCheck)  //Constructor
         {
@@ -66,7 +109,7 @@ namespace PlanCheck_IUCT
             // get the cells 4
             Excel.Range xlRange4 = xlWorksheet4.UsedRange;
             #endregion
-           
+
 
             #region sheet 1 General
             _protocolName = xlRange1.Cells[1, 2].Value2;
@@ -93,103 +136,54 @@ namespace PlanCheck_IUCT
             _normalisationMode = xlRange1.Cells[6, 2].Text;
 
             _enableGating = xlRange1.Cells[7, 2].Text;
-            #endregion          
-           
+            #endregion
+
 
             #region sheet 2 clinical structures
 
             int nRowsClinicalStruct = xlRange2.Rows.Count;
-            string oneClinicalStruct = null;
-            double huCS = 0;
-            for (int i = 2; i <= nRowsClinicalStruct; i++) // read all lines sheet 2
+            int i = 0;
+            for (i = 2; i <= nRowsClinicalStruct; i++) // read all lines sheet 2
             {
-                
-                var temp1 = xlRange2.Cells[i, 1].Value2; // column 1
+                expectedStructure es = readAStructRow(xlRange2, i);
+                _myClinicalExpectedStructures.Add(es);
 
-                if (temp1 != null)
-                {
-                    var temp2 = xlRange2.Cells[i, 2].Value2; // column 2
-                    var temp3 = xlRange2.Cells[i, 3].Value2; // column 2
-                    var temp4 = xlRange2.Cells[i, 4].Value2; // column 2
-
-                    oneClinicalStruct = temp1.ToString();
-                    if (temp2 != null)
-                        huCS = (double)(temp2);
-                    else
-                        huCS = 9999;///9999 if no asssigned HU
-
-                    double volmin = 0.0;
-                    double volmax = 0.0;
-                    if ((temp3 != null) && (temp4 != null))
-                    {
-
-                        volmin = (double)(temp3);
-                        volmax = (double)(temp4);
-                    }
-                    else
-                    {
-
-                        volmin = 9999;
-                        volmax = 9999;
-                    }
-
-                    Tuple<string, double, double, double> aCSElement = new Tuple<string, double, double, double>(oneClinicalStruct, huCS, volmin, volmax);
-
-                    _clinicalStructures.Add(aCSElement);
-                }
-                
             }
-           
+            /*
+            string allname=null;
+            foreach (expectedStructure es1 in _myClinicalExpectedStructures)
+            {
+                allname += " ";
+                allname += es1.Name;
+            }
+            MessageBox.Show(allname);   
+            */
             #endregion
-            
+
 
             #region sheet 3 opt structures
 
             int nRowsOptlStruct = xlRange3.Rows.Count;
-            string oneOptStruct = null;
-            double huOS = 0;
-            for (int i = 2; i <= nRowsOptlStruct; i++) // read all lines sheet 2
+
+            for (i = 2; i <= nRowsOptlStruct; i++) // read all lines sheet 2
             {
-                var temp1 = xlRange3.Cells[i, 1].Value2; // column 1
-                if (temp1 != null)
-                {
-                    var temp2 = xlRange3.Cells[i, 2].Value2; // column 2
-                    oneOptStruct = temp1.ToString();
-                    if (temp2 != null)
-                        huOS = (double)(temp2);
-                    else
-                        huOS = 9999;///9999 if no asssigned HU
-                    Tuple<string, double> aOSElement = new Tuple<string, double>(oneOptStruct, huOS);//, "cat", true);
-                    _optStructures.Add(aOSElement);
-                }
+                expectedStructure es = readAStructRow(xlRange3, i);
+                _myOptExpectedStructures.Add(es);
             }
 
-
             #endregion
-            
+
 
             #region sheet 4 Couch structures
 
             int nRowsCouchStruct = xlRange4.Rows.Count;
-            string couchEl = null;
-            double huEl = 0;
-            for (int i = 2; i <= nRowsCouchStruct; i++) // read all lines sheet 4
+            for (i = 2; i <= nRowsCouchStruct; i++) // read all lines sheet 4
             {
-                var temp1 = xlRange4.Cells[i, 1].Value2; // column 1
-                if (temp1 != null)
-                {
-                    var temp2 = xlRange4.Cells[i, 2].Value2; // column 2
-                    couchEl = temp1.ToString();
-                    huEl = (double)(temp2);
-                    Tuple<string, double> aCouchElement = new Tuple<string, double>(couchEl, huEl);//, "cat", true);
-                    _couchStructures.Add(aCouchElement);
-                    // MessageBox.Show(aCouchElement.Item1 + aCouchElement.Item2.ToString());
-                }
+                expectedStructure es = readAStructRow(xlRange4, i);
+                _myCouchExpectedStructures.Add(es);
             }
-
-
             #endregion
-           
+
 
             #region cleanup excel
             GC.Collect();
@@ -239,18 +233,17 @@ namespace PlanCheck_IUCT
         {
             get { return _enableGating; }
         }
-
-        public List<Tuple<string, double>> couchStructures
+        public List<expectedStructure> myClinicalExpectedStructures
         {
-            get { return _couchStructures; }
+            get { return _myClinicalExpectedStructures; }
         }
-        public List<Tuple<string, double,double,double>> clinicalStructures
+        public List<expectedStructure> myOptExpectedStructures
         {
-            get { return _clinicalStructures; }
+            get { return _myOptExpectedStructures; }
         }
-        public List<Tuple<string, double>> optStructures
+        public List<expectedStructure> myCouchExpectedStructures
         {
-            get { return _optStructures; }
+            get { return _myCouchExpectedStructures; }
         }
 
 

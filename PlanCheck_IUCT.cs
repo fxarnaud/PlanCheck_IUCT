@@ -58,16 +58,10 @@ namespace VMS.TPS
             if (context.PlanSetup.RTPrescription == null)
                 MessageBox.Show("Ce plan n'est lié à aucune prescription"); // run anyway even if there is no prescription
             #endregion
-
             
-            //get the full location of the assembly 
-            string fullPath = Assembly.GetExecutingAssembly().Location;
-            //get the folder that's in
-            string theDirectory = Path.GetDirectoryName(fullPath);
-             // set current directory as the .dll directory
-            Directory.SetCurrentDirectory(theDirectory);
-            // hardcoded dir           Directory.SetCurrentDirectory(@"\\srv015\SF_COM\SIMON_LU\scriptsEclipse\00004-plancheck\Plancheck");
-           
+            string fullPath = Assembly.GetExecutingAssembly().Location; //get the full location of the assembly          
+            string theDirectory = Path.GetDirectoryName(fullPath);//get the folder that's in                                                                  
+            Directory.SetCurrentDirectory(theDirectory);// set current directory as the .dll directory
 
             Perform(context);
         }

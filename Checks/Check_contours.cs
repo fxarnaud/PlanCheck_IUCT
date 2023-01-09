@@ -30,7 +30,7 @@ namespace PlanCheck_IUCT
 
         public void Check()
         {
-            
+
             #region COUCH STRUCTURES 
             Item_Result couchStructExist = new Item_Result();
             couchStructExist.Label = "Structures de table";
@@ -38,33 +38,32 @@ namespace PlanCheck_IUCT
 
             List<string> missingCouchStructures = new List<string>();
             List<string> wrongHUCouchStructures = new List<string>();
-            foreach (Tuple<string, double> el in _rcp.couchStructures) // foreach couch element in the xls protocol file
+
+            foreach (expectedStructure es in _rcp.myCouchExpectedStructures) // foreach couch element in the xls protocol file
             {
                 double mydouble = 0;
-                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == el.Item1); // find a structure in ss with the same name
+                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
                 if (struct1 == null) // if structure doesnt exist in ss
-                    missingCouchStructures.Add(el.Item1);
+                    missingCouchStructures.Add(es.Name);
                 else if (struct1.IsEmpty) // else if it exists but empty --> same
-                    missingCouchStructures.Add(el.Item1);
+                    missingCouchStructures.Add(es.Name);
                 else
                 {
                     struct1.GetAssignedHU(out mydouble);
-                    if (mydouble != el.Item2)
-                        wrongHUCouchStructures.Add(el.Item1);
-                    //MessageBox.Show("YES we found in ss " + el.Item1 + " " + struct1.Id + " " + mydouble.ToString());
+                    if (mydouble != es.HU)
+                        wrongHUCouchStructures.Add(es.Name);
                 }
             }
-
 
 
             if ((wrongHUCouchStructures.Count == 0) && (missingCouchStructures.Count == 0))
             {
                 couchStructExist.setToTRUE();
-                couchStructExist.MeasuredValue = "Présentes et UH corectes " + _rcp.couchStructures.Count.ToString() + "/" + _rcp.couchStructures.Count.ToString();
+                couchStructExist.MeasuredValue = "Présentes et UH corectes " + _rcp.myCouchExpectedStructures.Count.ToString() + "/" + _rcp.myCouchExpectedStructures.Count.ToString();
                 couchStructExist.Infobulle = "Structures de tables attendues pour le protocole " + _rcp.protocolName + " :\n";
-                foreach (Tuple<string, double> el in _rcp.couchStructures) // foreach couch element in the xls protocol file
+                foreach (expectedStructure es in _rcp.myCouchExpectedStructures) // foreach couch element in the xls protocol file
                 {
-                    couchStructExist.Infobulle += " - " + el.Item1 + "\n";
+                    couchStructExist.Infobulle += " - " + es.Name + "\n";
                 }
             }
             else
@@ -96,36 +95,35 @@ namespace PlanCheck_IUCT
 
             List<string> missingClinicalStructures = new List<string>();
             List<string> wrongHUClinicalStructures = new List<string>();
-            foreach (Tuple<string, double,double,double> el in _rcp.clinicalStructures) // foreach couch element in the xls protocol file
+
+            foreach (expectedStructure es in _rcp.myClinicalExpectedStructures) // foreach clinical struct in the xls check-protocol file
             {
+                //MessageBox.Show("here is " + es.Name);
                 double mydouble = 0;
-                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == el.Item1); // find a structure in ss with the same name
+                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
                 if (struct1 == null) // if structure doesnt exist in ss
-                    missingClinicalStructures.Add(el.Item1);
+                    missingClinicalStructures.Add(es.Name);
                 else if (struct1.IsEmpty) // else if it exists but empty --> same
-                    missingClinicalStructures.Add(el.Item1);
+                    missingClinicalStructures.Add(es.Name);
                 else
                 {
-                    if (el.Item2 != 9999) // 9999 if no assigned HU 
+                    if (es.HU != 9999) // 9999 if no assigned HU 
                     {
                         struct1.GetAssignedHU(out mydouble);
-                        if (mydouble != el.Item2)
-                            wrongHUClinicalStructures.Add(el.Item1);
+                        if (mydouble != es.HU)
+                            wrongHUClinicalStructures.Add(es.Name);
                     }
-                    //MessageBox.Show("YES we found in ss " + el.Item1 + " " + struct1.Id + " " + mydouble.ToString());
                 }
             }
-
-
 
             if ((wrongHUClinicalStructures.Count == 0) && (missingClinicalStructures.Count == 0))
             {
                 clinicalStructuresItem.setToTRUE();
-                clinicalStructuresItem.MeasuredValue = "Présentes et UH corectes " + _rcp.clinicalStructures.Count.ToString() + "/" + _rcp.clinicalStructures.Count.ToString();
+                clinicalStructuresItem.MeasuredValue = "Présentes et UH corectes " + _rcp.myClinicalExpectedStructures.Count.ToString() + "/" + _rcp.myClinicalExpectedStructures.Count.ToString();
                 clinicalStructuresItem.Infobulle = "Structures de tables attendues pour le protocole " + _rcp.protocolName + " :\n";
-                foreach (Tuple<string, double,double,double> el in _rcp.clinicalStructures) // foreach couch element in the xls protocol file
+                foreach (expectedStructure es in _rcp.myClinicalExpectedStructures)
                 {
-                    clinicalStructuresItem.Infobulle += " - " + el.Item1 + "\n";
+                    clinicalStructuresItem.Infobulle += " - " + es.Name + "\n";
                 }
             }
             else
@@ -151,7 +149,6 @@ namespace PlanCheck_IUCT
             #endregion
 
 
-
             #region OPT STRUCTURES 
 
             Item_Result optStructuresItem = new Item_Result();
@@ -161,21 +158,21 @@ namespace PlanCheck_IUCT
 
             List<string> missingOptStructures = new List<string>();
             List<string> wrongHUOptStructures = new List<string>();
-            foreach (Tuple<string, double> el in _rcp.optStructures) // foreach couch element in the xls protocol file
+            foreach (expectedStructure es in _rcp.myOptExpectedStructures)
             {
                 double mydouble = 0;
-                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == el.Item1); // find a structure in ss with the same name
+                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
                 if (struct1 == null) // if structure doesnt exist in ss
-                    missingOptStructures.Add(el.Item1);
+                    missingOptStructures.Add(es.Name);
                 else if (struct1.IsEmpty) // else if it exists but empty --> same
-                    missingOptStructures.Add(el.Item1);
+                    missingOptStructures.Add(es.Name);
                 else
                 {
-                    if (el.Item2 != 9999) // 9999 if no assigned HU 
+                    if (es.HU != 9999) // 9999 if no assigned HU 
                     {
                         struct1.GetAssignedHU(out mydouble);
-                        if (mydouble != el.Item2)
-                            wrongHUOptStructures.Add(el.Item1);
+                        if (mydouble != es.HU)
+                            wrongHUOptStructures.Add(es.Name);
                     }
                     //MessageBox.Show("YES we found in ss " + el.Item1 + " " + struct1.Id + " " + mydouble.ToString());
                 }
@@ -186,11 +183,11 @@ namespace PlanCheck_IUCT
             if ((wrongHUOptStructures.Count == 0) && (missingOptStructures.Count == 0))
             {
                 optStructuresItem.setToTRUE();
-                optStructuresItem.MeasuredValue = "Présentes et UH corectes " + _rcp.optStructures.Count.ToString() + "/" + _rcp.optStructures.Count.ToString();
+                optStructuresItem.MeasuredValue = "Présentes et UH corectes " + _rcp.myOptExpectedStructures.Count.ToString() + "/" + _rcp.myOptExpectedStructures.Count.ToString();
                 optStructuresItem.Infobulle = "Structures de tables attendues pour le protocole " + _rcp.protocolName + " :\n";
-                foreach (Tuple<string, double> el in _rcp.optStructures) // foreach couch element in the xls protocol file
+                foreach (expectedStructure es in _rcp.myOptExpectedStructures)
                 {
-                    optStructuresItem.Infobulle += " - " + el.Item1 + "\n";
+                    optStructuresItem.Infobulle += " - " + es.Name + "\n";
                 }
             }
             else
@@ -212,8 +209,12 @@ namespace PlanCheck_IUCT
             this._result.Add(optStructuresItem);
             #endregion
 
+
+            //            Concatenate all structures ine a list
+            var allStructures = _rcp.myClinicalExpectedStructures.Concat(_rcp.myOptExpectedStructures).Concat(_rcp.myCouchExpectedStructures).ToList();
             
-            #region Volume Anormal
+
+            #region  Anormal Volume
             // entre -3sigma et +3sigma >99.9% des cas
             List<string> anormalVolumeList = new List<string>();
             List<string> normalVolumeList = new List<string>();
@@ -221,18 +222,19 @@ namespace PlanCheck_IUCT
             anormalVolumeItem.Label = "Volume des structures";
             anormalVolumeItem.ExpectedValue = "EN COURS";
 
-            foreach (Tuple<string, double, double, double> el in _rcp.clinicalStructures) // foreach couch element in the xls protocol file
+            //foreach (expectedStructure es in _rcp.myClinicalExpectedStructures)
+            foreach (expectedStructure es in allStructures)
             {
-               
-                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == el.Item1); // find a structure in ss with the same name
+
+                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
                 if (struct1 != null) // if structure  exist 
                     if (!struct1.IsEmpty) //  and if not empty 
-                        if (el.Item3 != 9999) // and if a volume min is defined in protocol
+                        if (es.volMin != 9999) // and if a volume min is defined in protocol
                         {
-                            if ((struct1.Volume > el.Item3) && (struct1.Volume < el.Item4)) //if volume ok
-                                normalVolumeList.Add(el.Item1);
+                            if ((struct1.Volume > es.volMin) && (struct1.Volume < es.volMax)) //if volume ok
+                                normalVolumeList.Add(es.Name);
                             else
-                                anormalVolumeList.Add(el.Item1 + " ("+struct1.Volume.ToString("F2")+" cc). Attendu: "+ el.Item3.ToString("F2")+" - "+el.Item4.ToString("F2") + " cc");
+                                anormalVolumeList.Add(es.Name + " (" + struct1.Volume.ToString("F2") + " cc). Attendu: " + es.volMin.ToString("F2") + " - " + es.volMax.ToString("F2") + " cc");
 
                         }
 
@@ -243,29 +245,102 @@ namespace PlanCheck_IUCT
                 anormalVolumeItem.setToWARNING();
                 anormalVolumeItem.MeasuredValue = "Volumes anormaux détectés";
                 anormalVolumeItem.Infobulle = "Les volumes des structures suivantes ne sont\npas dans l'intervalle 6 sigma des volumes habituels\n";
-                foreach(string avs in anormalVolumeList)
+                foreach (string avs in anormalVolumeList)
                     anormalVolumeItem.Infobulle += " - " + avs + "\n";
 
-                this._result.Add(anormalVolumeItem);
+
             }
             else if (normalVolumeList.Count > 0)
             {
-                anormalVolumeItem.setToTRUE();
+
                 anormalVolumeItem.MeasuredValue = "Volumes des structures OK";
                 anormalVolumeItem.Infobulle = "Les volumes des structures suivantes sont\ndans l'intervalle 6 sigma des volumes habituels\n";
                 foreach (string avs in normalVolumeList)
                     anormalVolumeItem.Infobulle += " - " + avs + "\n";
 
-                this._result.Add(anormalVolumeItem);
+
+            }
+            else
+            {
+                anormalVolumeItem.setToINFO();
+                anormalVolumeItem.MeasuredValue = "Aucune analyse de volumes de structures";
+                anormalVolumeItem.Infobulle = "Les structures présentes n'ont pas de valeur de volumes (cc) attendus dans le check-protocol\n";
             }
 
-          
+            this._result.Add(anormalVolumeItem);
 
-//          this._result.Add(anormalVolumeItem);
 
             #endregion
 
+
+            #region Shape analyser
+            /* Check if a structrure has the expected number of parts e.g. if a slice is missing */
+            Item_Result shapeAnalyser = new Item_Result();
+            shapeAnalyser.Label = "Nombre de parties des structures";
+            shapeAnalyser.ExpectedValue = "wip...";
+
             
+            List<string> correctStructs = new List<string>();
+            List<string> uncorrectStructs = new List<string>();
+
+            
+
+
+            
+            foreach (expectedStructure es in allStructures)
+            {
+
+                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
+
+
+                if (struct1 != null)
+                    if (!struct1.IsEmpty)
+                        if (es.expectedNumberOfPart != 9999)
+                        {
+                            int n = struct1.GetNumberOfSeparateParts();
+                            if (n != es.expectedNumberOfPart)
+                            {
+                                
+                                uncorrectStructs.Add(es.Name + " comporte " + n + " parties (attendu : " + es.expectedNumberOfPart + ")");
+                               
+                            }
+                            else
+                            {
+                                
+                                correctStructs.Add(es.Name + " comporte " + n + " parties (attendu : " + es.expectedNumberOfPart + ")");
+                            }
+                        }
+
+            }
+            if (uncorrectStructs.Count > 0)
+            {
+                shapeAnalyser.setToFALSE();
+                shapeAnalyser.MeasuredValue = " Nombres de parties des structures incorrects";
+                shapeAnalyser.Infobulle = "Les structures suivantes ont un de nombre de parties non-conforme au check-protocol :\n";
+                foreach (string s in uncorrectStructs)
+                    shapeAnalyser.Infobulle += s + "\n";
+            }
+            else if (correctStructs.Count > 0)
+            {
+                shapeAnalyser.setToTRUE();
+
+                shapeAnalyser.MeasuredValue = " Nombres de parties des structures corrects";
+                shapeAnalyser.Infobulle = "Les structures suivantes ont un de nombre de parties conforme au check-protocol :\n";
+                foreach (string s in correctStructs)
+                    shapeAnalyser.Infobulle += s + "\n";
+
+            }
+            else
+            {
+                shapeAnalyser.setToINFO();
+                shapeAnalyser.MeasuredValue = " Aucune analyse du nombres de parties des structures";
+                shapeAnalyser.Infobulle = "Les structures présentes n'ont pas de valeurs attendues de nombre de parties dans le check-protocol\n";
+            }
+
+            this._result.Add(shapeAnalyser);
+
+
+            #endregion
 
         }
         public string Title
