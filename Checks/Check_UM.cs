@@ -84,7 +84,7 @@ namespace PlanCheck_IUCT
 
 
 
-            um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT. En VMAT warning si > 3.5 et ERREUR si > 4.5. A noter que pour H8 pelvis on accepte < 4.5 et pour les RA vertebre < 5";
+            um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT. En VMAT warning si > 3.5 et ERREUR si > 4.5. A noter que pour Halcyon pelvis on accepte < 4.5 et pour les RA vertebre < 5";
 
 
             // um.Infobulle = thereIsAFieldWithaWedge;

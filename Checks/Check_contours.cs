@@ -23,6 +23,30 @@ namespace PlanCheck_IUCT
             Check();
 
         }
+        public static int _GetSlice(double z, StructureSet SS)
+        {
+            var imageRes = SS.Image.ZRes;
+            return Convert.ToInt32((z - SS.Image.Origin.z) / imageRes);
+        }
+
+        public static int getNumberOfMissingSlices(Structure S, StructureSet SS)
+        {
+            var mesh = S.MeshGeometry.Bounds;
+            int meshLow = _GetSlice(mesh.Z, SS);
+            int meshUp = _GetSlice(mesh.Z + mesh.SizeZ, SS);
+
+
+            int nHoles = 0;
+            for (int i = meshLow; i <= meshUp; i++)
+            {
+                VMS.TPS.Common.Model.Types.VVector[][] vvv = S.GetContoursOnImagePlane(i);
+
+                if (vvv.Length == 0)
+                    nHoles++;
+
+            }
+            return nHoles;
+        }
 
         private List<Item_Result> _result = new List<Item_Result>();
         // private PreliminaryInformation _pinfo;
@@ -210,11 +234,11 @@ namespace PlanCheck_IUCT
             #endregion
 
 
-            //            Concatenate all structures ine a list
+            #region Concatenate all structures ine a list
             var allStructures = _rcp.myClinicalExpectedStructures.Concat(_rcp.myOptExpectedStructures).Concat(_rcp.myCouchExpectedStructures).ToList();
-            
+            #endregion
 
-            #region  Anormal Volume
+            #region  Anormal Volume values (cc)
             // entre -3sigma et +3sigma >99.9% des cas
             List<string> anormalVolumeList = new List<string>();
             List<string> normalVolumeList = new List<string>();
@@ -252,7 +276,7 @@ namespace PlanCheck_IUCT
             }
             else if (normalVolumeList.Count > 0)
             {
-
+                anormalVolumeItem.setToTRUE();
                 anormalVolumeItem.MeasuredValue = "Volumes des structures OK";
                 anormalVolumeItem.Infobulle = "Les volumes des structures suivantes sont\ndans l'intervalle 6 sigma des volumes habituels\n";
                 foreach (string avs in normalVolumeList)
@@ -273,20 +297,20 @@ namespace PlanCheck_IUCT
             #endregion
 
 
-            #region Shape analyser
+            #region Shape analyser (number of parts of a structure)
             /* Check if a structrure has the expected number of parts e.g. if a slice is missing */
             Item_Result shapeAnalyser = new Item_Result();
             shapeAnalyser.Label = "Nombre de parties des structures";
             shapeAnalyser.ExpectedValue = "wip...";
 
-            
+
             List<string> correctStructs = new List<string>();
             List<string> uncorrectStructs = new List<string>();
 
-            
 
 
-            
+
+
             foreach (expectedStructure es in allStructures)
             {
 
@@ -295,18 +319,20 @@ namespace PlanCheck_IUCT
 
                 if (struct1 != null)
                     if (!struct1.IsEmpty)
-                        if (es.expectedNumberOfPart != 9999)
+                        if (es.expectedNumberOfPart != 9999) // expected number of parts exists
                         {
-                            int n = struct1.GetNumberOfSeparateParts();
+                            int n = struct1.GetNumberOfSeparateParts(); 
+                            
+
                             if (n != es.expectedNumberOfPart)
                             {
-                                
+
                                 uncorrectStructs.Add(es.Name + " comporte " + n + " parties (attendu : " + es.expectedNumberOfPart + ")");
-                               
+
                             }
                             else
                             {
-                                
+
                                 correctStructs.Add(es.Name + " comporte " + n + " parties (attendu : " + es.expectedNumberOfPart + ")");
                             }
                         }
@@ -337,11 +363,45 @@ namespace PlanCheck_IUCT
                 shapeAnalyser.Infobulle = "Les structures présentes n'ont pas de valeurs attendues de nombre de parties dans le check-protocol\n";
             }
 
+
+
             this._result.Add(shapeAnalyser);
-
-
             #endregion
 
+            #region missing slices
+            Item_Result missingSlicesItem = new Item_Result();
+            missingSlicesItem.Label = "Contours manquants";
+            missingSlicesItem.ExpectedValue = "wip...";
+
+            int m = 0;
+            int nAnalysedStructures = 0;
+            List<string> structureswithAGap = new List<string>(); ;
+            foreach (Structure s in _ctx.StructureSet.Structures)
+            {
+                if (s.Id != "Plombs") // do no check marker structures
+                {
+                    nAnalysedStructures++;
+                    m = getNumberOfMissingSlices(s, _ctx.StructureSet);
+                    if (m > 0)
+                        structureswithAGap.Add(m.ToString() + "Contours manquantes pour: " + s.Id);
+                }
+            }
+            if(structureswithAGap.Count > 0)
+            {
+                missingSlicesItem.MeasuredValue = "Certaines structures présentent des contours manquants";
+                missingSlicesItem.setToWARNING();
+                foreach (string s in structureswithAGap)
+                    missingSlicesItem.Infobulle += s + "\n";
+
+            }
+            else
+            {
+                missingSlicesItem.MeasuredValue = "Pas de contours manquants";
+                missingSlicesItem.setToTRUE();
+                missingSlicesItem.Infobulle = nAnalysedStructures.ToString() + " structures analysées. Aucune coupes non-contourée détectée";
+            }
+            this._result.Add(missingSlicesItem);
+            #endregion
         }
         public string Title
         {
