@@ -82,6 +82,10 @@ namespace PlanCheck_IUCT
             Structure ptvTarget=null;// = new Structure;
            
 
+            // REPRENDRE ICI 
+            /// GERER LES CAS OU LE VOLUME CIBLE SPECIFIE n'EXISTE PAS ou est vide ou pas de volume cible
+
+
             foreach (Structure s in _ctx.StructureSet.Structures)
             {
                 if (s.Id == _ctx.PlanSetup.TargetVolumeID) 

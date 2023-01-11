@@ -31,7 +31,7 @@ namespace PlanCheck_IUCT
 
         public static int getNumberOfMissingSlices(Structure S, StructureSet SS)
         {
-            
+
             var mesh = S.MeshGeometry.Bounds;
             int meshLow = _GetSlice(mesh.Z, SS);
             int meshUp = _GetSlice(mesh.Z + mesh.SizeZ, SS);
@@ -443,10 +443,7 @@ namespace PlanCheck_IUCT
                                     badLaterality.Add(es.Name);
 
                             }
-
-    //                            MessageBox.Show(s.Id + " " + s.MeshGeometry.Bounds.X.ToString("0.00") + " " + s.MeshGeometry.Bounds.SizeX.ToString("0.00") +" "+  xpos.ToString("0.00") + " " + bodyXcenter.ToString("0.00")); //+ (0.5 - tolerance) * (ptvTarget.MeshGeometry.Bounds.SizeX);
-
-                        }  
+                        }
                 }
             }
 
@@ -475,16 +472,89 @@ namespace PlanCheck_IUCT
             #endregion
 
             #region A PTV for EACH CTV/GTV
-            Item_Result aPTVforEvryone = new Item_Result();
-            aPTVforEvryone.Label = "GTV PTV";
-            aPTVforEvryone.ExpectedValue = "wip...";
+            Item_Result aPTVforEveryone = new Item_Result();
+            aPTVforEveryone.Label = "GTV/CTV sans PTV";
+            aPTVforEveryone.ExpectedValue = "wip...";
+
+            List<string> CTVandGTVs = new List<string>();
+            List<string> PTVs = new List<string>();
+            List<string> CTVwithoutAnyPTV = new List<string>();
+            List<string> CTVwithPTV = new List<string>();
+            foreach (Structure s in _ctx.StructureSet.Structures) // list all GTV/CTVs and PTVs
+            {
+                if ((s.Id.ToUpper().Contains("CTV")) || (s.Id.ToUpper().Contains("GTV"))) // look for ctv or Gtv in name, case insensitive thanks to ToUpper
+                {
+                    if (!s.IsEmpty)
+                        CTVandGTVs.Add(s.Id);
+                }
+
+                if (s.Id.ToUpper().Contains("PTV")) // look for ptv in name, case insensitive thanks to ToUpper
+                {
+                    if (!s.IsEmpty)
+                        PTVs.Add(s.Id);
+                }
+            }
+
+            foreach (string CTV_ID in CTVandGTVs)
+            {
+                Structure myCTV = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == CTV_ID); // get the CTV
+                double CTV_xmin = myCTV.MeshGeometry.Bounds.X;
+                double CTV_xmax = myCTV.MeshGeometry.Bounds.SizeX;
+                double CTV_ymin = myCTV.MeshGeometry.Bounds.Y;
+                double CTV_ymax = myCTV.MeshGeometry.Bounds.SizeY;
+                double CTV_zmin = myCTV.MeshGeometry.Bounds.Z;
+                double CTV_zmax = myCTV.MeshGeometry.Bounds.SizeZ;
+                bool found = false;
+                foreach (string PTV_ID in PTVs)
+                {
+                    Structure myPTV = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == PTV_ID); // loop on PTV
+                    double PTV_xmin = myPTV.MeshGeometry.Bounds.X;
+                    double PTV_xmax = myPTV.MeshGeometry.Bounds.SizeX;
+                    double PTV_ymin = myPTV.MeshGeometry.Bounds.Y;
+                    double PTV_ymax = myPTV.MeshGeometry.Bounds.SizeY;
+                    double PTV_zmin = myPTV.MeshGeometry.Bounds.Z;
+                    double PTV_zmax = myPTV.MeshGeometry.Bounds.SizeZ;
+                    
+                    if( (PTV_xmin < CTV_xmin) && ((PTV_xmax > CTV_xmax)))
+                        if ((PTV_ymin < CTV_ymin) && ((PTV_ymax > CTV_ymax)))
+                            if ((PTV_zmin < CTV_zmin) && ((PTV_zmax > CTV_zmax)))
+                            {
+                                CTVwithPTV.Add(CTV_ID);
+                                found = true;
+                                break; // exit as soon as a PTV is found
+                            }
+                        
+                    
+
+                }
+                if (found == false)
+                    CTVwithoutAnyPTV.Add(CTV_ID);
+                else
+                    CTVwithPTV.Add(CTV_ID);
+
+            }
+            if (CTVwithoutAnyPTV.Count() > 0) // at least one GTV/CTV has no PTV
+            {
+                aPTVforEveryone.setToFALSE();
+                aPTVforEveryone.MeasuredValue = "Au moins un GTV/CTV n'a pas de PTV";
+                aPTVforEveryone.Infobulle = "Ces GTV/CTV n'ont pas de PTV : \n";
+                foreach (string s in CTVwithoutAnyPTV)
+                    aPTVforEveryone.Infobulle += " - " + s + "\n";
+            }
+            else
+            {
+                aPTVforEveryone.setToTRUE();
+                aPTVforEveryone.MeasuredValue = "Aucun GTV/CTV n'a pas de PTV";
+                aPTVforEveryone.Infobulle = "Ces GTV/CTV ont tous un PTV : \n";
+                foreach (string s in CTVwithPTV)
+                    aPTVforEveryone.Infobulle += " - " + s + "\n";
+            }
 
 
-            aPTVforEvryone.MeasuredValue = ". . . . ";
-            aPTVforEvryone.setToTRUE();
-            aPTVforEvryone.Infobulle = " - - - - -";
+            
+            
 
-            this._result.Add(aPTVforEvryone);
+            this._result.Add(aPTVforEveryone);
             #endregion
 
         }
