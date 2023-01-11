@@ -47,9 +47,10 @@ namespace PlanCheck_IUCT
             if (temp1 != null)
             {
                 var temp2 = r.Cells[row, 2].Value2; // column 2
-                var temp3 = r.Cells[row, 3].Value2; // column 2
-                var temp4 = r.Cells[row, 4].Value2; // column 2
-                var temp5 = r.Cells[row, 5].Value2; // column 2
+                var temp3 = r.Cells[row, 3].Value2; // column 3
+                var temp4 = r.Cells[row, 4].Value2; // column 4
+                var temp5 = r.Cells[row, 5].Value2; // column 5
+                var temp6 = r.Cells[row, 6].Value2; // column 6
 
                 es.Name = (r.Cells[row, 1].Value2).ToString();
                 
@@ -69,7 +70,10 @@ namespace PlanCheck_IUCT
                     es.expectedNumberOfPart = (int)(temp5);
                 else
                     es.expectedNumberOfPart = 9999;
-
+                if (temp6 != null)
+                    es.laterality = (r.Cells[row, 6].Value2).ToString();
+                else
+                    es.laterality = "NONE";
 
             }
             if (temp1 != null)

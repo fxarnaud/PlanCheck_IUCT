@@ -147,6 +147,25 @@ namespace PlanCheck_IUCT
             #endregion
 
 
+
+            #region Distance à l'origine en z
+            Item_Result distanceToOrigin = new Item_Result();
+            double maxDistance = 25.0;
+            distanceToOrigin.Label = "Distance à l'origine (z)";
+            distanceToOrigin.ExpectedValue = "1";
+            double distanceZ = (myz - _ctx.Image.UserOrigin.z) / 10.0;
+            
+            if((distanceZ > maxDistance) || (distanceZ < -maxDistance))
+                distanceToOrigin.setToFALSE();
+            else
+                distanceToOrigin.setToTRUE();
+
+            distanceToOrigin.MeasuredValue = distanceZ.ToString("0.##") + " cm";
+            distanceToOrigin.Infobulle = "L'isocentre doit être à < " + maxDistance + " cm de l'origine (en z)";
+            
+            this._result.Add(distanceToOrigin);
+            #endregion
+
         }
         public string Title
         {

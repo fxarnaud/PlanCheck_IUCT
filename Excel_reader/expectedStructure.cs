@@ -13,6 +13,7 @@ namespace PlanCheck_IUCT
         public double volMin { get; set; }
         public double volMax { get; set; }
         public int expectedNumberOfPart { get; set; }
+        public string laterality { get; set; }
 
     }
 }

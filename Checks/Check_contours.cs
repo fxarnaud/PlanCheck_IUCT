@@ -31,6 +31,7 @@ namespace PlanCheck_IUCT
 
         public static int getNumberOfMissingSlices(Structure S, StructureSet SS)
         {
+            
             var mesh = S.MeshGeometry.Bounds;
             int meshLow = _GetSlice(mesh.Z, SS);
             int meshUp = _GetSlice(mesh.Z + mesh.SizeZ, SS);
@@ -109,7 +110,6 @@ namespace PlanCheck_IUCT
             this._result.Add(couchStructExist);
             #endregion
 
-
             #region CLINICAL STRUCTURES 
 
             Item_Result clinicalStructuresItem = new Item_Result();
@@ -172,7 +172,6 @@ namespace PlanCheck_IUCT
             this._result.Add(clinicalStructuresItem);
             #endregion
 
-
             #region OPT STRUCTURES 
 
             Item_Result optStructuresItem = new Item_Result();
@@ -233,8 +232,7 @@ namespace PlanCheck_IUCT
             this._result.Add(optStructuresItem);
             #endregion
 
-
-            #region Concatenate all structures ine a list
+            #region Concatenate all structures in one list
             var allStructures = _rcp.myClinicalExpectedStructures.Concat(_rcp.myOptExpectedStructures).Concat(_rcp.myCouchExpectedStructures).ToList();
             #endregion
 
@@ -296,7 +294,6 @@ namespace PlanCheck_IUCT
 
             #endregion
 
-
             #region Shape analyser (number of parts of a structure)
             /* Check if a structrure has the expected number of parts e.g. if a slice is missing */
             Item_Result shapeAnalyser = new Item_Result();
@@ -321,8 +318,8 @@ namespace PlanCheck_IUCT
                     if (!struct1.IsEmpty)
                         if (es.expectedNumberOfPart != 9999) // expected number of parts exists
                         {
-                            int n = struct1.GetNumberOfSeparateParts(); 
-                            
+                            int n = struct1.GetNumberOfSeparateParts();
+
 
                             if (n != es.expectedNumberOfPart)
                             {
@@ -375,10 +372,10 @@ namespace PlanCheck_IUCT
 
             int m = 0;
             int nAnalysedStructures = 0;
-            List<string> structureswithAGap = new List<string>(); ;
+            List<string> structureswithAGap = new List<string>();
             foreach (Structure s in _ctx.StructureSet.Structures)
             {
-                if (s.Id != "Plombs") // do no check marker structures
+                if ((s.Id != "Plombs") && (!s.IsEmpty)) // do no check marker structures
                 {
                     nAnalysedStructures++;
                     m = getNumberOfMissingSlices(s, _ctx.StructureSet);
@@ -386,7 +383,7 @@ namespace PlanCheck_IUCT
                         structureswithAGap.Add(m.ToString() + "Contours manquantes pour: " + s.Id);
                 }
             }
-            if(structureswithAGap.Count > 0)
+            if (structureswithAGap.Count > 0)
             {
                 missingSlicesItem.MeasuredValue = "Certaines structures présentent des contours manquants";
                 missingSlicesItem.setToWARNING();
@@ -396,12 +393,100 @@ namespace PlanCheck_IUCT
             }
             else
             {
-                missingSlicesItem.MeasuredValue = "Pas de contours manquants";
+                missingSlicesItem.MeasuredValue = "Aucune coupe non-contourée détectée";
                 missingSlicesItem.setToTRUE();
-                missingSlicesItem.Infobulle = nAnalysedStructures.ToString() + " structures analysées. Aucune coupes non-contourée détectée";
+                missingSlicesItem.Infobulle = nAnalysedStructures.ToString() + " structures analysées. Aucune coupe non-contourée détectée";
             }
             this._result.Add(missingSlicesItem);
             #endregion
+
+
+            #region Laterality
+            Item_Result laterality = new Item_Result();
+            laterality.Label = "Lateralité";
+            laterality.ExpectedValue = "wip...";
+
+            List<string> goodLaterality = new List<string>();
+            List<string> badLaterality = new List<string>();
+            Structure sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == "BODY"); // find body
+
+            if (sbody == null) MessageBox.Show("BODY NOT FOUND");
+
+            double bodyXcenter = sbody.MeshGeometry.Bounds.X + (sbody.MeshGeometry.Bounds.SizeX / 2.0);
+
+            foreach (expectedStructure es in allStructures)
+            {
+                if (es.laterality != "NONE")
+                {
+                    Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
+                    double xpos = 0.0;
+                    if (s != null)
+                        if (!s.IsEmpty)
+                        {
+                            xpos = s.MeshGeometry.Bounds.X + (s.MeshGeometry.Bounds.SizeX / 2.0);  // (Left limit + size) /2
+
+                            //MessageBox.Show("orientation : " + _ctx.Image.ImagingOrientation.ToString());
+                            //if(_ctx.Image.ImagingOrientation) //
+
+                            if (xpos > bodyXcenter) // THIS IS LEFT,  if Supine HF but also Prone HF, Supine FF...
+                            {
+                                if (es.laterality == "L")
+                                    goodLaterality.Add(es.Name);
+                                else if (es.laterality == "R")
+                                    badLaterality.Add(es.Name);
+                            }
+                            else
+                            {
+                                if (es.laterality == "R")
+                                    goodLaterality.Add(es.Name);
+                                else if (es.laterality == "L")
+                                    badLaterality.Add(es.Name);
+
+                            }
+
+    //                            MessageBox.Show(s.Id + " " + s.MeshGeometry.Bounds.X.ToString("0.00") + " " + s.MeshGeometry.Bounds.SizeX.ToString("0.00") +" "+  xpos.ToString("0.00") + " " + bodyXcenter.ToString("0.00")); //+ (0.5 - tolerance) * (ptvTarget.MeshGeometry.Bounds.SizeX);
+
+                        }  
+                }
+            }
+
+            if (badLaterality.Count > 0)
+            {
+                laterality.MeasuredValue = "Mauvaise latéralité (voir détail)";
+                laterality.setToFALSE();
+
+                laterality.Infobulle = "Ces structures sont attendues à gauche ou à droite et semblent du mauvais côté : \n";
+                foreach (string s in badLaterality)
+                    laterality.Infobulle += " - " + s + "\n";
+            }
+            else
+            {
+                laterality.MeasuredValue = "Vérifiée pour " + goodLaterality.Count() + " structures";
+                laterality.setToTRUE();
+
+                laterality.Infobulle = "Ces structures sont attendues à gauche ou à droite et semblent du bon côté : \n";
+                foreach (string s in goodLaterality)
+                    laterality.Infobulle += " - " + s + "\n";
+
+            }
+
+
+            this._result.Add(laterality);
+            #endregion
+
+            #region A PTV for EACH CTV/GTV
+            Item_Result aPTVforEvryone = new Item_Result();
+            aPTVforEvryone.Label = "GTV PTV";
+            aPTVforEvryone.ExpectedValue = "wip...";
+
+
+            aPTVforEvryone.MeasuredValue = ". . . . ";
+            aPTVforEvryone.setToTRUE();
+            aPTVforEvryone.Infobulle = " - - - - -";
+
+            this._result.Add(aPTVforEvryone);
+            #endregion
+
         }
         public string Title
         {
