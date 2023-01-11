@@ -1,0 +1,69 @@
+﻿
+
+
+prescription
+	accord avec les standards ? 
+	accord avec un essai ?
+	traitements antérieurs ? 
+
+
+CT
+	orientation FF/HF
+	MAR ? 
+	Densité forcée ? 
+	4DCT 3ph ? Ave ? 6 Ph
+	DIBH ?
+
+Plan 
+	Enable gating ? 
+	Pondération (écart des um entre les faisceaux )
+	présence kv/cbct
+	algo, grille, options de calcul
+	Programmation du plan ? 
+	replanif ??? 
+	Optimisation
+	  valeurs des poids
+	  pertinence des objectifs en particulier pour les ptv
+	  Optimiseur ? 
+
+
+CONTOURS
+	approuvé ?
+	existent ils ?
+	volume cohérent ? 
+	plus ? (un morceau/deux morceaux...
+	Table ? 
+	Contours opt : existent ils ? 
+	le OAR Gauche est il a gauche ? 
+	Cohérence nbre de ctv vs ptv
+
+
+
+
+Faiscaux
+	Energie
+	Dimensions
+	Blocage ? 
+	Mode SRS
+	Nova SBRT/NOVA
+	Mode (DSP pour les elecs....)
+	machoires (max pour nova..., minimales, jaw tracking activé
+	Bras (pour les tangentiels, pour les ptv latéralisés)
+	DOSE RATE
+	Delivery time
+	Table de tolérance
+	Bolus ? 
+	180E ?
+	DRR
+	Telemetre visible ? 
+	MLC		MLC minimal ? 		Facteur de moculation ? 
+
+
+
+
+Finalisation
+	Plan CQ préparé ? 
+	Documents?  
+
+
+ 

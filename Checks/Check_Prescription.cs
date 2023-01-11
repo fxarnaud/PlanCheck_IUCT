@@ -50,14 +50,22 @@ namespace PlanCheck_IUCT
             }
 
             prescriptionVolumes.ExpectedValue = "info";
-            prescriptionVolumes.Label = " " + targetNumber + " cible(s) dans la prescription : ";
-            prescriptionVolumes.setToINFO();
+            if (_ctx.PlanSetup.RTPrescription.Status == "Approved")
+            {
+                prescriptionVolumes.Label = " Prescription approuvée pour " + targetNumber + " cible(s) : ";
+                prescriptionVolumes.setToTRUE();
+            }
+            else
+            {
+                prescriptionVolumes.Label = " Prescription non approuvée (" + targetNumber + " cible(s))";
+                prescriptionVolumes.setToFALSE();
+            }
 
             this._result.Add(prescriptionVolumes);
 
             #endregion
 
-
+            /*
             #region APPROBATION DE LA PRESCRIPTION
             Item_Result prescriptionStatus = new Item_Result();
             prescriptionStatus.Label = "Approbation de la prescription (" + _ctx.PlanSetup.RTPrescription.Name + ")";
@@ -73,7 +81,7 @@ namespace PlanCheck_IUCT
             prescriptionStatus.Infobulle = "OK si la prescription est approuvée";
             this._result.Add(prescriptionStatus);
             #endregion
-
+            */
             #region FRACTIONNEMENT - CIBLE LA PLUS HAUTE
             Item_Result fractionation = new Item_Result();
             //fractionation.Label = "Fractionnement du PTV principal";

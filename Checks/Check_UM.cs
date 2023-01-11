@@ -61,7 +61,7 @@ namespace PlanCheck_IUCT
 
            // MessageBox.Show(n_um_per_gray.ToString("N2") + myMLCType);
 
-            if (myMLCType == "VMAT")
+            if ((myMLCType == "VMAT") || (myMLCType == "IMRT"))
             {
                 um.setToTRUE();
                 if (n_um_per_gray > 3.5)
@@ -84,7 +84,7 @@ namespace PlanCheck_IUCT
 
 
 
-            um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT. En VMAT warning si > 3.5 et ERREUR si > 4.5. A noter que pour Halcyon pelvis on accepte < 4.5 et pour les RA vertebre < 5";
+            um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT. En VMAT/IMRT warning si > 3.5 et ERREUR si > 4.5. A noter que pour Halcyon pelvis on accepte < 4.5 et pour les RA vertebre < 5";
 
 
             // um.Infobulle = thereIsAFieldWithaWedge;
