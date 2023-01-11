@@ -87,66 +87,159 @@ namespace PlanCheck_IUCT
 
 
             #region other courses
+            Item_Result myCourseStatus = new Item_Result();
+            myCourseStatus.Label = "Statut des autres courses";
+            
+            List<string> otherCoursesTerminated = new List<string>();
+            List<string> otherCoursesNotOKNotQA_butRecent = new List<string>();
+            List<string> otherQACoursesOK = new List<string>();
+            List<string> oldCourses = new List<string>();
+            myCourseStatus.ExpectedValue = "...";
+            
+            
+/*
+ * myCourseStatus.Infobulle = "Les courses doivent être TERMINE ou, si ils contiennent un plan CQ, en cours depuis < " + maxNumberOfDays + " jours";
+            myCourseStatus.Infobulle += "\nWARNING si le course est en cours depuis moins de " + maxNumberOfDays + " jours et ne contient pas de plan CQ ";
+            myCourseStatus.Infobulle += "\nErreur si le course est en cours depuis > " + maxNumberOfDays + " jours";
+*/
+            myCourseStatus.Infobulle = "Les courses doivent être dans l'état TERMINE\n";
+            myCourseStatus.Infobulle += "\nERREUR si au moins un course (CQ ou non) est EN COURS cours depuis > " + maxNumberOfDays + " jours";
+            myCourseStatus.Infobulle += "\nWARNING si au moins un course (non CQ) est en cours depuis moins de " + maxNumberOfDays + " jours";
+            myCourseStatus.Infobulle += "\nOK si tous les course sont TERMINE (CQ ou non) ou EN COURS (CQ) depuis moins de " + maxNumberOfDays + " jours";
+
+
+
             foreach (Course courseN in _ctx.Patient.Courses) // loop on the courses
             {
-                Item_Result myCourseStatus = new Item_Result();
-                myCourseStatus.ExpectedValue = "TERMINE";
-                //myCourseStatus.Comparator = "=";
-                myCourseStatus.Infobulle = "Les courses doivent être TERMINE ou, si ils contiennent un plan CQ, en cours depuis < " + maxNumberOfDays + " jours";
-                myCourseStatus.Infobulle += "\nWARNING si le course est en cours depuis moins de "+ maxNumberOfDays + " jours et ne contient pas de plan CQ " ;
-                myCourseStatus.Infobulle += "\nErreur si le course est en cours depuis > "+ maxNumberOfDays + " jours";
-                //Comparator testing = new Comparator();
-                myCourseStatus.Label = "Autre course : " + courseN.Id;
 
                 if (courseN.Id != _ctx.Course.Id) // do not test current course
                     if (courseN.CompletedDateTime != null) // --> terminated courses = there is a  completed date time
                     {
-                        myCourseStatus.MeasuredValue = "TERMINE";
-                        myCourseStatus.setToTRUE();
-                        //myCourseStatus.ResultStatus = testing.CompareDatas(myCourseStatus.ExpectedValue, myCourseStatus.MeasuredValue, myCourseStatus.Comparator);
-                        this._result.Add(myCourseStatus);
+                        otherCoursesTerminated.Add(courseN.Id + " terminé le " + courseN.CompletedDateTime.ToString());
                     }
-                    else // course en cours
+                    else // course not terminated
                     {
                         DateTime myToday = DateTime.Today;
-                        int nDays = (myToday - (DateTime)courseN.HistoryDateTime).Days;
-                        if (nDays < maxNumberOfDays)
+                        int nDays = (myToday - (DateTime)courseN.StartDateTime).Days;
+                        if (nDays < maxNumberOfDays) // if recent
                         {
-                            int itIsAQAPlan = 0;
+                            int itIsaQA_Course = 0;
                             foreach (PlanSetup p in courseN.PlanSetups)
                             {
-                                if(p.PlanIntent.ToString() == "VERIFICATION") // is there a QA plan in the course ? 
+                                if(p.PlanIntent.ToString() != "VERIFICATION") // is there at least one  nonQA plan in the course ? 
                                 {
-                                    itIsAQAPlan = 1;
+                                    itIsaQA_Course = 0;  // yes --> not a QA course
+                                    break;
                                 }
+                                itIsaQA_Course = 1;  // only QA Plans in the course --> QA course
                             }
-                            if (itIsAQAPlan == 0)
+                            if (itIsaQA_Course == 0) // en cours, recent, non QA
                             {
-                                myCourseStatus.setToWARNING();
-                                myCourseStatus.MeasuredValue = "Course sans plan CQ < " + nDays.ToString() + " jours";
+                                otherCoursesNotOKNotQA_butRecent.Add(courseN.Id + " (" + nDays+ " jours)");
+                                
                             }
-                            else
+                            else // en cours, recent,  QA
                             {
-                                myCourseStatus.setToTRUE();
-                                myCourseStatus.MeasuredValue = "En cours depuis  " + nDays.ToString() + " jours (plan CQ)";
+                                otherQACoursesOK.Add(courseN.Id + " (" + nDays + " jours)");
                             }
                         }
-                        else
+                        else // if not recent
                         {
-                            myCourseStatus.setToFALSE();
-                            myCourseStatus.MeasuredValue = "EN COURS depuis " + nDays.ToString() + " jours (max "+maxNumberOfDays+" jours)";
+                            oldCourses.Add(courseN.Id + " (" + nDays + " jours)"); 
                         }
 
                         
-
-                        //myCourseStatus.ResultStatus = testing.CompareDatas(myCourseStatus.ExpectedValue, myCourseStatus.MeasuredValue, myCourseStatus.Comparator);
-                        this._result.Add(myCourseStatus);
-
                     }
+            }
+            #region infobulle
+            myCourseStatus.Infobulle += "\n\nListe des courses\n";
+            if (oldCourses.Count() > 0)
+            {
+                myCourseStatus.Infobulle += "\nAnciens et toujours EN COURS : \n";
+                foreach (string s in oldCourses)
+                    myCourseStatus.Infobulle += " - " + s + "\n";
+            }
+            if (otherCoursesNotOKNotQA_butRecent.Count() > 0)
+            {
+                myCourseStatus.Infobulle += "\nEN COURS mais récents (non CQ) : \n";
+                foreach (string s in otherCoursesNotOKNotQA_butRecent)
+                    myCourseStatus.Infobulle += " - " + s + "\n";
+            }
+            if (otherQACoursesOK.Count() > 0)
+            {
+                myCourseStatus.Infobulle += "\nEN COURS mais récents (CQ) : \n";
+                foreach (string s in otherQACoursesOK)
+                    myCourseStatus.Infobulle += " - " + s + "\n";
+            }
+            if (otherCoursesTerminated.Count() > 0)
+            {
+                myCourseStatus.Infobulle += "\nTerminés : \n";
+                foreach (string s in otherCoursesTerminated)
+                    myCourseStatus.Infobulle += " - " + s + "\n";
             }
             #endregion
 
+            if (oldCourses.Count() > 0)
+            {
+                myCourseStatus.setToFALSE();
+                myCourseStatus.MeasuredValue = "Au moins un course ancien est EN COURS (voir détail)\n";
+            }
+            else if (otherCoursesNotOKNotQA_butRecent.Count() > 0)
+            {
+                myCourseStatus.setToWARNING();
+                myCourseStatus.MeasuredValue = "Au moins un course récent (hors CQ) est EN COURS (voir détail)\n";
+            }
+            else
+            {
+                myCourseStatus.setToTRUE();
+                myCourseStatus.MeasuredValue = "Pas de courses EN COURS (voir détail)";
+            }
+            this._result.Add(myCourseStatus);
+            #endregion
 
+
+            #region Traitements antérieurs
+            Item_Result anteriorTraitement = new Item_Result();
+            List<string> anteriorTraitementList = new List<string>();
+            anteriorTraitement.Label = "Traitements antérieurs";
+            anteriorTraitement.ExpectedValue = "...";
+
+            foreach (Course c in _ctx.Patient.Courses) // loop courses
+            {
+                if (c.Id != _ctx.Course.Id) // in other course a plan with the same name can exist
+                {
+                    foreach (PlanSetup p in c.PlanSetups) // loop plan
+                        if (p.ApprovalStatus.ToString() == "TreatmentApproved")
+                            anteriorTraitementList.Add(p.Id + " " + p.TreatmentApprovalDate.ToString());
+
+                }
+                else
+                {
+                    foreach (PlanSetup p in c.PlanSetups) // loop plans except the context plan
+                        if (p.Id != _ctx.PlanSetup.Id) // dont check the context plan
+                            if (p.ApprovalStatus.ToString() == "TreatmentApproved")
+                                anteriorTraitementList.Add(p.Id + " " + p.TreatmentApprovalDate.ToString());
+                }
+            }
+            if (anteriorTraitementList.Count > 0)
+            {
+                anteriorTraitement.setToWARNING();
+                anteriorTraitement.MeasuredValue = anteriorTraitementList.Count.ToString() + " traitements antérieurs détéctés";
+                anteriorTraitement.Infobulle = "Les plans suivants sont à l'état TreatmentApproved";
+                anteriorTraitement.Infobulle += "\nIl peut s'agir de traitements concomitants ou de traitements antérieurs :\n";
+                foreach (string s in anteriorTraitementList)
+                    anteriorTraitement.Infobulle += "\n - " + s;
+
+            }
+            else
+            {
+                anteriorTraitement.setToTRUE();
+                anteriorTraitement.MeasuredValue = anteriorTraitementList.Count.ToString() + " traitement antérieur détécté";
+                anteriorTraitement.Infobulle = "Aucun Plan au status TreatmentApproved dans les courses du patient";
+            }
+
+            this._result.Add(anteriorTraitement);
+            #endregion
         }
         public string Title
         {

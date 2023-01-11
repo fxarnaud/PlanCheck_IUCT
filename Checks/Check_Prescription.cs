@@ -179,14 +179,14 @@ namespace PlanCheck_IUCT
                 }
             }
 
-                //if (normMethod == "100.00% couvre 50.00% du volume cible")
-                //  normalisation.MeasuredValue = normMethod + " au " + _ctx.PlanSetup.TargetVolumeID;
-                //else if (normMethod == "100% au point de référence principal")
-                //  normalisation.MeasuredValue = normMethod + " au point " + _ctx.PlanSetup.PrimaryReferencePoint.Id;
+            //if (normMethod == "100.00% couvre 50.00% du volume cible")
+            //  normalisation.MeasuredValue = normMethod + " au " + _ctx.PlanSetup.TargetVolumeID;
+            //else if (normMethod == "100% au point de référence principal")
+            //  normalisation.MeasuredValue = normMethod + " au point " + _ctx.PlanSetup.PrimaryReferencePoint.Id;
 
 
 
-                normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le check-protocol. Cet item est en WARNING si Aucune normalisation";
+            normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le check-protocol. Cet item est en WARNING si Aucune normalisation";
 
 
 
@@ -195,7 +195,6 @@ namespace PlanCheck_IUCT
 
             this._result.Add(normalisation);
             #endregion
-
 
         }
         public string Title
