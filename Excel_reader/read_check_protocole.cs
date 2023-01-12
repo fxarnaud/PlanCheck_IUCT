@@ -39,41 +39,76 @@ namespace PlanCheck_IUCT
         private List<expectedStructure> _myClinicalExpectedStructures = new List<expectedStructure>();
         private List<expectedStructure> _myOptExpectedStructures = new List<expectedStructure>();
 
+        public bool isANumber(string a)
+        {
+            double myNum = 0;
+            
+            if(Double.TryParse(a, out myNum))
+                return true;
+            else
+                return false;
+        }
 
+        public double giveMeTheDouble(string s,int row, int col,string worksheet) // row and worsheet only for error message. 
+        {
+            // returns the number if it is a number
+            // returns 9999 with error message if it is e.g. a letter
+            // returns 9999 if empty
+            if ((s != null) && (s != ""))
+            {
+                s = s.Replace(",", ".");
+                if (isANumber(s))
+                    return (Convert.ToDouble(s));
+                else
+                {
+                    MessageBox.Show("Erreur dans le check protocol. Dans la feuille " + worksheet + " L" + row.ToString() + "C"+col+": devrait être un nombre : " + s);
+                    return  9999;
+                }
+            }
+            else
+                return 9999;
+        }
+        public int giveMeTheInt(string s, int row, int col, string worksheet) // row and worsheet only for error message. 
+        {
+            // returns the number if it is a number
+            // returns 9999 with error message if it is e.g. a letter
+            // returns 9999 if empty
+            
+            if ((s != null) && (s != ""))
+            {
+                s=s.Replace(",", ".");
+                if (isANumber(s))
+                    return (Convert.ToInt16(s));
+                else
+                {
+                    MessageBox.Show("Erreur dans le check protocol. Dans la feuille " + worksheet + " L" + row.ToString() + "C" + col + ": devrait être un nombre : " + s);
+                    return  9999;
+                }
+            }
+            else
+                return 9999;
+        }
         public expectedStructure readAStructRow(Excel.Range r, int row)
         {
             expectedStructure es = new expectedStructure();
             var temp1 = r.Cells[row, 1].Value2;
             if (temp1 != null)
             {
-                var temp2 = r.Cells[row, 2].Value2; // column 2
-                var temp3 = r.Cells[row, 3].Value2; // column 3
-                var temp4 = r.Cells[row, 4].Value2; // column 4
-                var temp5 = r.Cells[row, 5].Value2; // column 5
-                var temp6 = r.Cells[row, 6].Value2; // column 6
+                string temp2 = r.Cells[row, 2].Text; // column 2
+                string temp3 = r.Cells[row, 3].Text; // column 3
+                string temp4 = r.Cells[row, 4].Text; // column 4
+                string temp5 = r.Cells[row, 5].Text; // column 5
+                string temp6 = r.Cells[row, 6].Text; // column 6
 
                 es.Name = (r.Cells[row, 1].Value2).ToString();
-                
-                if (temp2 != null)
-                    es.HU = (double)(temp2);
+                es.HU = giveMeTheDouble(temp2, row,2, r.Worksheet.Name);
+                es.volMin = giveMeTheDouble(temp3, row,3, r.Worksheet.Name);
+                es.volMax = giveMeTheDouble(temp4, row, 4, r.Worksheet.Name);
+                es.expectedNumberOfPart = giveMeTheInt(temp5, row, 5, r.Worksheet.Name);                
+                if ((temp6 == "R") || (temp6 == "L"))
+                    es.laterality = temp6;
                 else
-                    es.HU = 9999;
-                if (temp3 != null)
-                    es.volMin = (double)(temp3);
-                else
-                    es.volMin = 9999;
-                if (temp4 != null)
-                    es.volMax = (double)(temp4);
-                else
-                    es.volMax = 9999;
-                if (temp5 != null)
-                    es.expectedNumberOfPart = (int)(temp5);
-                else
-                    es.expectedNumberOfPart = 9999;
-                if (temp6 != null)
-                    es.laterality = (r.Cells[row, 6].Value2).ToString();
-                else
-                    es.laterality = "NONE";
+                    es.laterality = "NONE"; // laterality cell is simply ignored if it is not L or R
 
             }
             if (temp1 != null)
