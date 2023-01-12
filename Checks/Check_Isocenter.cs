@@ -166,19 +166,30 @@ namespace PlanCheck_IUCT
 
             #region Distance à l'origine en z
             Item_Result distanceToOrigin = new Item_Result();
-            double maxDistance = 25.0;
-            distanceToOrigin.Label = "Distance à l'origine (z)";
-            distanceToOrigin.ExpectedValue = "1";
-            double distanceZ = (myz - _ctx.Image.UserOrigin.z) / 10.0;
             
-            if((distanceZ > maxDistance) || (distanceZ < -maxDistance))
-                distanceToOrigin.setToFALSE();
+            double maxDistanceX = 15.0;
+            //double maxDistanceY = 15.0;
+            double maxDistanceZ = 25.0;
+            distanceToOrigin.Label = "Distance iso-origine";
+            distanceToOrigin.ExpectedValue = "1";
+            double distanceX = (myx - _ctx.Image.UserOrigin.x) / 10.0;
+            //double distanceY = (myy - _ctx.Image.UserOrigin.y) / 10.0;
+            double distanceZ = (myz - _ctx.Image.UserOrigin.z) / 10.0;
+
+            if ((distanceX > maxDistanceX) || (distanceX < -maxDistanceX)  || (distanceZ > maxDistanceZ) || (distanceZ < -maxDistanceZ))
+            {
+                if(_ctx.PlanSetup.Beams.First().TreatmentUnit.Id.ToUpper().Contains("HALCYON"))
+                    distanceToOrigin.setToFALSE();
+                else
+                    distanceToOrigin.setToWARNING();
+            }
             else
                 distanceToOrigin.setToTRUE();
 
-            distanceToOrigin.MeasuredValue = distanceZ.ToString("0.##") + " cm";
-            distanceToOrigin.Infobulle = "L'isocentre doit être à < " + maxDistance + " cm de l'origine (en z)";
-            
+            distanceToOrigin.MeasuredValue = distanceX.ToString("0.##") + " cm (x) / "+ distanceZ.ToString("0.##") + " cm (z)";
+            distanceToOrigin.Infobulle = "L'isocentre doit être à < " + maxDistanceX + " cm  (en x) et < "+ maxDistanceZ + " cm (en z) de l'origine";
+            distanceToOrigin.Infobulle += "\n Obligatoire pour les Halcyon";
+
             this._result.Add(distanceToOrigin);
             #endregion
 

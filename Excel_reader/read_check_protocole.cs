@@ -101,7 +101,7 @@ namespace PlanCheck_IUCT
                 string temp6 = r.Cells[row, 6].Text; // column 6
 
                 es.Name = (r.Cells[row, 1].Value2).ToString();
-                es.HU = giveMeTheDouble(temp2, row,2, r.Worksheet.Name);
+                es.HU = giveMeTheDouble(temp2, row,2, r.Worksheet.Name);                
                 es.volMin = giveMeTheDouble(temp3, row,3, r.Worksheet.Name);
                 es.volMax = giveMeTheDouble(temp4, row, 4, r.Worksheet.Name);
                 es.expectedNumberOfPart = giveMeTheInt(temp5, row, 5, r.Worksheet.Name);                
