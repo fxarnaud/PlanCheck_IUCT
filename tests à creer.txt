@@ -4,21 +4,21 @@
 prescription
 	accord avec les standards ? 
 	accord avec un essai ?
-	traitements antérieurs ? 
+	traitements antérieurs 			OK
 
 
 CT
 	orientation FF/HF
 	MAR ? 
-	Densité forcée ? 
+	Densité forcée ? 			OK
 	4DCT 3ph ? Ave ? 6 Ph
 	DIBH ?
 
 Plan 
-	Enable gating ? 
-	Pondération (écart des um entre les faisceaux )
-	présence kv/cbct
-	algo, grille, options de calcul
+	Enable gating ? 			OK
+	Pondération 
+	
+	algo, grille, options de calcul		OK
 	Programmation du plan ? 
 	replanif ??? 
 	Optimisation
@@ -28,14 +28,14 @@ Plan
 
 
 CONTOURS
-	approuvé ?
-	existent ils ?
-	volume cohérent ? 
-	plus ? (un morceau/deux morceaux...
-	Table ? 
-	Contours opt : existent ils ? 
-	le OAR Gauche est il a gauche ? 
-	Cohérence nbre de ctv vs ptv
+	approuvé ?				ok
+	existent ils ?				ok
+	volume cohérent ? 			ok
+	plus ? (un morceau/deux morceaux...	ok (bof)
+	Table ? 				ok
+	Contours opt : existent ils ? 		ok
+	le OAR Gauche est il a gauche ? 	ok
+	Cohérence nbre de ctv vs ptv		ok
 
 
 
@@ -57,6 +57,7 @@ Faiscaux
 	DRR
 	Telemetre visible ? 
 	MLC		MLC minimal ? 		Facteur de moculation ? 
+	présence kv/cbct
 
 
 

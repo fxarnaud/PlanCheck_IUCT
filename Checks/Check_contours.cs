@@ -56,6 +56,27 @@ namespace PlanCheck_IUCT
         public void Check()
         {
 
+            #region APPROVE ?  
+            Item_Result approbationStatus = new Item_Result();
+            approbationStatus.Label = "Approbation du groupe de structures";
+            approbationStatus.ExpectedValue = "...";
+            approbationStatus.Infobulle = "Les structures doivent être approuvées";
+            if (_ctx.StructureSet.Structures.First().ApprovalHistory.First().ApprovalStatus.ToString() == "Approved")
+            {
+                approbationStatus.setToTRUE();
+                approbationStatus.MeasuredValue = "Approuvé";
+            }
+            else
+            {
+                approbationStatus.setToWARNING();
+                approbationStatus.MeasuredValue = "Non Approuvé";
+            }
+
+
+
+            this._result.Add(approbationStatus);
+            #endregion
+
             #region COUCH STRUCTURES 
             Item_Result couchStructExist = new Item_Result();
             couchStructExist.Label = "Structures de table";
@@ -514,8 +535,8 @@ namespace PlanCheck_IUCT
                     double PTV_ymax = myPTV.MeshGeometry.Bounds.SizeY;
                     double PTV_zmin = myPTV.MeshGeometry.Bounds.Z;
                     double PTV_zmax = myPTV.MeshGeometry.Bounds.SizeZ;
-                    
-                    if( (PTV_xmin < CTV_xmin) && ((PTV_xmax > CTV_xmax)))
+
+                    if ((PTV_xmin < CTV_xmin) && ((PTV_xmax > CTV_xmax)))
                         if ((PTV_ymin < CTV_ymin) && ((PTV_ymax > CTV_ymax)))
                             if ((PTV_zmin < CTV_zmin) && ((PTV_zmax > CTV_zmax)))
                             {
@@ -523,8 +544,8 @@ namespace PlanCheck_IUCT
                                 found = true;
                                 break; // exit as soon as a PTV is found
                             }
-                        
-                    
+
+
 
                 }
                 if (found == false)
@@ -551,8 +572,8 @@ namespace PlanCheck_IUCT
             }
 
 
-            
-            
+
+
 
             this._result.Add(aPTVforEveryone);
             #endregion

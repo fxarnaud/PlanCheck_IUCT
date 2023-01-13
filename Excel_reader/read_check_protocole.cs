@@ -15,7 +15,7 @@ using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Windows.Navigation;
 using Excel = Microsoft.Office.Interop.Excel;
-
+using System.Text.RegularExpressions;
 
 
 namespace PlanCheck_IUCT
@@ -38,18 +38,17 @@ namespace PlanCheck_IUCT
         private List<expectedStructure> _myCouchExpectedStructures = new List<expectedStructure>();
         private List<expectedStructure> _myClinicalExpectedStructures = new List<expectedStructure>();
         private List<expectedStructure> _myOptExpectedStructures = new List<expectedStructure>();
-
+        private List<DOstructure> _myDOStructures = new List<DOstructure>();
         public bool isANumber(string a)
         {
             double myNum = 0;
-            
-            if(Double.TryParse(a, out myNum))
+
+            if (Double.TryParse(a, out myNum))
                 return true;
             else
                 return false;
         }
-
-        public double giveMeTheDouble(string s,int row, int col,string worksheet) // row and worsheet only for error message. 
+        public double giveMeTheDouble(string s, int row, int col, string worksheet) // row and worsheet only for error message. 
         {
             // returns the number if it is a number
             // returns 9999 with error message if it is e.g. a letter
@@ -61,8 +60,8 @@ namespace PlanCheck_IUCT
                     return (Convert.ToDouble(s));
                 else
                 {
-                    MessageBox.Show("Erreur dans le check protocol. Dans la feuille " + worksheet + " L" + row.ToString() + "C"+col+": devrait être un nombre : " + s);
-                    return  9999;
+                    MessageBox.Show("Erreur dans le check protocol. Dans la feuille " + worksheet + " L" + row.ToString() + "C" + col + ": devrait être un nombre : " + s);
+                    return 9999;
                 }
             }
             else
@@ -73,16 +72,16 @@ namespace PlanCheck_IUCT
             // returns the number if it is a number
             // returns 9999 with error message if it is e.g. a letter
             // returns 9999 if empty
-            
+
             if ((s != null) && (s != ""))
             {
-                s=s.Replace(",", ".");
+                s = s.Replace(",", ".");
                 if (isANumber(s))
                     return (Convert.ToInt16(s));
                 else
                 {
                     MessageBox.Show("Erreur dans le check protocol. Dans la feuille " + worksheet + " L" + row.ToString() + "C" + col + ": devrait être un nombre : " + s);
-                    return  9999;
+                    return 9999;
                 }
             }
             else
@@ -101,10 +100,10 @@ namespace PlanCheck_IUCT
                 string temp6 = r.Cells[row, 6].Text; // column 6
 
                 es.Name = (r.Cells[row, 1].Value2).ToString();
-                es.HU = giveMeTheDouble(temp2, row,2, r.Worksheet.Name);                
-                es.volMin = giveMeTheDouble(temp3, row,3, r.Worksheet.Name);
+                es.HU = giveMeTheDouble(temp2, row, 2, r.Worksheet.Name);
+                es.volMin = giveMeTheDouble(temp3, row, 3, r.Worksheet.Name);
                 es.volMax = giveMeTheDouble(temp4, row, 4, r.Worksheet.Name);
-                es.expectedNumberOfPart = giveMeTheInt(temp5, row, 5, r.Worksheet.Name);                
+                es.expectedNumberOfPart = giveMeTheInt(temp5, row, 5, r.Worksheet.Name);
                 if ((temp6 == "R") || (temp6 == "L"))
                     es.laterality = temp6;
                 else
@@ -116,6 +115,48 @@ namespace PlanCheck_IUCT
             else
                 return null;
         }
+
+        public DOstructure readADOStructRow(Excel.Range r, int row)
+        {
+
+            DOstructure dos = new DOstructure();
+            var temp1 = r.Cells[row, 1].Value2;// get struct name
+            if (temp1 != null)
+            {
+
+                dos.Name = (r.Cells[row, 1].Value2).ToString();
+
+                int i = 2;
+                while (r.Cells[row, i].Text != "")
+                {
+                    string s = r.Cells[row, i].Text;
+                    s = s.Replace(",", "."); // fuck that french excel
+
+                    // this part check with regex that the objective is in the format 
+                    // a>xa or a<xa where a is a string and x a number
+                    Regex regex1 = new Regex("[A-Za-z0-9]+<[0-9]*\\.[0-9]+[a-zA-Z]+", RegexOptions.IgnoreCase); // obj inferior
+                    Regex regex2 = new Regex("[A-Za-z0-9]+>[0-9]*\\.[0-9]+[a-zA-Z]+", RegexOptions.IgnoreCase); // ob superior
+                    if ((regex1.IsMatch(s)) || (regex2.IsMatch(s)))
+                        dos.listOfObjectives.Add(s);
+                    else
+                    {
+                        string err = "Objectif invalide feuille 5 ligne " + row.ToString() + "col " + i.ToString() + " : " + s;
+                        err += "\n\nDoit être de la forme a<xa ou a>xa ou x est un double, et a un string";
+                        MessageBox.Show(err);
+                    }
+                    i++;
+
+                    if (i > 100)
+                        break;
+                }
+
+            }
+            if (temp1 != null)
+                return dos;
+            else
+                return null;
+        }
+
 
         public read_check_protocol(string pathToProtocolCheck)  //Constructor
         {
@@ -147,8 +188,12 @@ namespace PlanCheck_IUCT
             Excel._Worksheet xlWorksheet4 = xlWorkbook.Sheets[4];
             // get the cells 4
             Excel.Range xlRange4 = xlWorksheet4.UsedRange;
-            #endregion
 
+            // open the sheet 5
+            Excel._Worksheet xlWorksheet5 = xlWorkbook.Sheets[5];
+            // get the cells 5
+            Excel.Range xlRange5 = xlWorksheet5.UsedRange;
+            #endregion
 
             #region sheet 1 General
             _protocolName = xlRange1.Cells[1, 2].Value2;
@@ -177,7 +222,6 @@ namespace PlanCheck_IUCT
             _enableGating = xlRange1.Cells[7, 2].Text;
             #endregion
 
-
             #region sheet 2 clinical structures
 
             int nRowsClinicalStruct = xlRange2.Rows.Count;
@@ -199,7 +243,6 @@ namespace PlanCheck_IUCT
             */
             #endregion
 
-
             #region sheet 3 opt structures
 
             int nRowsOptlStruct = xlRange3.Rows.Count;
@@ -212,7 +255,6 @@ namespace PlanCheck_IUCT
 
             #endregion
 
-
             #region sheet 4 Couch structures
 
             int nRowsCouchStruct = xlRange4.Rows.Count;
@@ -223,6 +265,28 @@ namespace PlanCheck_IUCT
             }
             #endregion
 
+            #region sheet 5 Structure with dose objectives
+
+            int nRowsDOStruct = xlRange5.Rows.Count;
+
+            for (i = 2; i <= nRowsDOStruct; i++) // read all lines sheet 2
+            {
+                DOstructure dos = readADOStructRow(xlRange5, i); // read a line sheet 5                
+
+                if (dos.listOfObjectives.Count() > 0)
+                {
+                    _myDOStructures.Add(dos); // 
+                    //MessageBox.Show("in rcp read " + dos.Name);
+                    
+                    //foreach( string s in dos.listOfObjectives ) MessageBox.Show("in rcp read " + dos.Name + " " +s);
+                }
+            }
+            /*
+            foreach (DOstructure mydos in _myDOStructures)
+                foreach(string s in mydos.listOfObjectives)
+                    MessageBox.Show("in rcp read " + s);
+            */
+            #endregion
 
             #region cleanup excel
             GC.Collect();
@@ -283,6 +347,10 @@ namespace PlanCheck_IUCT
         public List<expectedStructure> myCouchExpectedStructures
         {
             get { return _myCouchExpectedStructures; }
+        }
+        public List<DOstructure> myDOStructures
+        {
+            get { return _myDOStructures; }
         }
 
 

@@ -55,8 +55,8 @@ namespace VMS.TPS
                 return;
             }
 
-            if (context.PlanSetup.RTPrescription == null)
-                MessageBox.Show("Ce plan n'est lié à aucune prescription"); // run anyway even if there is no prescription
+            //if (context.PlanSetup.RTPrescription == null)
+              //  MessageBox.Show("Ce plan n'est lié à aucune prescription"); // run anyway even if there is no prescription
             #endregion
             
             string fullPath = Assembly.GetExecutingAssembly().Location; //get the full location of the assembly          

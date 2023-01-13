@@ -412,11 +412,11 @@ namespace PlanCheck_IUCT
             var check_point_um = new CheckScreen_Global(c_UM.Title, c_UM.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_um);
 
-            /*   A FAIRE 
-            Check_doseDistribution c_doseDistribution = new Check_doseDistribution(_pinfo, _pcontext);
+        
+            Check_doseDistribution c_doseDistribution = new Check_doseDistribution(_pinfo, _pcontext, rcp);
             var check_point_dose_distribution = new CheckScreen_Global(c_doseDistribution.Title, c_doseDistribution.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_dose_distribution);
-            */
+           
             /*   A FAIRE 
             Check_finalisation c_Finalisation = new Check_finalisation(_pinfo, _pcontext);
             var check_point_finalisation = new CheckScreen_Global(c_Finalisation.Title, c_Finalisation.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
