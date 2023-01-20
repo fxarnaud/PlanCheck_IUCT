@@ -120,7 +120,7 @@ namespace PlanCheck_IUCT
                 {
                     Group eval = testMatch[0].Groups["evalpt"];
                     Group unit = testMatch[0].Groups["unit"];
-                    
+
                     DoseValue.DoseUnit da = DoseValue.DoseUnit.Gy;
                     DoseValue.DoseUnit dr = DoseValue.DoseUnit.Percent;
                     DoseValue myDabs_something = new DoseValue(50.1000, da);
@@ -189,7 +189,7 @@ namespace PlanCheck_IUCT
             dd.setToINFO();
             dd.MeasuredValue = "en cours";
             double result = 0.0;
-            foreach (DOstructure dos in _rcp.myDOStructures) // loop on list structures with objectivs in check-protocol
+            foreach (DOstructure dos in _rcp.myDOStructures) // loop on list structures with > 0 objectives in check-protocol
             {
                 Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == dos.Name); // get the chosen structure
                 DVHData dvh = null;
@@ -209,6 +209,7 @@ namespace PlanCheck_IUCT
 
                         string theObjective = "";
                         string theValue = "";
+                        double theValueDouble = 0.0;
                         string theValueWithUnit = "";//0.0;
                         string theUnit = "";
                         string[] elementI = null;
@@ -243,13 +244,29 @@ namespace PlanCheck_IUCT
                             if (theUnit != "failed")
                             {
                                 theValue = theValueWithUnit.Replace(theUnit, "");// extract 20.4 from 20.4Gy
-                                result = getValueForThisObjective(s, dvh, theObjective, theUnit);
+                                theValueDouble = Convert.ToDouble(theValue);
+                                result = getValueForThisObjective(s, dvh, theObjective, theUnit); // no need to pass the value, just the indicator and the output unit
+                                if (isInfObj)
+                                {
+                                    if (result <= theValueDouble)//success
+                                        successList.Add(obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                    else // failed
+                                        failedList.Add(obj + " --> " + result.ToString("0.00") + " " + theUnit);
+
+                                }
+                                else if (isSupObj) 
+                                {
+                                    if (result >= theValueDouble)//success
+                                        successList.Add(obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                    else // failed
+                                        failedList.Add(obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                }
                             }
                             else
                                 MessageBox.Show("error in this objective: wrong unit: " + obj + "It will be ignored.");
 
-                            
-                          // MessageBox.Show("End of process for " + obj + " Result : " + result.ToString("0.00") + " " + theUnit);
+
+                            // MessageBox.Show("End of process for " + obj + " Result : " + result.ToString("0.00") + " " + theUnit);
                         }
 
                     }
@@ -257,7 +274,7 @@ namespace PlanCheck_IUCT
 
             }
             dd.setToINFO();
-            dd.Infobulle = "Aucun test réalisé";
+            dd.Infobulle = "Aucun test réalisé sur des indicateurs de dose";
             if ((successList.Count > 0) || (failedList.Count > 0))
             {
                 if (failedList.Count > 0)
