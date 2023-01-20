@@ -134,14 +134,22 @@ namespace PlanCheck_IUCT
 
                     // this part check with regex that the objective is in the format 
                     // a>xa or a<xa where a is a string and x a number
-                    Regex regex1 = new Regex("[A-Za-z0-9]+<[0-9]*\\.[0-9]+[a-zA-Z]+", RegexOptions.IgnoreCase); // obj inferior
-                    Regex regex2 = new Regex("[A-Za-z0-9]+>[0-9]*\\.[0-9]+[a-zA-Z]+", RegexOptions.IgnoreCase); // ob superior
+                    //     "[A-Za-z0-9]+<[0-9]*\\.[0-9]+%"
+
+                    Regex regex1 = new Regex("[A-Za-z0-9]+(%|Gy|cc|)+<(\\-?\\d*\\.?\\d+)+(%|Gy|cc)", RegexOptions.IgnoreCase); // obj inferior
+                    Regex regex2 = new Regex("[A-Za-z0-9]+(%|Gy|cc|)+>(\\-?\\d*\\.?\\d+)+(%|Gy|cc)", RegexOptions.IgnoreCase); // ob superior
+                                                                                                                               //                    Regex regex1 = new Regex("[A-Za-z0-9]+<[0-9]*\\.[0-9]+[a-zA-Z]+", RegexOptions.IgnoreCase); // obj inferior
+                                                                                                                               //                  Regex regex2 = new Regex("[A-Za-z0-9]+>[0-9]*\\.[0-9]+[a-zA-Z]+", RegexOptions.IgnoreCase); // ob superior
                     if ((regex1.IsMatch(s)) || (regex2.IsMatch(s)))
+                    {
                         dos.listOfObjectives.Add(s);
+
+                        //MessageBox.Show("we have a match " + s);
+                    }
                     else
                     {
-                        string err = "Objectif invalide feuille 5 ligne " + row.ToString() + "col " + i.ToString() + " : " + s;
-                        err += "\n\nDoit être de la forme a<xa ou a>xa ou x est un double, et a un string";
+                        string err = "Objectif invalide feuille 5 ligne " + row.ToString() + "  col " + i.ToString() + " : " + s;
+                        err += "\n\nDoit être de la forme a<xu ou a>xu ou x est un double,  a un string u une unité parmi Gy,cc,%";
                         MessageBox.Show(err);
                     }
                     i++;
@@ -272,14 +280,14 @@ namespace PlanCheck_IUCT
             for (i = 2; i <= nRowsDOStruct; i++) // read all lines sheet 2
             {
                 DOstructure dos = readADOStructRow(xlRange5, i); // read a line sheet 5                
+                if (dos != null)
+                    if (dos.listOfObjectives.Count() > 0)
+                    {
+                        _myDOStructures.Add(dos); // 
+                                                  //MessageBox.Show("in rcp read " + dos.Name);
 
-                if (dos.listOfObjectives.Count() > 0)
-                {
-                    _myDOStructures.Add(dos); // 
-                    //MessageBox.Show("in rcp read " + dos.Name);
-                    
-                    //foreach( string s in dos.listOfObjectives ) MessageBox.Show("in rcp read " + dos.Name + " " +s);
-                }
+                        //foreach( string s in dos.listOfObjectives ) MessageBox.Show("in rcp read " + dos.Name + " " +s);
+                    }
             }
             /*
             foreach (DOstructure mydos in _myDOStructures)

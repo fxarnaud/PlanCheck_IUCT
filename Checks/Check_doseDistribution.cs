@@ -25,21 +25,151 @@ namespace PlanCheck_IUCT
 
         }
 
-        public double getValueForThisObjective(DVHData dvh, string theObjective, string unit)
+        public string getTheUnit(string theValueWithUnit) // get 20Gy or 12.5cc and return Gy or cc
+        {
+            string FormatPattern = "(?<vali>\\-?\\d*\\.?\\d+)(?<uniti>%|Gy|cc)";
+            MatchCollection mi = Regex.Matches(theValueWithUnit, FormatPattern);
+            string s = "";
+            if (mi != null) // get an objective <
+            {
+                if (mi.Count > 0)
+                {
+
+                    //Group gVal = mi[0].Groups["vali"];
+                    Group gUnit = mi[0].Groups["uniti"];
+                    s = gUnit.Value;
+                }
+                else
+                    s = "failed";
+            }
+            else
+                s = "failed";
+
+            return s;
+
+        }
+        public double getValueForThisObjective(Structure s, DVHData dvh, string theObjective, string outputUnit)
         {
             double result = 0.0;
 
 
-            if (dvh != null)
-                if (theObjective == "mean")
+            #region mean dose (Gy only)
+            if (theObjective == "mean")
+            {
+                var myMeanDose = dvh.MeanDose;
+                result = myMeanDose.Dose;
+            }
+            #endregion
+
+            #region Vxx
+            // exemple V20.1Gy<32.1cc  means that the user wants the result in cc
+            // the value 32.1 is not pass in this function (but the unit is passed)
+            // V20.1Gy or V20.1%
+            if (theObjective.Substring(0, 1) == "V")
+            {
+
+                string v_at_d_pattern = @"^V(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|Gy))$"; // matches V50.4Gy or V50.4% 
+                                                                                         //var
+                var testMatch = Regex.Matches(theObjective, v_at_d_pattern);
+                if (testMatch.Count != 0) // count is 1
                 {
-                    var myMeanDose = dvh.MeanDose;
-                    result = myMeanDose.Dose;
-
+                    Group eval = testMatch[0].Groups["evalpt"];
+                    Group myunit = testMatch[0].Groups["unit"];
+                    DoseValue.DoseUnit du = DoseValue.DoseUnit.Gy;
+                    if (myunit.Value == "Gy")
+                    {
+                        du = DoseValue.DoseUnit.Gy;
+                        DoseValue myRequestedDose = new DoseValue(Convert.ToDouble(eval.Value), du);
+                        if (outputUnit == "cc")
+                            result = _ctx.PlanSetup.GetVolumeAtDose(s, myRequestedDose, VolumePresentation.AbsoluteCm3);
+                        else if (outputUnit == "%")
+                            result = _ctx.PlanSetup.GetVolumeAtDose(s, myRequestedDose, VolumePresentation.Relative);
+                        else
+                            result = -1.0;
+                    }
+                    else if (myunit.Value == "%")
+                    {
+                        du = DoseValue.DoseUnit.Percent;
+                        DoseValue myRequestedDose = new DoseValue(Convert.ToDouble(eval.Value), du);
+                        if (outputUnit == "cc")
+                            result = _ctx.PlanSetup.GetVolumeAtDose(s, myRequestedDose, VolumePresentation.AbsoluteCm3);
+                        else if (outputUnit == "%")
+                            result = _ctx.PlanSetup.GetVolumeAtDose(s, myRequestedDose, VolumePresentation.Relative);
+                        else
+                            result = -1.0;
+                    }
+                    else
+                        result = -1.0;
                 }
-            //if(theObjective)
+                else
+                    result = -1.0;
+            }
 
-            // pense quand s est null
+
+            #endregion
+
+            #region Dxx
+            // must handle D33%<20Gy or D33cc>10% 
+
+            if (theObjective.Substring(0, 1) == "D")
+            {
+                string v_at_d_pattern = @"^V(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|Gy))$"; // matches V50.4Gy or V50.4% 
+                string d_at_v_pattern = @"^D(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|cc))$";
+                var testMatch = Regex.Matches(theObjective, d_at_v_pattern);
+                if (testMatch.Count != 0) // count is 1
+                {
+                    Group eval = testMatch[0].Groups["evalpt"];
+                    Group unit = testMatch[0].Groups["unit"];
+                    
+                    DoseValue.DoseUnit da = DoseValue.DoseUnit.Gy;
+                    DoseValue.DoseUnit dr = DoseValue.DoseUnit.Percent;
+                    DoseValue myDabs_something = new DoseValue(50.1000, da);
+                    DoseValue myDrel_something = new DoseValue(50.0000, dr);
+
+                    double myD = Convert.ToDouble(eval.Value);//33
+                    if (unit.Value == "%")
+                    {
+                        if (outputUnit == "%")
+                        {
+                            myDrel_something = _ctx.PlanSetup.GetDoseAtVolume(s, myD, VolumePresentation.Relative, DoseValuePresentation.Relative);
+                            result = myDrel_something.Dose;
+                        }
+                        else if (outputUnit == "Gy")
+                        {
+                            myDabs_something = _ctx.PlanSetup.GetDoseAtVolume(s, myD, VolumePresentation.Relative, DoseValuePresentation.Absolute);
+                            result = myDabs_something.Dose;
+                        }
+                        else
+                            result = -1.0;
+
+                    }
+                    else if (unit.Value == "cc")
+                    {
+                        if (outputUnit == "%")
+                        {
+                            myDrel_something = _ctx.PlanSetup.GetDoseAtVolume(s, myD, VolumePresentation.AbsoluteCm3, DoseValuePresentation.Relative);
+                            result = myDrel_something.Dose;
+                        }
+                        else if (outputUnit == "Gy")
+                        {
+                            myDabs_something = _ctx.PlanSetup.GetDoseAtVolume(s, myD, VolumePresentation.AbsoluteCm3, DoseValuePresentation.Absolute);
+                            result = myDabs_something.Dose;
+                        }
+                        else
+                            result = -1.0;
+                    }
+                    else
+                        result = -1.0;
+                }
+                else
+                    result = -1.0;
+            }
+            #endregion
+
+            if (result == -1.0)
+            {
+                MessageBox.Show("The following objective for " + s.Id + " is not in the correct format: " + theObjective + " (see check-protocol). This objective will be ignored");
+            }
             return result;
         }
 
@@ -57,13 +187,8 @@ namespace PlanCheck_IUCT
             List<string> successList = new List<string>();
             List<string> failedList = new List<string>();
             dd.setToINFO();
-            dd.MeasuredValue = "en cours";// "Différent de Planning Approved";
-            //Regex regexInf = new Regex("[A-Za-z0-9]+<[0-9]*\\.[0-9]+[a-zA-Z]+", RegexOptions.IgnoreCase); // obj inferior
-            //Regex regexSup = new Regex("[A-Za-z0-9]+>[0-9]*\\.[0-9]+[a-zA-Z]+", RegexOptions.IgnoreCase); // ob superior
-            string infFormatPattern = "([A-Za-z0-9]+)(<)([0-9]*\\.[0-9]+)([a-zA-Z]+)"; // this waits for an expression a<xa  (a string,x double)
-            string supFormatPattern = "([A-Za-z0-9]+)(>)([0-9]*\\.[0-9]+)([a-zA-Z]+)";
-
-
+            dd.MeasuredValue = "en cours";
+            double result = 0.0;
             foreach (DOstructure dos in _rcp.myDOStructures) // loop on list structures with objectivs in check-protocol
             {
                 Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == dos.Name); // get the chosen structure
@@ -74,71 +199,58 @@ namespace PlanCheck_IUCT
                     dvh = _ctx.PlanSetup.GetDVHCumulativeData(s, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
                 }
                 if (dvh != null)
-                    foreach (string obj in dos.listOfObjectives) // loop on list of objectives in check-protocol
+                    foreach (string obj in dos.listOfObjectives) // loop on list of objectives in check-protocol. 
                     {
+                        //----------------------------------
+                        //  Ex. of objective V20.0Gy<33.1%
+                        //----------------------------------
 
-                        string message = "love";
+                        //MessageBox.Show("start processing " + obj);
+
                         string theObjective = "";
-                        double theValue = 0.0;
+                        string theValue = "";
+                        string theValueWithUnit = "";//0.0;
                         string theUnit = "";
-                        MatchCollection mi = Regex.Matches(obj, infFormatPattern);
-                        MatchCollection ms = Regex.Matches(obj, supFormatPattern);
+                        string[] elementI = null;
+                        string[] elementS = null;
                         bool isInfObj = false;
                         bool isSupObj = false;
-                        if (mi != null) // get an objective <
+
+                        elementS = obj.Split('>');  // split around > or <   Get V20.0Gy an 33.1%
+                        elementI = obj.Split('<');
+
+                        if (elementS.Length > 1)
                         {
-                            isInfObj = true;
-                            if (mi.Count > 0)
-                            {
-
-
-                                int i = 0;
-                                foreach (Group g in mi[0].Groups)  // well I dont like regex finally. It sucks.. but it works
-                                {
-                                    if (i == 1)
-                                        theObjective = g.Value;
-                                    if (i == 3)
-                                        theValue = Convert.ToDouble(g.Value) + 1.0;
-                                    if (i == 4)
-                                        theUnit = g.Value;
-
-                                    i++;
-                                }
-                            }
+                            isSupObj = true; // it is a sup obective
+                            theObjective = elementS[0];
+                            theValueWithUnit = elementS[1];
                         }
-                        if (ms != null) // get an objective > 
+                        else if (elementI.Length > 1)
                         {
-                            isSupObj = true;
-                            if (ms.Count > 0)
-                            {
-                                int i = 0;
-                                foreach (Group g in ms[0].Groups)  // well I dont like regex finally. It sucks.. but it works
-                                {
-                                    if (i == 1)
-                                        theObjective = g.Value;
-                                    if (i == 3)
-                                        theValue = Convert.ToDouble(g.Value) + 1.0;
-                                    if (i == 4)
-                                        theUnit = g.Value;
-
-                                    i++;
-                                }
-                            }
+                            isInfObj = true; // it is a inf obective
+                            theObjective = elementI[0];
+                            theValueWithUnit = elementI[1];
+                        }
+                        else
+                        {
+                            MessageBox.Show("This objective is not correct " + obj + "(must contain < or >). It will be ignored");
+                            break;
                         }
 
-                        double result = getValueForThisObjective(dvh, theObjective, theUnit);
-
-                        if (isInfObj) // it is an inferior obj                           
-                            if (result < theValue)
-                                successList.Add(dos.Name + " " + obj + " Valeur du plan : " + result.ToString("0.00"));
+                        if (isInfObj || isSupObj)
+                        {
+                            theUnit = getTheUnit(theValueWithUnit); // extract Gy from 20.4Gy
+                            if (theUnit != "failed")
+                            {
+                                theValue = theValueWithUnit.Replace(theUnit, "");// extract 20.4 from 20.4Gy
+                                result = getValueForThisObjective(s, dvh, theObjective, theUnit);
+                            }
                             else
-                                failedList.Add(dos.Name + " " + obj + " Valeur du plan : " + result.ToString("0.00"));
-                        else if (isSupObj)
-                            if (result > theValue)
-                                successList.Add(dos.Name + " " + obj + " Valeur du plan : " + result.ToString("0.00"));
-                            else
-                                failedList.Add(dos.Name + " " + obj + " Valeur du plan : " + result.ToString("0.00"));
+                                MessageBox.Show("error in this objective: wrong unit: " + obj + "It will be ignored.");
 
+                            
+                          // MessageBox.Show("End of process for " + obj + " Result : " + result.ToString("0.00") + " " + theUnit);
+                        }
 
                     }
 
