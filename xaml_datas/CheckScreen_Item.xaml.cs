@@ -73,7 +73,7 @@ namespace PlanCheck_IUCT
             set => _item_title = value;
         }
 
-        public string Comment
+        public string Comment 
         {
             get => _comment;
             set => _comment = value;
