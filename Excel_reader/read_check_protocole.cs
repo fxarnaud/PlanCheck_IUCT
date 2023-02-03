@@ -31,6 +31,7 @@ namespace PlanCheck_IUCT
         private String _prescriptionPercentage;
         private String _normalisationMode;
         private String _enableGating;
+        private String _energy;
         //private List<Tuple<string, double>> _couchStructures = new List<Tuple<string, double>>();
         // private List<Tuple<string, double, double, double>> _clinicalStructures = new List<Tuple<string, double, double, double>>();
         // private List<Tuple<string, double>> _optStructures = new List<Tuple<string, double>>();
@@ -228,6 +229,8 @@ namespace PlanCheck_IUCT
             _normalisationMode = xlRange1.Cells[6, 2].Text;
 
             _enableGating = xlRange1.Cells[7, 2].Text;
+
+            _energy = xlRange1.Cells[8, 2].Text;
             #endregion
 
             #region sheet 2 clinical structures
@@ -343,6 +346,10 @@ namespace PlanCheck_IUCT
         public string enebleGating
         {
             get { return _enableGating; }
+        }
+        public string energy
+        {
+            get { return _energy; }
         }
         public List<expectedStructure> myClinicalExpectedStructures
         {

@@ -402,11 +402,11 @@ namespace PlanCheck_IUCT
             var check_point_model = new CheckScreen_Global(c_algo.Title, c_algo.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_model);
 
-            /*   A FAIRE 
+            
             Check_beams c_Beams = new Check_beams(_pinfo, _pcontext, rcp);
             var check_point_beams = new CheckScreen_Global(c_Beams.Title, c_Beams.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_beams);
-            */
+           
 
             Check_UM c_UM = new Check_UM(_pinfo, _pcontext);
             var check_point_um = new CheckScreen_Global(c_UM.Title, c_UM.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
