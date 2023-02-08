@@ -1,4 +1,51 @@
-﻿
+﻿AVEC THIERRY : patient 202300192 (loge)
+
+- CONTOURS APPROUVES ? 
+ - Body bien fait (voir table)
+ - structure de contentions : 
+	est elle bien positionné ? 
+	intersection avec body ? 
+	suppression ORFIT TETE
+ - structres de table
+	pas d'intersection avec le body
+
+ - injection vesssie ; ce n'est pas tjs le cas pour les prostate. 
+
+ - si le Dr a mal nommé le PTV  les OAR-PTv et les overlaps seront mauvais ou vides. 
+
+ - Lors du choix du template de plan il est possible de choisir un template Halcyon et puis a la derniere étape prendre une machine nova. 
+
+ - Le volume cible est en pricnipe le PTV HD OPT
+
+ - Nom du plan = nom de la prescription = commentaire du course 
+
+ - Calcul en AAA et calcul du PDIP aussi en AAA à l'Halcyon !!
+
+ - Il est facile d'oublier de mettre une table de tolérance sur le setup a l'halcyon (car ajouté a posteriori)
+
+ - Position ISO : si le PTV TOTAL existe on doit être au milieu
+
+ - Au NOVA il est facile de ne pas ajuster les machoires ; il faut vérifier si les X/Y sont plus grands que le PTV
+
+ - OPTIMISEUR : 
+	- si possible verifier les options : air cavity ; on (parametres du PO)
+	- pour Halcyion ; les machoires max < 20 cm
+	- valeurs NTO ? 
+	- valeurs des obj ? existe il une dose moyenne vessie et rectum  ? (il faut l'ajouter systemeatiquement pour les prostates)
+	- existe t il un volume chauffe ? ((il faut l'ajouter systemeatiquement pour les prostates)
+
+
+ - couleurs isodoses 
+
+
+
+
+
+
+ 
+
+
+	
 
 
 prescription

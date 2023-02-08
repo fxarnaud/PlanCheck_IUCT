@@ -431,7 +431,11 @@ namespace PlanCheck_IUCT
             List<string> badLaterality = new List<string>();
             Structure sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == "BODY"); // find body
 
-            if (sbody == null) MessageBox.Show("BODY NOT FOUND");
+            if (sbody == null)
+                sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == "CONTOUR EXTERNE"); // find body
+
+            if (sbody == null) 
+                MessageBox.Show("BODY NOT FOUND");
 
             double bodyXcenter = sbody.MeshGeometry.Bounds.X + (sbody.MeshGeometry.Bounds.SizeX / 2.0);
 
@@ -505,14 +509,16 @@ namespace PlanCheck_IUCT
             {
                 if ((s.Id.ToUpper().Contains("CTV")) || (s.Id.ToUpper().Contains("GTV"))) // look for ctv or Gtv in name, case insensitive thanks to ToUpper
                 {
-                    if (!s.IsEmpty)
-                        CTVandGTVs.Add(s.Id);
+                    if ((!s.Id.ToUpper().Contains("-CTV")) && (!s.Id.ToUpper().Contains("-GTV"))) // excludes lung-CTV
+                        if (!s.IsEmpty)
+                            CTVandGTVs.Add(s.Id);
                 }
 
                 if (s.Id.ToUpper().Contains("PTV")) // look for ptv in name, case insensitive thanks to ToUpper
                 {
-                    if (!s.IsEmpty)
-                        PTVs.Add(s.Id);
+                    if (!s.Id.ToUpper().Contains("-PTV")) // exlude lung-PTV
+                        if (!s.IsEmpty)
+                            PTVs.Add(s.Id);
                 }
             }
 

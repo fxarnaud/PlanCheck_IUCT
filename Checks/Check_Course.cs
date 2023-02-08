@@ -33,7 +33,7 @@ namespace PlanCheck_IUCT
         public void Check()
         {
 
-            #region ACTUAL COURSE
+            #region ACTUAL COURSE IS IN COURSE ? 
             Item_Result currentCourseStatus = new Item_Result();
             currentCourseStatus.Label = "Course " + _ctx.Course.Id + " (Course ouvert)";
             currentCourseStatus.ExpectedValue = "EN COURS";
@@ -56,30 +56,78 @@ namespace PlanCheck_IUCT
             Item_Result approve = new Item_Result();
             approve.Label = "Statut d'approbation du plan";
             approve.ExpectedValue = "EN COURS";
-            String[] beautifulDoctorName = _ctx.PlanSetup.PlanningApprover.Split('\\');
-            String[] TAname = _ctx.PlanSetup.TreatmentApprover.Split('\\');
+
+
+
             approve.Infobulle = "Le plan doit être Planning Approved";
-            if (_ctx.PlanSetup.ApprovalStatus.ToString() == "PlanningApproved")
+            if (_ctx.PlanSetup.Beams.FirstOrDefault().TreatmentUnit.Id != "TOM")
             {
+                String[] beautifulDoctorName = _ctx.PlanSetup.PlanningApprover.Split('\\');
+                String[] TAname = _ctx.PlanSetup.TreatmentApprover.Split('\\');
 
-                approve.MeasuredValue = "Plan approuvé par le Dr " + beautifulDoctorName[1].ToUpper();// + _ctx.PlanSetup.PlanningApprover;s[0].ToString().ToUpper() + s.Substring(1);
-                approve.setToTRUE();
-                
-            }
-            else if (_ctx.PlanSetup.ApprovalStatus.ToString() == "TreatmentApproved")
-            {
+                if (_ctx.PlanSetup.ApprovalStatus.ToString() == "PlanningApproved")
+                {
 
-                approve.MeasuredValue = "Treatment approved";
-                //Approuvé par le Dr " + _ctx.PlanSetup.TreatmentApprover + [1].ToUpper();// + _ctx.PlanSetup.PlanningApprover;s[0].ToString().ToUpper() + s.Substring(1);
-                approve.Infobulle += "\n\nLe plan est en état Treat Approved";
-                approve.Infobulle += "\nPlanning approver: " + beautifulDoctorName[1].ToUpper() + "\nTreatment approver " + TAname[1].ToUpper();
-                approve.setToWARNING();
+                    approve.MeasuredValue = "Plan approuvé par le Dr " + beautifulDoctorName[1].ToUpper();// + _ctx.PlanSetup.PlanningApprover;s[0].ToString().ToUpper() + s.Substring(1);
+                    approve.setToTRUE();
+
+                }
+                else if (_ctx.PlanSetup.ApprovalStatus.ToString() == "TreatmentApproved")
+                {
+
+                    approve.MeasuredValue = "Treatment approved";
+                    //Approuvé par le Dr " + _ctx.PlanSetup.TreatmentApprover + [1].ToUpper();// + _ctx.PlanSetup.PlanningApprover;s[0].ToString().ToUpper() + s.Substring(1);
+                    approve.Infobulle += "\n\nLe plan est en état Treat Approved";
+                    approve.Infobulle += "\nPlanning approver: " + beautifulDoctorName[1].ToUpper() + "\nTreatment approver " + TAname[1].ToUpper();
+                    approve.setToWARNING();
+                }
+                else
+                {
+                    approve.MeasuredValue = _ctx.PlanSetup.ApprovalStatus.ToString();// "Différent de Planning Approved";
+                    approve.setToFALSE();
+                    //approve.Infobulle = "Le plan doit être Planning Approved";
+                }
             }
-            else
+            else // else this is a tomo plan. A plan SEA must be planning approved
             {
-                approve.MeasuredValue = _ctx.PlanSetup.ApprovalStatus.ToString();// "Différent de Planning Approved";
-                approve.setToFALSE();
-                //approve.Infobulle = "Le plan doit être Planning Approved";
+                bool foundA_SEA_plan = false;
+                foreach (PlanSetup p in _ctx.Course.PlanSetups)
+                {
+                    if (p.Id.Contains("SEA"))
+                    {
+                        foundA_SEA_plan = true;
+                        String[] beautifulDoctorName = p.PlanningApprover.Split('\\');
+                        String[] TAname = p.TreatmentApprover.Split('\\');
+
+                        if (p.ApprovalStatus.ToString() == "PlanningApproved")
+                        {
+                            approve.MeasuredValue = "Tomo : Plan " + p.Id + " approuvé par le Dr " + beautifulDoctorName[1].ToUpper();// + _ctx.PlanSetup.PlanningApprover;s[0].ToString().ToUpper() + s.Substring(1);
+                            approve.setToTRUE();
+
+                        }
+                        else if (p.ApprovalStatus.ToString() == "TreatmentApproved")
+                        {
+                            approve.MeasuredValue = "Treatment approved";
+                            //Approuvé par le Dr " + _ctx.PlanSetup.TreatmentApprover + [1].ToUpper();// + _ctx.PlanSetup.PlanningApprover;s[0].ToString().ToUpper() + s.Substring(1);
+                            approve.Infobulle += "\n\nLe plan  " + p.Id + " est en état Treat Approved";
+                            approve.Infobulle += "\nPlanning approver: " + beautifulDoctorName[1].ToUpper() + "\nTreatment approver " + TAname[1].ToUpper();
+                            approve.setToWARNING();
+                        }
+                        else
+                        {
+                            approve.MeasuredValue = "TOMO : " + p.Id + " : " + p.ApprovalStatus.ToString();// "Différent de Planning Approved";
+                            approve.setToFALSE();
+                            //approve.Infobulle = "Le plan doit être Planning Approved";
+                        }
+                    }
+                }
+                if (!foundA_SEA_plan)
+                {
+                    approve.MeasuredValue = "TOMO : pas de plan SEA";
+                    approve.Infobulle += "\n\nPour les plans TOMO un plan SEA doit exister et être approuvé";
+                    approve.setToFALSE();
+                }
+
             }
 
             this._result.Add(approve);
@@ -89,19 +137,15 @@ namespace PlanCheck_IUCT
             #region other courses
             Item_Result myCourseStatus = new Item_Result();
             myCourseStatus.Label = "Statut des autres courses";
-            
+
             List<string> otherCoursesTerminated = new List<string>();
             List<string> otherCoursesNotOKNotQA_butRecent = new List<string>();
             List<string> otherQACoursesOK = new List<string>();
             List<string> oldCourses = new List<string>();
             myCourseStatus.ExpectedValue = "...";
-            
-            
-/*
- * myCourseStatus.Infobulle = "Les courses doivent être TERMINE ou, si ils contiennent un plan CQ, en cours depuis < " + maxNumberOfDays + " jours";
-            myCourseStatus.Infobulle += "\nWARNING si le course est en cours depuis moins de " + maxNumberOfDays + " jours et ne contient pas de plan CQ ";
-            myCourseStatus.Infobulle += "\nErreur si le course est en cours depuis > " + maxNumberOfDays + " jours";
-*/
+
+
+
             myCourseStatus.Infobulle = "Les courses doivent être dans l'état TERMINE\n";
             myCourseStatus.Infobulle += "\nERREUR si au moins un course (CQ ou non) est EN COURS cours depuis > " + maxNumberOfDays + " jours";
             myCourseStatus.Infobulle += "\nWARNING si au moins un course (non CQ) est en cours depuis moins de " + maxNumberOfDays + " jours";
@@ -126,7 +170,7 @@ namespace PlanCheck_IUCT
                             int itIsaQA_Course = 0;
                             foreach (PlanSetup p in courseN.PlanSetups)
                             {
-                                if(p.PlanIntent.ToString() != "VERIFICATION") // is there at least one  nonQA plan in the course ? 
+                                if (p.PlanIntent.ToString() != "VERIFICATION") // is there at least one  nonQA plan in the course ? 
                                 {
                                     itIsaQA_Course = 0;  // yes --> not a QA course
                                     break;
@@ -135,8 +179,8 @@ namespace PlanCheck_IUCT
                             }
                             if (itIsaQA_Course == 0) // en cours, recent, non QA
                             {
-                                otherCoursesNotOKNotQA_butRecent.Add(courseN.Id + " (" + nDays+ " jours)");
-                                
+                                otherCoursesNotOKNotQA_butRecent.Add(courseN.Id + " (" + nDays + " jours)");
+
                             }
                             else // en cours, recent,  QA
                             {
@@ -145,10 +189,10 @@ namespace PlanCheck_IUCT
                         }
                         else // if not recent
                         {
-                            oldCourses.Add(courseN.Id + " (" + nDays + " jours)"); 
+                            oldCourses.Add(courseN.Id + " (" + nDays + " jours)");
                         }
 
-                        
+
                     }
             }
             #region infobulle
@@ -209,16 +253,62 @@ namespace PlanCheck_IUCT
                 if (c.Id != _ctx.Course.Id) // in other course a plan with the same name can exist
                 {
                     foreach (PlanSetup p in c.PlanSetups) // loop plan
-                        if (p.ApprovalStatus.ToString() == "TreatmentApproved")
-                            anteriorTraitementList.Add(p.Id + " " + p.TreatmentApprovalDate.ToString());
+                    {
+                        bool validPlan = false;
 
+                        try // exception for old tomo plan with no beam
+                        {
+                            int nBeams = p.Beams.Count();
+                            validPlan = true;
+
+                        }
+                        catch
+                        {
+                            validPlan = false;// do nothing but catch is mandatory
+
+                        }
+
+                        if (validPlan)
+                            if (p.ApprovalStatus.ToString() == "TreatmentApproved")
+                            {
+
+                                anteriorTraitementList.Add(p.Id + " " + p.TreatmentApprovalDate.ToString());
+                            }
+                    }
                 }
                 else
                 {
                     foreach (PlanSetup p in c.PlanSetups) // loop plans except the context plan
+                    {
+
+
                         if (p.Id != _ctx.PlanSetup.Id) // dont check the context plan
-                            if (p.ApprovalStatus.ToString() == "TreatmentApproved")
-                                anteriorTraitementList.Add(p.Id + " " + p.TreatmentApprovalDate.ToString());
+                        {
+                            bool validPlan = false;
+
+                            try // exception for old tomo plan with no beam
+                            {
+                                int nBeams = p.Beams.Count();
+                                validPlan = true;
+
+                            }
+                            catch
+                            {
+                                validPlan = false;// do nothing but catch is mandatory
+
+                            }
+
+                            if (validPlan)
+                                if (p.ApprovalStatus.ToString() == "TreatmentApproved")
+                                {
+
+                                    anteriorTraitementList.Add(p.Id + " " + p.TreatmentApprovalDate.ToString());
+
+                                }
+
+
+                        }
+                    }
                 }
             }
             if (anteriorTraitementList.Count > 0)

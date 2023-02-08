@@ -40,6 +40,7 @@ namespace PlanCheck_IUCT
         private List<expectedStructure> _myClinicalExpectedStructures = new List<expectedStructure>();
         private List<expectedStructure> _myOptExpectedStructures = new List<expectedStructure>();
         private List<DOstructure> _myDOStructures = new List<DOstructure>();
+        private List<string> _listQAplans = new List<string>();
         public bool isANumber(string a)
         {
             double myNum = 0;
@@ -167,7 +168,12 @@ namespace PlanCheck_IUCT
         }
 
 
-        public read_check_protocol(string pathToProtocolCheck)  //Constructor
+        /*
+         
+         READ CHECK-PROTOCOL: get data in <check-protocol-file>.xls 
+         
+         */
+        public read_check_protocol(string pathToProtocolCheck)  //Constructor. 
         {
 
 
@@ -205,13 +211,16 @@ namespace PlanCheck_IUCT
             #endregion
 
             #region sheet 1 General
+
+            // line 1
             _protocolName = xlRange1.Cells[1, 2].Value2;
+
+            // line 2
             _CTslicewidth = xlRange1.Cells[2, 2].Value2;
+
+            // line 3
             _algoName = xlRange1.Cells[3, 2].Value2;
-
-
             int optnumber = 3;
-            //string[] optionComp = null;
             String tempo1;
             String tempo2;
             while (xlRange1.Cells[3, optnumber].Text != "") // parse the excel line from col 3 to first empty cell
@@ -219,18 +228,34 @@ namespace PlanCheck_IUCT
                 tempo1 = xlRange1.Cells[3, optnumber].Text;
                 tempo2 = tempo1.Replace(',', '.');// replace , by .
                 _optionComp.Add(tempo2);
-
                 optnumber++;
             }
 
+            // line 4
             _gridsize = xlRange1.Cells[4, 2].Value2;
 
+            // line 5
             _prescriptionPercentage = xlRange1.Cells[5, 2].Text;
+
+            // line 6
             _normalisationMode = xlRange1.Cells[6, 2].Text;
 
+            // line 7
             _enableGating = xlRange1.Cells[7, 2].Text;
 
+            // line 8
             _energy = xlRange1.Cells[8, 2].Text;
+
+            // line 9
+            int nQA = 2;
+            while (xlRange1.Cells[9, nQA].Text != "") // parse the excel line from col 2 to first empty cell
+            {
+                String oneQA = xlRange1.Cells[9, nQA].Text;                
+                _listQAplans.Add(oneQA);
+                nQA++;
+            }
+
+
             #endregion
 
             #region sheet 2 clinical structures
@@ -315,6 +340,8 @@ namespace PlanCheck_IUCT
             #endregion
 
         }
+
+        #region GET/SET
         public double CTslicewidth
         {
             get { return _CTslicewidth; }
@@ -367,6 +394,11 @@ namespace PlanCheck_IUCT
         {
             get { return _myDOStructures; }
         }
+        public List<String> listQAplans
+        {
+            get { return _listQAplans; }
+        }
+        #endregion
 
 
     }

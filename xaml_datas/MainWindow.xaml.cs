@@ -152,7 +152,7 @@ namespace PlanCheck_IUCT
                 string listOfDoses = nFractions.ToString() + " x " + nDosePerFraction[0];
                 for (int i= 1; i < nDosePerFraction.Count(); i++)
                     if (nDosePerFraction[i] != nDosePerFraction[i-1])
-                        listOfDoses += "/" + nDosePerFraction[i];
+                        listOfDoses += "/" + nDosePerFraction[i].ToString("0.00");
 
                 listOfDoses += " Gy (";
                 prescriptionComment = listOfDoses;
@@ -417,11 +417,11 @@ namespace PlanCheck_IUCT
             var check_point_dose_distribution = new CheckScreen_Global(c_doseDistribution.Title, c_doseDistribution.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_dose_distribution);
            
-            /*   A FAIRE 
-            Check_finalisation c_Finalisation = new Check_finalisation(_pinfo, _pcontext);
+            
+            Check_finalisation c_Finalisation = new Check_finalisation(_pinfo, _pcontext,rcp);
             var check_point_finalisation = new CheckScreen_Global(c_Finalisation.Title, c_Finalisation.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_finalisation);
-            */
+            
             #endregion
 
 

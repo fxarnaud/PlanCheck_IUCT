@@ -113,7 +113,7 @@ namespace PlanCheck_IUCT
 
             if (theObjective.Substring(0, 1) == "D")
             {
-                string v_at_d_pattern = @"^V(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|Gy))$"; // matches V50.4Gy or V50.4% 
+                //string v_at_d_pattern = @"^V(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|Gy))$"; // matches V50.4Gy or V50.4% 
                 string d_at_v_pattern = @"^D(?<evalpt>\d+\p{P}\d+|\d+)(?<unit>(%|cc))$";
                 var testMatch = Regex.Matches(theObjective, d_at_v_pattern);
                 if (testMatch.Count != 0) // count is 1
@@ -175,7 +175,7 @@ namespace PlanCheck_IUCT
 
         private List<Item_Result> _result = new List<Item_Result>();
         // private PreliminaryInformation _pinfo;
-        private string _title = "Dose Distribution (en cours)";
+        private string _title = "Dose Distribution";
 
         public void Check()
         {
@@ -192,11 +192,13 @@ namespace PlanCheck_IUCT
             foreach (DOstructure dos in _rcp.myDOStructures) // loop on list structures with > 0 objectives in check-protocol
             {
                 Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == dos.Name); // get the chosen structure
+                String structName = null ;
                 DVHData dvh = null;
 
                 if (s != null) // get the dvh once per struct
                 {
                     dvh = _ctx.PlanSetup.GetDVHCumulativeData(s, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                    structName = s.Id;
                 }
                 if (dvh != null)
                     foreach (string obj in dos.listOfObjectives) // loop on list of objectives in check-protocol. 
@@ -249,21 +251,21 @@ namespace PlanCheck_IUCT
                                 if (isInfObj)
                                 {
                                     if (result <= theValueDouble)//success
-                                        successList.Add(obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                        successList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
                                     else // failed
-                                        failedList.Add(obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                        failedList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
 
                                 }
                                 else if (isSupObj) 
                                 {
                                     if (result >= theValueDouble)//success
-                                        successList.Add(obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                        successList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
                                     else // failed
-                                        failedList.Add(obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                        failedList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
                                 }
                             }
                             else
-                                MessageBox.Show("error in this objective: wrong unit: " + obj + "It will be ignored.");
+                                MessageBox.Show("error in this objective: wrong unit: " +structName + " "  + obj + "It will be ignored.");
 
 
                             // MessageBox.Show("End of process for " + obj + " Result : " + result.ToString("0.00") + " " + theUnit);
