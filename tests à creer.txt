@@ -1,6 +1,9 @@
-﻿AVEC THIERRY : patient 202300192 (loge)
+﻿
+AVEC THIERRY : patient 202300192 (loge)
 
-- CONTOURS APPROUVES ? 
+Interessant 
+
+Pas possible
  - Body bien fait (voir table)
  - structure de contentions : 
 	est elle bien positionné ? 

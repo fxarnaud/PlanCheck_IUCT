@@ -32,19 +32,27 @@ namespace PlanCheck_IUCT
         public static int getNumberOfMissingSlices(Structure S, StructureSet SS)
         {
 
-            var mesh = S.MeshGeometry.Bounds;
-            int meshLow = _GetSlice(mesh.Z, SS);
-            int meshUp = _GetSlice(mesh.Z + mesh.SizeZ, SS);
-
-
             int nHoles = 0;
-            for (int i = meshLow; i <= meshUp; i++)
+            try
             {
-                VMS.TPS.Common.Model.Types.VVector[][] vvv = S.GetContoursOnImagePlane(i);
+                var mesh = S.MeshGeometry.Bounds;
+                int meshLow = _GetSlice(mesh.Z, SS);
+                int meshUp = _GetSlice(mesh.Z + mesh.SizeZ, SS);
 
-                if (vvv.Length == 0)
-                    nHoles++;
 
+
+                for (int i = meshLow; i <= meshUp; i++)
+                {
+                    VMS.TPS.Common.Model.Types.VVector[][] vvv = S.GetContoursOnImagePlane(i);
+
+                    if (vvv.Length == 0)
+                        nHoles++;
+
+                }
+            }
+            catch
+            {
+                nHoles = 0;
             }
             return nHoles;
         }
@@ -84,7 +92,8 @@ namespace PlanCheck_IUCT
 
             List<string> missingCouchStructures = new List<string>();
             List<string> wrongHUCouchStructures = new List<string>();
-
+            List<string> overlapStructList = new List<string>();
+            double tolerancedOV = 4.0; // Tolerance for overlap couch vs. body
             foreach (expectedStructure es in _rcp.myCouchExpectedStructures) // foreach couch element in the xls protocol file
             {
                 double mydouble = 0;
@@ -93,11 +102,34 @@ namespace PlanCheck_IUCT
                     missingCouchStructures.Add(es.Name);
                 else if (struct1.IsEmpty) // else if it exists but empty --> same
                     missingCouchStructures.Add(es.Name);
-                else
+                else // else struct is not empty
                 {
-                    struct1.GetAssignedHU(out mydouble);
+                    struct1.GetAssignedHU(out mydouble);   // check assigned HU
                     if (mydouble != es.HU)
                         wrongHUCouchStructures.Add(es.Name);
+                    //MessageBox.Show(struct1.Id + " " + struct1.MeshGeometry.Bounds.Y + " " + struct1.MeshGeometry.Bounds.SizeY);
+
+                    try
+                    {
+                        Structure body = _ctx.StructureSet.Structures.FirstOrDefault(x => x.DicomType == "EXTERNAL"); // find a structure BODY
+                       
+                        double yBodyMax = body.MeshGeometry.Bounds.Y + body.MeshGeometry.Bounds.SizeY; // post limit of body
+                        double ySetUpMin = struct1.MeshGeometry.Bounds.Y;
+                        if((yBodyMax - 4.0) > ySetUpMin) // overlap suspected 4 mm allowed
+                        {
+                            overlapStructList.Add(struct1.Id);
+                        }
+                        /*else // no overlap suspected
+                        {
+                            ;
+                        }*/
+                    }
+                    catch
+                    {
+                        MessageBox.Show("No Body found for check contours: couch structures item "+es.Name);
+                    }
+
+                    //MessageBox.Show(body.Id + " " + body.MeshGeometry.Bounds.Y + " " + body.MeshGeometry.Bounds.SizeY);
                 }
             }
 
@@ -131,6 +163,32 @@ namespace PlanCheck_IUCT
             this._result.Add(couchStructExist);
             #endregion
 
+            #region overlap body vs couch structs. 
+
+            Item_Result overlapCouchBody = new Item_Result();
+            overlapCouchBody.Label = "Overlap Body vs. Table";
+            overlapCouchBody.ExpectedValue = "EN COURS";
+
+            if(overlapStructList.Count()>0)
+            {
+
+                overlapCouchBody.MeasuredValue = "Overlap suspecté";
+                overlapCouchBody.Infobulle = "La position Y max du BODY semble refléter un overlap avec les sturctures de tables :\n ";
+                foreach (string s in overlapStructList)
+                    overlapCouchBody.Infobulle += " - " + s;
+
+                overlapCouchBody.setToWARNING();
+            }
+            else
+            {
+                overlapCouchBody.MeasuredValue = "Pas d'overlap détécté entre la table et le body";
+                overlapCouchBody.Infobulle = "Pas d'overlap détécté entre la table et le body (Tolérance = "+ tolerancedOV.ToString() + " mm)";
+                overlapCouchBody.setToTRUE();
+            }
+            this._result.Add(overlapCouchBody);
+
+
+            #endregion
             #region CLINICAL STRUCTURES 
 
             Item_Result clinicalStructuresItem = new Item_Result();

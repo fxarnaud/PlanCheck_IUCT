@@ -8,6 +8,7 @@ using VMS.TPS.Common.Model.API;
 using System.Windows;
 using System.Windows.Navigation;
 using System.Drawing;
+using System.Globalization;
 
 
 
@@ -33,7 +34,7 @@ namespace PlanCheck_IUCT
         public void Check()
         {
 
-            #region ACTUAL COURSE IS IN COURSE ? 
+            #region IS ACTUAL COURSE "EN COURS" ? 
             Item_Result currentCourseStatus = new Item_Result();
             currentCourseStatus.Label = "Course " + _ctx.Course.Id + " (Course ouvert)";
             currentCourseStatus.ExpectedValue = "EN COURS";
@@ -52,7 +53,7 @@ namespace PlanCheck_IUCT
             #endregion
 
 
-            #region Plan approuvé ? 
+            #region Is actual Plan PlanningApproved ? 
             Item_Result approve = new Item_Result();
             approve.Label = "Statut d'approbation du plan";
             approve.ExpectedValue = "EN COURS";
@@ -247,10 +248,11 @@ namespace PlanCheck_IUCT
             List<string> anteriorTraitementList = new List<string>();
             anteriorTraitement.Label = "Traitements antérieurs";
             anteriorTraitement.ExpectedValue = "...";
+            var cultureInfo = new CultureInfo("fr-FR");
 
             foreach (Course c in _ctx.Patient.Courses) // loop courses
             {
-                if (c.Id != _ctx.Course.Id) // in other course a plan with the same name can exist
+                if (c.Id != _ctx.Course.Id) // if not current course: in other course a plan with the same name can exist
                 {
                     foreach (PlanSetup p in c.PlanSetups) // loop plan
                     {
@@ -260,23 +262,21 @@ namespace PlanCheck_IUCT
                         {
                             int nBeams = p.Beams.Count();
                             validPlan = true;
-
                         }
                         catch
                         {
                             validPlan = false;// do nothing but catch is mandatory
-
                         }
 
                         if (validPlan)
                             if (p.ApprovalStatus.ToString() == "TreatmentApproved")
                             {
-
-                                anteriorTraitementList.Add(p.Id + " " + p.TreatmentApprovalDate.ToString());
+                                var theDateTime = DateTime.Parse(p.TreatmentApprovalDate.ToString(), cultureInfo);
+                                anteriorTraitementList.Add(theDateTime.ToString("d") + "\t" + p.Id);
                             }
                     }
                 }
-                else
+                else // in current course
                 {
                     foreach (PlanSetup p in c.PlanSetups) // loop plans except the context plan
                     {
@@ -290,23 +290,18 @@ namespace PlanCheck_IUCT
                             {
                                 int nBeams = p.Beams.Count();
                                 validPlan = true;
-
                             }
                             catch
                             {
                                 validPlan = false;// do nothing but catch is mandatory
-
                             }
 
                             if (validPlan)
                                 if (p.ApprovalStatus.ToString() == "TreatmentApproved")
                                 {
-
-                                    anteriorTraitementList.Add(p.Id + " " + p.TreatmentApprovalDate.ToString());
-
+                                    var theDateTime = DateTime.Parse(p.TreatmentApprovalDate.ToString(), cultureInfo);
+                                    anteriorTraitementList.Add(theDateTime.ToString("d") + "\t" + p.Id);
                                 }
-
-
                         }
                     }
                 }
