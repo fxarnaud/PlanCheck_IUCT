@@ -126,6 +126,8 @@ namespace PlanCheck_IUCT
             String CT = _context.Image.Series.ImagingDeviceManufacturer + " ";
             CT = CT + _context.Image.Series.ImagingDeviceModel;
             CT = CT + _context.Image.Series.ImagingDeviceSerialNo;
+
+
             deviceName.Label = "CT series number";
             deviceName.ExpectedValue = "GE MEDICAL SYSTEMS Optima CT580";//XXXXX TO GET         
             deviceName.MeasuredValue = CT;

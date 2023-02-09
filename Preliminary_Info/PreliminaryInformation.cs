@@ -23,7 +23,7 @@ namespace PlanCheck_IUCT
         private IUCT_User _doctor;
         private string _algoname;
         private string _mlctype;
-
+        private string _treatmentType;
         private string[] calculoptions;
 
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
@@ -185,6 +185,14 @@ namespace PlanCheck_IUCT
         public string Mlctype
         {
             get { return _mlctype; }
+        }
+        public string treatmentType
+        {
+            get { return _treatmentType; }
+        }
+        public void setTreatmentType(string type)
+        {
+            _treatmentType = type; 
         }
         //public string CalculationGridSize
         //{

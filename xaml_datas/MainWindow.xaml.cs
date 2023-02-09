@@ -76,7 +76,7 @@ namespace PlanCheck_IUCT
         public void FillHeaderInfos()
         {
             //Patient, plan and others infos to bind to xml
-
+            
             #region PATIENT NAME, SEX AND AGE
 
             DateTime PatientDOB = (DateTime)_pinfo.PatientDOB_dt;// .Patient.DateOfBirth;         
@@ -217,6 +217,7 @@ namespace PlanCheck_IUCT
                         else
                             treatmentType = "Technique non statique inconnue : pas de MLC !";
                     }
+                    _pinfo.setTreatmentType(treatmentType);
                 }
             }
 

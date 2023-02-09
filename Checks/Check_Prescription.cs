@@ -196,6 +196,29 @@ namespace PlanCheck_IUCT
             this._result.Add(normalisation);
             #endregion
 
+            #region NOM DE LA PRESCRIPTION
+
+
+            Item_Result prescriptionName = new Item_Result();
+            prescriptionName.Label = "Nom de la prescription";
+            prescriptionName.MeasuredValue = _ctx.PlanSetup.RTPrescription.Id;
+            if (_ctx.PlanSetup.Id == _ctx.PlanSetup.RTPrescription.Id)
+            {
+                //prescriptionName.MeasuredValue ="OK";
+                prescriptionName.setToTRUE();
+            }
+            else
+            {
+                prescriptionName.MeasuredValue += " (différent du nom du plan)";
+                prescriptionName.setToWARNING();
+            }
+            prescriptionName.Infobulle="La prescription et le plan doivent avoir le même nom";
+            prescriptionName.Infobulle += "\nIl est recommandé de mettre ce nom en commentaire du course\n";
+            if (_ctx.Course.Comment == _ctx.PlanSetup.RTPrescription.Id)
+                prescriptionName.Infobulle += "C'est le cas pour ce course";
+            this._result.Add(prescriptionName);
+            #endregion
+            
         }
         public string Title
         {

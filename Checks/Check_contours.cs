@@ -189,6 +189,7 @@ namespace PlanCheck_IUCT
 
 
             #endregion
+
             #region CLINICAL STRUCTURES 
 
             Item_Result clinicalStructuresItem = new Item_Result();
@@ -223,7 +224,7 @@ namespace PlanCheck_IUCT
             {
                 clinicalStructuresItem.setToTRUE();
                 clinicalStructuresItem.MeasuredValue = "Présentes et UH corectes " + _rcp.myClinicalExpectedStructures.Count.ToString() + "/" + _rcp.myClinicalExpectedStructures.Count.ToString();
-                clinicalStructuresItem.Infobulle = "Structures de tables attendues pour le protocole " + _rcp.protocolName + " :\n";
+                clinicalStructuresItem.Infobulle = "Structures attendues pour le protocole " + _rcp.protocolName + " :\n";
                 foreach (expectedStructure es in _rcp.myClinicalExpectedStructures)
                 {
                     clinicalStructuresItem.Infobulle += " - " + es.Name + "\n";
@@ -286,7 +287,7 @@ namespace PlanCheck_IUCT
             {
                 optStructuresItem.setToTRUE();
                 optStructuresItem.MeasuredValue = "Présentes et UH corectes " + _rcp.myOptExpectedStructures.Count.ToString() + "/" + _rcp.myOptExpectedStructures.Count.ToString();
-                optStructuresItem.Infobulle = "Structures de tables attendues pour le protocole " + _rcp.protocolName + " :\n";
+                optStructuresItem.Infobulle = "Structures attendues pour le protocole " + _rcp.protocolName + " :\n";
                 foreach (expectedStructure es in _rcp.myOptExpectedStructures)
                 {
                     optStructuresItem.Infobulle += " - " + es.Name + "\n";

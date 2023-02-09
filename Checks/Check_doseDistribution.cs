@@ -179,6 +179,52 @@ namespace PlanCheck_IUCT
 
         public void Check()
         {
+            #region turquoise isodose
+            Item_Result turquoiseIsodose = new Item_Result();
+            turquoiseIsodose.Label = "Isodose Turquoise";
+            turquoiseIsodose.ExpectedValue = "EN COURS";
+            turquoiseIsodose.Infobulle = "L'isodose turquoise doit avoir la valeur de 95% ou 100% d'une prescription";
+            Isodose i = _ctx.PlanSetup.Dose.Isodoses.FirstOrDefault(x => x.Color.ToString() == "#FF80FFFF");
+            MessageBox.Show("turquoise is " + i.Level.Dose + " " + i.Level.IsAbsoluteDoseValue);
+            if(i==null)
+            {
+                turquoiseIsodose.MeasuredValue = "Pas d'isodose turquoise";
+                turquoiseIsodose.setToWARNING();
+            }
+            else
+            {
+                List<double> possibleValue = new List<double>();
+                possibleValue.Add(95.0);
+                foreach (var target in _ctx.PlanSetup.RTPrescription.Targets)
+                {
+                    double d = (target.NumberOfFractions * target.DosePerFraction.Dose) / (_ctx.PlanSetup.TotalDose.Dose);
+                    possibleValue.Add(d);
+                }
+                bool foundIt = false;
+                double levelMatch = 0.0;
+                foreach(double d in possibleValue)
+                {
+                    if(i.Level.Dose - d < 0.00001)
+                    {
+                        foundIt = true;
+                        levelMatch = d;
+                    }
+                }
+
+                if(foundIt)
+                {
+                    turquoiseIsodose.MeasuredValue = levelMatch.ToString("0.00");
+                    turquoiseIsodose.setToTRUE();
+                }
+                else
+                {
+                    turquoiseIsodose.setToWARNING();
+                    turquoiseIsodose.MeasuredValue = i.Level.Dose.ToString("0.00");
+                }
+            }
+            this._result.Add(turquoiseIsodose);
+
+            #endregion
 
             #region Objectives to reach             
             Item_Result dd = new Item_Result();
@@ -192,7 +238,7 @@ namespace PlanCheck_IUCT
             foreach (DOstructure dos in _rcp.myDOStructures) // loop on list structures with > 0 objectives in check-protocol
             {
                 Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == dos.Name); // get the chosen structure
-                String structName = null ;
+                String structName = null;
                 DVHData dvh = null;
 
                 if (s != null) // get the dvh once per struct
@@ -256,7 +302,7 @@ namespace PlanCheck_IUCT
                                         failedList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
 
                                 }
-                                else if (isSupObj) 
+                                else if (isSupObj)
                                 {
                                     if (result >= theValueDouble)//success
                                         successList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
@@ -265,7 +311,7 @@ namespace PlanCheck_IUCT
                                 }
                             }
                             else
-                                MessageBox.Show("error in this objective: wrong unit: " +structName + " "  + obj + "It will be ignored.");
+                                MessageBox.Show("error in this objective: wrong unit: " + structName + " " + obj + "It will be ignored.");
 
 
                             // MessageBox.Show("End of process for " + obj + " Result : " + result.ToString("0.00") + " " + theUnit);
