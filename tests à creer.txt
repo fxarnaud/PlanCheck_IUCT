@@ -1,35 +1,16 @@
 ﻿
 AVEC THIERRY : patient 202300192 (loge)
 
-Interessant 
+Fait
+- intersection avec body --> 		FAIT
+- Nom du plan = nom de la prescription = commentaire du course  --> FAIT
+- Il est facile d'oublier de mettre une table de tolérance sur le setup a l'halcyon (car ajouté a posteriori) ---> FAIT
+ - couleurs isodoses ---> FAIT
 
-Pas possible
- - Body bien fait (voir table)
- - structure de contentions : 
-	est elle bien positionné ? 
-	intersection avec body ? 
-	suppression ORFIT TETE
- - structres de table
-	pas d'intersection avec le body
-
- - injection vesssie ; ce n'est pas tjs le cas pour les prostate. 
-
- - si le Dr a mal nommé le PTV  les OAR-PTv et les overlaps seront mauvais ou vides. 
-
- - Lors du choix du template de plan il est possible de choisir un template Halcyon et puis a la derniere étape prendre une machine nova. 
-
- - Le volume cible est en pricnipe le PTV HD OPT
-
- - Nom du plan = nom de la prescription = commentaire du course 
-
+A faire
  - Calcul en AAA et calcul du PDIP aussi en AAA à l'Halcyon !!
-
- - Il est facile d'oublier de mettre une table de tolérance sur le setup a l'halcyon (car ajouté a posteriori)
-
- - Position ISO : si le PTV TOTAL existe on doit être au milieu
-
+suppression ORFIT TETE			NON FAIT
  - Au NOVA il est facile de ne pas ajuster les machoires ; il faut vérifier si les X/Y sont plus grands que le PTV
-
  - OPTIMISEUR : 
 	- si possible verifier les options : air cavity ; on (parametres du PO)
 	- pour Halcyion ; les machoires max < 20 cm
@@ -38,18 +19,17 @@ Pas possible
 	- existe t il un volume chauffe ? ((il faut l'ajouter systemeatiquement pour les prostates)
 
 
- - couleurs isodoses 
 
+Pas possible ou Bof
+ - Body bien fait (voir table)
+ - structure de contentions : 	est elle bien positionné ? 		IMPOSSIBLE	
+ - injection vesssie ; ce n'est pas tjs le cas pour les prostate. --> BOF
+ - si le Dr a mal nommé le PTV  les OAR-PTv et les overlaps seront mauvais ou vides.  --> BOF 
+ - Lors du choix du template de plan il est possible de choisir un template Halcyon et puis a la derniere étape prendre une machine nova. --> BOF
+ - Le volume cible est en pricnipe le PTV HD OPT --> BOF
+ - Position ISO : si le PTV TOTAL existe on doit être au milieu --> BOF
 
-
-
-
-
- 
-
-
-	
-
+---------------
 
 prescription
 	accord avec les standards ? 

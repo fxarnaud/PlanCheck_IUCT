@@ -185,7 +185,7 @@ namespace PlanCheck_IUCT
             turquoiseIsodose.ExpectedValue = "EN COURS";
             turquoiseIsodose.Infobulle = "L'isodose turquoise doit avoir la valeur de 95% ou 100% d'une prescription";
             Isodose i = _ctx.PlanSetup.Dose.Isodoses.FirstOrDefault(x => x.Color.ToString() == "#FF80FFFF");
-            MessageBox.Show("turquoise is " + i.Level.Dose + " " + i.Level.IsAbsoluteDoseValue);
+            
             if(i==null)
             {
                 turquoiseIsodose.MeasuredValue = "Pas d'isodose turquoise";
@@ -223,6 +223,7 @@ namespace PlanCheck_IUCT
                 }
             }
             this._result.Add(turquoiseIsodose);
+            
 
             #endregion
 

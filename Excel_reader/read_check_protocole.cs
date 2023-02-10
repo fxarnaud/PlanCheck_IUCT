@@ -32,6 +32,7 @@ namespace PlanCheck_IUCT
         private String _normalisationMode;
         private String _enableGating;
         private String _energy;
+        private String _tolTable;
         //private List<Tuple<string, double>> _couchStructures = new List<Tuple<string, double>>();
         // private List<Tuple<string, double, double, double>> _clinicalStructures = new List<Tuple<string, double, double, double>>();
         // private List<Tuple<string, double>> _optStructures = new List<Tuple<string, double>>();
@@ -254,7 +255,8 @@ namespace PlanCheck_IUCT
                 _listQAplans.Add(oneQA);
                 nQA++;
             }
-
+            // line 10
+            _tolTable = xlRange1.Cells[10, 2].Text;
 
             #endregion
 
@@ -377,6 +379,10 @@ namespace PlanCheck_IUCT
         public string energy
         {
             get { return _energy; }
+        }
+        public string toleranceTable
+        {
+            get { return _tolTable; }
         }
         public List<expectedStructure> myClinicalExpectedStructures
         {

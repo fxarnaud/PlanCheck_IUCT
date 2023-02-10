@@ -34,12 +34,12 @@ namespace PlanCheck_IUCT
             Item_Result energy = new Item_Result();
             energy.Label = "Energie";
             energy.ExpectedValue = "NA";
-            
+
             if ((_rcp.energy == "") || (_rcp.energy == null)) // no energy specified in check-protocol
             {
                 energy.setToINFO();
-                energy.MeasuredValue = "Aucune énergie spécifiée dans le check-protocol "+_rcp.protocolName;
-                energy.Infobulle = "Aucune énergie spécifiée dans le check-protocol "+_rcp.protocolName;
+                energy.MeasuredValue = "Aucune énergie spécifiée dans le check-protocol " + _rcp.protocolName;
+                energy.Infobulle = "Aucune énergie spécifiée dans le check-protocol " + _rcp.protocolName;
             }
             else
             {
@@ -70,6 +70,77 @@ namespace PlanCheck_IUCT
             this._result.Add(energy);
             #endregion
 
+
+            #region tolerance table
+            Item_Result toleranceTable = new Item_Result();
+            toleranceTable.Label = "Table de tolérance";
+            toleranceTable.ExpectedValue = "NA";
+    
+            bool toleranceOK = true;
+            List<string> listOfTolTable = new List<string>();
+            String firstTT = null;
+            bool firstTTfound = false;
+            bool allSame = false;
+            
+            foreach (Beam b in _ctx.PlanSetup.Beams)
+            {
+                listOfTolTable.Add(b.Id + "\t(" + b.ToleranceTableLabel + ")");
+                // this part is to check if the tol table are all the same
+                if (!firstTTfound) 
+                {
+                    firstTTfound = true;
+                    allSame = true;
+                    firstTT = b.ToleranceTableLabel;
+                }
+                else
+                {
+                    if (b.ToleranceTableLabel != firstTT)
+                        allSame = false;
+                }
+                // this part is to check if the tol table are as specified in schek protocol
+                if (b.ToleranceTableLabel != _rcp.toleranceTable)
+                {
+                    toleranceOK = false;
+                    
+                }
+            }
+            if (toleranceOK)
+            {
+                toleranceTable.setToTRUE();
+                toleranceTable.MeasuredValue = _rcp.toleranceTable;
+                toleranceTable.Infobulle = "Tous les champs ont bien la table de tolérance spécifiée dans le check-protocol:\n";
+            }
+            else
+            {
+                toleranceTable.setToFALSE();
+                toleranceTable.MeasuredValue = "Table de tolérances des champs à revoir (voir détail)";
+                toleranceTable.Infobulle += "\n\nCertains des chams suivants n'ont pas la bonne table de tolérance\n";
+                
+            }
+            if (_rcp.toleranceTable == "") // if no table specidfied in RCP
+            {
+                
+                toleranceTable.MeasuredValue = "Table de tolérances unique  (voir détail) ";
+                toleranceTable.Infobulle = "Pas de table de tolérance spécifiée dans le check-protocol " + _rcp.protocolName;
+                if (allSame)
+                {
+                    toleranceTable.Infobulle += "\nUnse seule table de tolérance est utilisée pour tous les faisceaux\n";
+                    toleranceTable.MeasuredValue = "Table de tolérances unique  (voir détail) ";
+                    toleranceTable.setToTRUE();
+                }
+                else
+                {
+                    toleranceTable.Infobulle += "\nPlusieurs tables de tolérance utilisées pour les faisceaux\n";
+                    toleranceTable.MeasuredValue = "Table de tolérances différentes  (voir détail) ";
+                    toleranceTable.setToFALSE(); 
+                }
+                
+            }
+            foreach (String field in listOfTolTable)
+                toleranceTable.Infobulle += "\n - " + field;
+
+            this._result.Add(toleranceTable);
+            #endregion
 
             #region Technique 
             /*Item_Result technique = new Item_Result();

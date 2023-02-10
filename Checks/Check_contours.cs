@@ -112,10 +112,10 @@ namespace PlanCheck_IUCT
                     try
                     {
                         Structure body = _ctx.StructureSet.Structures.FirstOrDefault(x => x.DicomType == "EXTERNAL"); // find a structure BODY
-                       
+
                         double yBodyMax = body.MeshGeometry.Bounds.Y + body.MeshGeometry.Bounds.SizeY; // post limit of body
                         double ySetUpMin = struct1.MeshGeometry.Bounds.Y;
-                        if((yBodyMax - 4.0) > ySetUpMin) // overlap suspected 4 mm allowed
+                        if ((yBodyMax - 4.0) > ySetUpMin) // overlap suspected 4 mm allowed
                         {
                             overlapStructList.Add(struct1.Id);
                         }
@@ -126,7 +126,7 @@ namespace PlanCheck_IUCT
                     }
                     catch
                     {
-                        MessageBox.Show("No Body found for check contours: couch structures item "+es.Name);
+                        MessageBox.Show("No Body found for check contours: couch structures item " + es.Name);
                     }
 
                     //MessageBox.Show(body.Id + " " + body.MeshGeometry.Bounds.Y + " " + body.MeshGeometry.Bounds.SizeY);
@@ -169,7 +169,7 @@ namespace PlanCheck_IUCT
             overlapCouchBody.Label = "Overlap Body vs. Table";
             overlapCouchBody.ExpectedValue = "EN COURS";
 
-            if(overlapStructList.Count()>0)
+            if (overlapStructList.Count() > 0)
             {
 
                 overlapCouchBody.MeasuredValue = "Overlap suspecté";
@@ -182,7 +182,7 @@ namespace PlanCheck_IUCT
             else
             {
                 overlapCouchBody.MeasuredValue = "Pas d'overlap détécté entre la table et le body";
-                overlapCouchBody.Infobulle = "Pas d'overlap détécté entre la table et le body (Tolérance = "+ tolerancedOV.ToString() + " mm)";
+                overlapCouchBody.Infobulle = "Pas d'overlap détécté entre la table et le body (Tolérance = " + tolerancedOV.ToString() + " mm)";
                 overlapCouchBody.setToTRUE();
             }
             this._result.Add(overlapCouchBody);
@@ -493,7 +493,7 @@ namespace PlanCheck_IUCT
             if (sbody == null)
                 sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == "CONTOUR EXTERNE"); // find body
 
-            if (sbody == null) 
+            if (sbody == null)
                 MessageBox.Show("BODY NOT FOUND");
 
             double bodyXcenter = sbody.MeshGeometry.Bounds.X + (sbody.MeshGeometry.Bounds.SizeX / 2.0);
@@ -569,8 +569,9 @@ namespace PlanCheck_IUCT
                 if ((s.Id.ToUpper().Contains("CTV")) || (s.Id.ToUpper().Contains("GTV"))) // look for ctv or Gtv in name, case insensitive thanks to ToUpper
                 {
                     if ((!s.Id.ToUpper().Contains("-CTV")) && (!s.Id.ToUpper().Contains("-GTV"))) // excludes lung-CTV
-                        if (!s.IsEmpty)
-                            CTVandGTVs.Add(s.Id);
+                        if ((!s.Id.ToUpper().Contains("RING"))) // exlude rings
+                            if (!s.IsEmpty)
+                                CTVandGTVs.Add(s.Id);
                 }
 
                 if (s.Id.ToUpper().Contains("PTV")) // look for ptv in name, case insensitive thanks to ToUpper
