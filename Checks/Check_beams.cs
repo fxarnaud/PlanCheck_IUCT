@@ -181,42 +181,9 @@ namespace PlanCheck_IUCT
             this._result.Add(technique);*/
             #endregion
 
-            #region FIELD SIZE HALCYON
-            Item_Result fieldTooLargeHalcyon = new Item_Result();
-            fieldTooLargeHalcyon.Label = "Champs Halcyon > 20x20";
-            fieldTooLargeHalcyon.ExpectedValue = "NA";
-            fieldTooLargeHalcyon.Infobulle = "Les machoîres Halcyon doivent être < 10 cm";
-
-            List<String> fieldTooLarge = new List<String>();
-            String machine = _ctx.PlanSetup.Beams.FirstOrDefault().Id.ToUpper();
-            if (machine.Contains("HALCYON")) // if  HALCYON XxY must be < 20x20
-            {
-                foreach (Beam b in _ctx.PlanSetup.Beams)
-                {
-                    if (!b.IsSetupField)
-                        foreach (ControlPoint cp in b.ControlPoints)
-                            if ((cp.JawPositions.X1 > 10.0) || (cp.JawPositions.X2 > 10.0) || (cp.JawPositions.Y1 > 10.0) || (cp.JawPositions.Y2 > 10.0))
-                                fieldTooLarge.Add(b.Id);
-                }
-
-
-                if (fieldTooLarge.Count > 0)
-                {
-                    fieldTooLargeHalcyon.setToFALSE();
-                    fieldTooLargeHalcyon.MeasuredValue = fieldTooLarge.Count + " Control Point(s) hors limite";
-                }
-                else
-                {
-                    fieldTooLargeHalcyon.setToTRUE();
-                    fieldTooLargeHalcyon.MeasuredValue = " Aucun Control Point hors limite";
-                }
-                this._result.Add(fieldTooLargeHalcyon);
-
-            }
-
-            #endregion
 
             #region FIELD SIZE GENERAL
+            String machine = _ctx.PlanSetup.Beams.FirstOrDefault().TreatmentUnit.Id;
             bool giveup = false;
             Item_Result fieldTooSmall = new Item_Result();
             List<String> fieldTooSmallList = new List<String>();
@@ -272,13 +239,13 @@ namespace PlanCheck_IUCT
                 {
                     fieldTooSmall.setToTRUE();
                     fieldTooSmall.MeasuredValue = "Dimensions des Jaws correctes";
-                    fieldTooSmall.Infobulle += "\n\nAtous les champs ou Controp Points ont des dimensions de machoîres cohérentes par rapport au volume cible";
+                    fieldTooSmall.Infobulle += "\n\nTous les champs ou Control Points ont des dimensions de machoîres cohérentes par rapport au volume cible";
                 }
                 else
                 {
                     fieldTooSmall.setToWARNING();
                     fieldTooSmall.MeasuredValue = "Un ou plusieurs champs trop petits";
-                    fieldTooSmall.Infobulle += "\n\nAu moins un champ ou un Controp Point présentent des dimensions de machoîres trop petites par rapport au volume cible";
+                    fieldTooSmall.Infobulle += "\n\nAu moins un champ ou un Control Point a des dimensions de machoîres trop petites par rapport au volume cible";
                 }
 
 
@@ -286,6 +253,43 @@ namespace PlanCheck_IUCT
 
             this._result.Add(fieldTooSmall);
             #endregion
+
+            #region FIELD SIZE HALCYON
+            Item_Result fieldTooLargeHalcyon = new Item_Result();
+            fieldTooLargeHalcyon.Label = "Champs Halcyon > 20x20";
+            fieldTooLargeHalcyon.ExpectedValue = "NA";
+            fieldTooLargeHalcyon.Infobulle = "Les machoîres Halcyon doivent être < 10 cm";
+
+            List<String> fieldTooLarge = new List<String>();
+
+            
+            if (machine.Contains("HALCYON")) // if  HALCYON XxY must be < 20x20
+            {
+                foreach (Beam b in _ctx.PlanSetup.Beams)
+                {
+                    if (!b.IsSetupField)
+                        foreach (ControlPoint cp in b.ControlPoints)
+                            if ((cp.JawPositions.X1 > 10.0) || (cp.JawPositions.X2 > 10.0) || (cp.JawPositions.Y1 > 10.0) || (cp.JawPositions.Y2 > 10.0))
+                                fieldTooLarge.Add(b.Id);
+                }
+
+
+                if (fieldTooLarge.Count > 0)
+                {
+                    fieldTooLargeHalcyon.setToFALSE();
+                    fieldTooLargeHalcyon.MeasuredValue = fieldTooLarge.Count + " Control Point(s) hors limite";
+                }
+                else
+                {
+                    fieldTooLargeHalcyon.setToTRUE();
+                    fieldTooLargeHalcyon.MeasuredValue = " Aucun Control Point hors limite";
+                }
+                this._result.Add(fieldTooLargeHalcyon);
+
+            }
+
+            #endregion
+
         }
         public string Title
         {

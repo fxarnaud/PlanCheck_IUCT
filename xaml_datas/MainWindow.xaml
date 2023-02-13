@@ -87,7 +87,7 @@
 
                             <Button Grid.Row="0" Grid.Column ="2" x:Name="OK_button" Content="Check!" Width="100" Height="32" Click="OK_button_click" ToolTip="Lancer la vérification" RenderTransformOrigin="-0.734,0.136"/>
 
-                            <Button Grid.Row="0" Grid.Column ="3" Content="?" FontSize="10" FontFamily="Bauhaus" Click="Button_Click_help" Width="15" Height="32" Background="Coral" VerticalAlignment="Top" HorizontalAlignment="Right" ToolTip="Aide (pdf)" />
+                            <Button Grid.Row="0" Grid.Column ="3" Content="?" FontSize="10" FontFamily="Bauhaus" Click="Button_Click_help" Width="15" Height="32" Background="Coral" VerticalAlignment="Top" HorizontalAlignment="Right" ToolTip="Aide online si Chrome installé (sinon pdf)" />
 
                         </Grid>
                     </Border>
