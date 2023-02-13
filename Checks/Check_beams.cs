@@ -8,6 +8,7 @@ using VMS.TPS.Common.Model.API;
 using System.Windows;
 using System.Windows.Navigation;
 
+
 namespace PlanCheck_IUCT
 {
     internal class Check_beams
@@ -28,8 +29,23 @@ namespace PlanCheck_IUCT
         // private PreliminaryInformation _pinfo;
         private string _title = "Faisceaux";
 
+
+        private bool fieldIsTooSmall(double surfaceZX, double surfaceZY, double X1, double X2, double Y1, double Y2)
+        {
+            bool itIsTooSmall = false;
+            double tolerance = 1.2;
+            double surfaceJaw = tolerance * (Math.Abs(X1) + Math.Abs(X2)) * (Math.Abs(Y1) + Math.Abs(Y2));
+            if ((surfaceJaw < surfaceZX) || (surfaceJaw < surfaceZY))
+                itIsTooSmall = true;
+            return itIsTooSmall;
+
+        }
+
         public void Check()
         {
+
+
+
             #region ENERGY 
             Item_Result energy = new Item_Result();
             energy.Label = "Energie";
@@ -70,23 +86,22 @@ namespace PlanCheck_IUCT
             this._result.Add(energy);
             #endregion
 
-
             #region tolerance table
             Item_Result toleranceTable = new Item_Result();
             toleranceTable.Label = "Table de tolérance";
             toleranceTable.ExpectedValue = "NA";
-    
+
             bool toleranceOK = true;
             List<string> listOfTolTable = new List<string>();
             String firstTT = null;
             bool firstTTfound = false;
             bool allSame = false;
-            
+
             foreach (Beam b in _ctx.PlanSetup.Beams)
             {
                 listOfTolTable.Add(b.Id + "\t(" + b.ToleranceTableLabel + ")");
                 // this part is to check if the tol table are all the same
-                if (!firstTTfound) 
+                if (!firstTTfound)
                 {
                     firstTTfound = true;
                     allSame = true;
@@ -101,7 +116,7 @@ namespace PlanCheck_IUCT
                 if (b.ToleranceTableLabel != _rcp.toleranceTable)
                 {
                     toleranceOK = false;
-                    
+
                 }
             }
             if (toleranceOK)
@@ -115,11 +130,11 @@ namespace PlanCheck_IUCT
                 toleranceTable.setToFALSE();
                 toleranceTable.MeasuredValue = "Table de tolérances des champs à revoir (voir détail)";
                 toleranceTable.Infobulle += "\n\nCertains des chams suivants n'ont pas la bonne table de tolérance\n";
-                
+
             }
             if (_rcp.toleranceTable == "") // if no table specidfied in RCP
             {
-                
+
                 toleranceTable.MeasuredValue = "Table de tolérances unique  (voir détail) ";
                 toleranceTable.Infobulle = "Pas de table de tolérance spécifiée dans le check-protocol " + _rcp.protocolName;
                 if (allSame)
@@ -132,9 +147,9 @@ namespace PlanCheck_IUCT
                 {
                     toleranceTable.Infobulle += "\nPlusieurs tables de tolérance utilisées pour les faisceaux\n";
                     toleranceTable.MeasuredValue = "Table de tolérances différentes  (voir détail) ";
-                    toleranceTable.setToFALSE(); 
+                    toleranceTable.setToFALSE();
                 }
-                
+
             }
             foreach (String field in listOfTolTable)
                 toleranceTable.Infobulle += "\n - " + field;
@@ -166,7 +181,111 @@ namespace PlanCheck_IUCT
             this._result.Add(technique);*/
             #endregion
 
+            #region FIELD SIZE HALCYON
+            Item_Result fieldTooLargeHalcyon = new Item_Result();
+            fieldTooLargeHalcyon.Label = "Champs Halcyon > 20x20";
+            fieldTooLargeHalcyon.ExpectedValue = "NA";
+            fieldTooLargeHalcyon.Infobulle = "Les machoîres Halcyon doivent être < 10 cm";
 
+            List<String> fieldTooLarge = new List<String>();
+            String machine = _ctx.PlanSetup.Beams.FirstOrDefault().Id.ToUpper();
+            if (machine.Contains("HALCYON")) // if  HALCYON XxY must be < 20x20
+            {
+                foreach (Beam b in _ctx.PlanSetup.Beams)
+                {
+                    if (!b.IsSetupField)
+                        foreach (ControlPoint cp in b.ControlPoints)
+                            if ((cp.JawPositions.X1 > 10.0) || (cp.JawPositions.X2 > 10.0) || (cp.JawPositions.Y1 > 10.0) || (cp.JawPositions.Y2 > 10.0))
+                                fieldTooLarge.Add(b.Id);
+                }
+
+
+                if (fieldTooLarge.Count > 0)
+                {
+                    fieldTooLargeHalcyon.setToFALSE();
+                    fieldTooLargeHalcyon.MeasuredValue = fieldTooLarge.Count + " Control Point(s) hors limite";
+                }
+                else
+                {
+                    fieldTooLargeHalcyon.setToTRUE();
+                    fieldTooLargeHalcyon.MeasuredValue = " Aucun Control Point hors limite";
+                }
+                this._result.Add(fieldTooLargeHalcyon);
+
+            }
+
+            #endregion
+
+            #region FIELD SIZE GENERAL
+            bool giveup = false;
+            Item_Result fieldTooSmall = new Item_Result();
+            List<String> fieldTooSmallList = new List<String>();
+            fieldTooSmall.Label = "Champs trop petits";
+            fieldTooSmall.ExpectedValue = "NA";
+            fieldTooSmall.Infobulle = "Les champs doivent avoir une dimension adaptée au PTV";
+            String targetName = _ctx.PlanSetup.TargetVolumeID;
+            Structure target = null;
+            double surfaceZX = 0;
+            double surfaceZY = 0;
+            int n = 0;
+            try // do we have a target volume ? 
+            {
+                target = _ctx.StructureSet.Structures.Where(s => s.Id == targetName).FirstOrDefault();
+                surfaceZX = target.MeshGeometry.Bounds.SizeZ * target.MeshGeometry.Bounds.SizeX;
+                surfaceZY = target.MeshGeometry.Bounds.SizeZ * target.MeshGeometry.Bounds.SizeY;
+            }
+            catch // no we don't
+            {
+                giveup = true;
+            }
+
+            if (machine.Contains("TOM")) // if  not Tomo
+                giveup = true;
+
+            if (!giveup)
+            {
+                foreach (Beam b in _ctx.PlanSetup.Beams)
+                {
+                    if (!b.IsSetupField)
+                    {
+
+                        
+                        foreach (ControlPoint cp in b.ControlPoints)
+                        {
+                            if (fieldIsTooSmall(surfaceZX, surfaceZY, cp.JawPositions.X1, cp.JawPositions.X2, cp.JawPositions.Y1, cp.JawPositions.Y2))
+                                n++;
+                        }
+                    }
+                }
+            }
+
+
+            if (giveup)
+            {
+                fieldTooSmall.setToINFO();
+                fieldTooSmall.MeasuredValue = "Test non réalisé";
+                fieldTooSmall.Infobulle += "\n\nCe test n'est pas réalisé pour les Tomos ou si le plan n'a pas de volume cible";
+            }
+            else
+            {
+                if(n==0)
+                {
+                    fieldTooSmall.setToTRUE();
+                    fieldTooSmall.MeasuredValue = "Dimensions des Jaws correctes";
+                    fieldTooSmall.Infobulle += "\n\nAtous les champs ou Controp Points ont des dimensions de machoîres cohérentes par rapport au volume cible";
+                }
+                else
+                {
+                    fieldTooSmall.setToWARNING();
+                    fieldTooSmall.MeasuredValue = "Un ou plusieurs champs trop petits";
+                    fieldTooSmall.Infobulle += "\n\nAu moins un champ ou un Controp Point présentent des dimensions de machoîres trop petites par rapport au volume cible";
+                }
+
+
+            }
+
+            this._result.Add(fieldTooSmall);
+            #endregion
         }
         public string Title
         {

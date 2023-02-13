@@ -185,33 +185,40 @@ namespace PlanCheck_IUCT
             turquoiseIsodose.ExpectedValue = "EN COURS";
             turquoiseIsodose.Infobulle = "L'isodose turquoise doit avoir la valeur de 95% ou 100% d'une prescription";
             Isodose i = _ctx.PlanSetup.Dose.Isodoses.FirstOrDefault(x => x.Color.ToString() == "#FF80FFFF");
-            
-            if(i==null)
+
+            if (i == null)
             {
                 turquoiseIsodose.MeasuredValue = "Pas d'isodose turquoise";
                 turquoiseIsodose.setToWARNING();
             }
             else
             {
-                List<double> possibleValue = new List<double>();
-                possibleValue.Add(95.0);
-                foreach (var target in _ctx.PlanSetup.RTPrescription.Targets)
-                {
-                    double d = (target.NumberOfFractions * target.DosePerFraction.Dose) / (_ctx.PlanSetup.TotalDose.Dose);
-                    possibleValue.Add(d);
-                }
                 bool foundIt = false;
                 double levelMatch = 0.0;
-                foreach(double d in possibleValue)
+
+                List<double> possibleValue = new List<double>();
+                possibleValue.Add(95.0);
+                try
                 {
-                    if(i.Level.Dose - d < 0.00001)
+                    foreach (var target in _ctx.PlanSetup.RTPrescription.Targets)
                     {
-                        foundIt = true;
-                        levelMatch = d;
+                        double d = (target.NumberOfFractions * target.DosePerFraction.Dose) / (_ctx.PlanSetup.TotalDose.Dose);
+                        possibleValue.Add(d);
+                    }
+                    foreach (double d in possibleValue)
+                    {
+                        if (i.Level.Dose - d < 0.00001)
+                        {
+                            foundIt = true;
+                            levelMatch = d;
+                        }
                     }
                 }
+                catch { foundIt = false; }
 
-                if(foundIt)
+                
+
+                if (foundIt)
                 {
                     turquoiseIsodose.MeasuredValue = levelMatch.ToString("0.00");
                     turquoiseIsodose.setToTRUE();
@@ -219,11 +226,11 @@ namespace PlanCheck_IUCT
                 else
                 {
                     turquoiseIsodose.setToWARNING();
-                    turquoiseIsodose.MeasuredValue = i.Level.Dose.ToString("0.00");
+                    turquoiseIsodose.MeasuredValue = "Isodose turquoise sans rapport avec la prescription";
                 }
             }
             this._result.Add(turquoiseIsodose);
-            
+
 
             #endregion
 
@@ -323,7 +330,8 @@ namespace PlanCheck_IUCT
 
             }
             dd.setToINFO();
-            dd.Infobulle = "Aucun test réalisé sur des indicateurs de dose";
+            dd.MeasuredValue = "Aucun test réalisé sur des indicateurs de dose";
+            dd.Infobulle = "Aucun test réalisé sur des indicateurs de dose. Soit il n'en est spécifié aucun dans le check-protocol, soit les structures requises sont absentes.";
             if ((successList.Count > 0) || (failedList.Count > 0))
             {
                 if (failedList.Count > 0)
