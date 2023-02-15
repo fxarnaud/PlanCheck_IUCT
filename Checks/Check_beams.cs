@@ -41,6 +41,7 @@ namespace PlanCheck_IUCT
 
         }
 
+       
         public void Check()
         {
 
@@ -99,6 +100,8 @@ namespace PlanCheck_IUCT
 
             foreach (Beam b in _ctx.PlanSetup.Beams)
             {
+                
+
                 listOfTolTable.Add(b.Id + "\t(" + b.ToleranceTableLabel + ")");
                 // this part is to check if the tol table are all the same
                 if (!firstTTfound)

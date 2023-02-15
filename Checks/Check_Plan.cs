@@ -15,10 +15,11 @@ namespace PlanCheck_IUCT
 {
     internal class Check_Plan
     {
+
         private ScriptContext _ctx;
         private PreliminaryInformation _pinfo;
         private read_check_protocol _rcp;
-        public Check_Plan(PreliminaryInformation pinfo, ScriptContext ctx,read_check_protocol rcp)  //Constructor
+        public Check_Plan(PreliminaryInformation pinfo, ScriptContext ctx, read_check_protocol rcp)  //Constructor
         {
             _rcp = rcp;
             _ctx = ctx;
@@ -36,13 +37,13 @@ namespace PlanCheck_IUCT
             #region Gating
             Item_Result gating = new Item_Result();
             gating.Label = "Gating";
-            
-            if(_ctx.PlanSetup.UseGating)
+
+            if (_ctx.PlanSetup.UseGating)
                 gating.MeasuredValue = "Gating activé";
             else
                 gating.MeasuredValue = "Gating Désactivé";
 
-            if(_rcp.enebleGating == "Oui")
+            if (_rcp.enebleGating == "Oui")
                 gating.ExpectedValue = "Gating activé";
             if (_rcp.enebleGating == "Non")
                 gating.ExpectedValue = "Gating Désactivé";
@@ -55,6 +56,31 @@ namespace PlanCheck_IUCT
             gating.Infobulle = "La case Enable gating doit être en accord avec le check-protocol " + _rcp.protocolName + " (" + gating.ExpectedValue + ")";
             this._result.Add(gating);
             #endregion
+
+
+
+            String msg = null;
+
+            foreach (OptimizationParameter op in _ctx.PlanSetup.OptimizationSetup.Parameters)
+            {
+                OptimizationNormalTissueParameter ontp = op as OptimizationNormalTissueParameter;
+                OptimizationExcludeStructureParameter oesp = op as OptimizationExcludeStructureParameter;
+                OptimizationIMRTBeamParameter oibp = op as OptimizationIMRTBeamParameter;
+                OptimizationJawTrackingUsedParameter ojtup = op as OptimizationJawTrackingUsedParameter;
+                OptimizationPointCloudParameter opcp = op as OptimizationPointCloudParameter;
+
+
+                msg += "dist to string " + ontp.DistanceFromTargetBorderInMM.ToString();
+                msg += "\nend dose " + ontp.EndDosePercentage.ToString();
+                msg += "\nstart dose " + ontp.StartDosePercentage.ToString();
+                msg += "\nfallof " + ontp.FallOff.ToString();
+                msg += "\nis auto " + ontp.IsAutomatic.ToString();
+                msg += "\npriotiy " + ontp.Priority.ToString();
+
+ 
+            }
+           // MessageBox.Show(_ctx.PlanSetup.OptimizationSetup.Parameters.Count() + " " + msg);
+
 
         }
         public string Title

@@ -69,10 +69,13 @@ namespace VMS.TPS
 
         public static void Perform(ScriptContext context)
         {
-            var planSetup = context.PlanSetup;
+            
             PreliminaryInformation pinfo = new PreliminaryInformation(context);    //Get Plan information...      
-            var window = new MainWindow(pinfo, context); //passer pinfo dans main window ...
-            window.ShowDialog(); /// AFFICHE LA FENETRE
+          
+            var window = new MainWindow(pinfo, context); // create window
+          
+            window.ShowDialog(); // display window, next lines not executed until it is closed
+            
         }
     }
 }

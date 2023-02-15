@@ -58,6 +58,7 @@ namespace PlanCheck_IUCT
 
         public MainWindow(PreliminaryInformation pinfo, ScriptContext pcontext) //Constructeur
         {
+
             DataContext = this;
             _pinfo = pinfo;
             _plan = pcontext.PlanSetup;
@@ -70,13 +71,39 @@ namespace PlanCheck_IUCT
             myFullFilename = Directory.GetCurrentDirectory() + @"\check_protocol\prostate.xlsx";
             theProtocol = "Check-protocol: prostate"; // theProtocol is not a file name. It s a string that display the file name with no extension
             FillHeaderInfos(); //Filling datas binded to xaml
-            InitializeComponent(); // not clear what is done here
+                               
+            InitializeComponent(); // read the xaml
+            // MessageBox.Show("Componrtnt inited");
+
+            //OK_button.color BackColor = SystemColors.ButtonFace;
+            //OK_button.ForeColor = default(Color);
+            //OK_button.UseVisualStyleBackColor = true;
+            // OK_button.Background = SystemColors.GrayTextBrush;
+            // OK_button.Foreground = SystemColors.ScrollBarBrush;
+            //OK_button.Background = new SolidColorBrush(Color.FromArgb(200, 255, 50, 50));// "#FFFFFF00";// SystemColors.GrayTextBrush;// buttonface;
+            //OK_button.Foreground = new SolidColorBrush(Color.FromArgb(200, 255, 50, 50)); //SystemColors.ScrollBarBrush;
+            // OK_button.
+            /*OK_button.Opacity = 0.50;
+            OK_button.OpacityMask = new SolidColorBrush(Color.FromArgb(255, 0, 255, 0));
+            OK_button.Background = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));// "#FFFFFF00";// SystemColors.GrayTextBrush;// buttonface;
+            OK_button.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0)); //SystemColors.ScrollBarBrush;
+            HELP_button.Opacity = 1;
+            HELP_button.OpacityMask = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+            HELP_button.Background = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));// "#FFFFFF00";// SystemColors.GrayTextBrush;// buttonface;
+            HELP_button.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 255, 0)); //SystemColors.ScrollBarBrush;
+            */
+            /* Verif_button.Opacity = 0.25;
+             Verif_button.OpacityMask = new SolidColorBrush(Color.FromArgb(255, 0, 255, 255));
+             Verif_button.Background = new SolidColorBrush(Color.FromArgb(255, 255, 255, 0));// "#FFFFFF00";// SystemColors.GrayTextBrush;// buttonface;
+                                                                                             // Verif_button.Foreground = new SolidColorBrush(Color.FromArgb(255, 255, 0, 255)); //SystemColors.ScrollBarBrush;
+             Verif_button.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));//"#FFEF0E0E");// ;
+             //OK_button.OverridesDefaultStyle;*/
         }
 
         public void FillHeaderInfos()
         {
             //Patient, plan and others infos to bind to xml
-            
+
             #region PATIENT NAME, SEX AND AGE
 
             DateTime PatientDOB = (DateTime)_pinfo.PatientDOB_dt;// .Patient.DateOfBirth;         
@@ -150,8 +177,8 @@ namespace PlanCheck_IUCT
                     nDosePerFraction.Add(target.DosePerFraction.Dose);
                 }
                 string listOfDoses = nFractions.ToString() + " x " + nDosePerFraction[0];
-                for (int i= 1; i < nDosePerFraction.Count(); i++)
-                    if (nDosePerFraction[i] != nDosePerFraction[i-1])
+                for (int i = 1; i < nDosePerFraction.Count(); i++)
+                    if (nDosePerFraction[i] != nDosePerFraction[i - 1])
                         listOfDoses += "/" + nDosePerFraction[i].ToString("0.00");
 
                 listOfDoses += " Gy (";
@@ -161,8 +188,8 @@ namespace PlanCheck_IUCT
                     prescriptionComment += "Pas de commentaire dans la presciption)";
                 else
                 {
-                    string noEndline = _pcontext.PlanSetup.RTPrescription.Notes.Replace("\n", "").Replace("\r"," - "); // replace newline by -
-                    prescriptionComment += noEndline  + ")";
+                    string noEndline = _pcontext.PlanSetup.RTPrescription.Notes.Replace("\n", "").Replace("\r", " - "); // replace newline by -
+                    prescriptionComment += noEndline + ")";
 
                     // Just in case but revision name and number are not useful
                     //+ _pcontext.PlanSetup.RTPrescription.RevisionNumber + ": " + ": " + _pcontext.PlanSetup.RTPrescription.Id + ": " + _pcontext.PlanSetup.RTPrescription.Notes;
@@ -298,7 +325,7 @@ namespace PlanCheck_IUCT
             }
             else
                 theFields = "Tomotherapy";
-            
+
             #endregion
 
             #region other infos
@@ -311,13 +338,10 @@ namespace PlanCheck_IUCT
             #endregion
 
         }
-
         public void cleanList()
         {
             ListChecks.Clear();
         }
-
-
         public void AddCheck(UserControl checkScreen)
         {
             ListChecks.Add(checkScreen);
@@ -368,7 +392,7 @@ namespace PlanCheck_IUCT
             #region THE CHECKS
 
             Check_Course c_course = new Check_Course(_pinfo, _pcontext);
-            var check_point_course = new CheckScreen_Global(c_course.Title, c_course.Result);                                                                                               
+            var check_point_course = new CheckScreen_Global(c_course.Title, c_course.Result);
             this.AddCheck(check_point_course);
 
 
@@ -384,11 +408,11 @@ namespace PlanCheck_IUCT
             var check_point_ct = new CheckScreen_Global(c_CT.Title, c_CT.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_ct);
 
-            
+
             Check_contours c_Contours = new Check_contours(_pinfo, _pcontext, rcp);
             var check_point_contours = new CheckScreen_Global(c_Contours.Title, c_Contours.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_contours);
-            
+
 
             Check_Isocenter c_Isocenter = new Check_Isocenter(_pinfo, _pcontext);
             var check_point_iso = new CheckScreen_Global(c_Isocenter.Title, c_Isocenter.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
@@ -403,33 +427,32 @@ namespace PlanCheck_IUCT
             var check_point_model = new CheckScreen_Global(c_algo.Title, c_algo.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_model);
 
-            
+
             Check_beams c_Beams = new Check_beams(_pinfo, _pcontext, rcp);
             var check_point_beams = new CheckScreen_Global(c_Beams.Title, c_Beams.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_beams);
-           
+
 
             Check_UM c_UM = new Check_UM(_pinfo, _pcontext);
             var check_point_um = new CheckScreen_Global(c_UM.Title, c_UM.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_um);
 
-        
+
             Check_doseDistribution c_doseDistribution = new Check_doseDistribution(_pinfo, _pcontext, rcp);
             var check_point_dose_distribution = new CheckScreen_Global(c_doseDistribution.Title, c_doseDistribution.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_dose_distribution);
-           
-            
-            Check_finalisation c_Finalisation = new Check_finalisation(_pinfo, _pcontext,rcp);
+
+
+            Check_finalisation c_Finalisation = new Check_finalisation(_pinfo, _pcontext, rcp);
             var check_point_finalisation = new CheckScreen_Global(c_Finalisation.Title, c_Finalisation.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_finalisation);
-            
+
             #endregion
 
 
             CheckList.Visibility = Visibility.Visible;
 
         }
-
         private void Button_Click_help(object sender, RoutedEventArgs e)
         {
             // Chrome is not installed on citrix and if hte navigator is not specified IE is launched and can't read google doc.. So,...pdf
