@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="PlanCheck_IUCT.CheckScreen_Item"
+﻿<UserControl x:Class="PlanCheck.CheckScreen_Item"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PlanCheck_IUCT"
+             xmlns:local="clr-namespace:PlanCheck"
              mc:Ignorable="d" 
              d:DesignHeight="80" d:DesignWidth="778" Background="AliceBlue"
              Style="{x:Null}" >

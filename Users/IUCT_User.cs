@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     public class IUCT_User
     {

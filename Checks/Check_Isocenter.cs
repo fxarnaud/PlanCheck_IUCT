@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using VMS.TPS.Common.Model.API;
 using System.Windows;
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     internal class Check_Isocenter
     {

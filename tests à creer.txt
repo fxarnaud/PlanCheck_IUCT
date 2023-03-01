@@ -46,7 +46,7 @@ Plan replanif ???
  
  - OPTIMISEUR : 
 	- si possible verifier les options : air cavity ; on (parametres du PO)
-	- pour Halcyion ; les machoires max < 20 cm
+	- 
 	- valeurs NTO ? 
 	- valeurs des obj ? existe il une dose moyenne vessie et rectum  ? (il faut l'ajouter systemeatiquement pour les prostates)
 	- existe t il un volume chauffe ? ((il faut l'ajouter systemeatiquement pour les prostates)

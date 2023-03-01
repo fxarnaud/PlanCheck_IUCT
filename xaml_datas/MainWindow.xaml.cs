@@ -7,10 +7,14 @@ using System.Windows.Media;
 using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
 using System.IO;
+using MigraDoc.DocumentObjectModel;
+using MigraDoc.DocumentObjectModel.Tables;
+using MigraDoc.Rendering;
+using PdfSharp.Pdf;
 //using System.Windows.Forms;
 
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -42,7 +46,7 @@ namespace PlanCheck_IUCT
         public SolidColorBrush DoctorBackgroundColor { get; set; }
         public SolidColorBrush DoctorForegroundColor { get; set; }
         public string User { get; set; }
-        public Color UserColor { get; set; }
+        public System.Windows.Media.Color UserColor { get; set; }
         public string theMachine { get; set; }
         public string theFields { get; set; }
         public string theProtocol { get; set; }
@@ -71,7 +75,7 @@ namespace PlanCheck_IUCT
             myFullFilename = Directory.GetCurrentDirectory() + @"\check_protocol\prostate.xlsx";
             theProtocol = "Check-protocol: prostate"; // theProtocol is not a file name. It s a string that display the file name with no extension
             FillHeaderInfos(); //Filling datas binded to xaml
-                               
+
             InitializeComponent(); // read the xaml
             // MessageBox.Show("Componrtnt inited");
 
@@ -386,6 +390,7 @@ namespace PlanCheck_IUCT
         {
             this.cleanList();
             OK_button.IsEnabled = false;// Visibility.Collapsed;
+            exportPDF_button.Visibility = Visibility.Visible;
             read_check_protocol rcp = new read_check_protocol(myFullFilename);
 
 
@@ -448,7 +453,7 @@ namespace PlanCheck_IUCT
             this.AddCheck(check_point_finalisation);
 
             #endregion
-
+            //int i = 0;
 
             CheckList.Visibility = Visibility.Visible;
 
@@ -468,5 +473,156 @@ namespace PlanCheck_IUCT
             }
         }
 
+        private void exportPDF_button_Click(object sender, RoutedEventArgs e)
+        {
+
+
+
+            Document migraDoc = new Document();
+            Section section = migraDoc.AddSection();
+            section.PageSetup.Orientation = MigraDoc.DocumentObjectModel.Orientation.Landscape;
+            //Paragraph paragraph = section.AddParagraph();
+
+            #region header
+            Table table = new Table();
+            table.Borders.Width = 1;
+            table.Borders.Color = MigraDoc.DocumentObjectModel.Colors.White;
+            table.AddColumn(Unit.FromCentimeter(6));
+            table.AddColumn(Unit.FromCentimeter(6));
+            Row row = table.AddRow();
+            Cell cell = row.Cells[0];
+            cell.AddParagraph("Patient ID:");
+            cell = row.Cells[1];
+            Paragraph paragraph = cell.AddParagraph();
+            paragraph.AddFormattedText(_pcontext.Patient.Id, TextFormat.Bold);
+            row = table.AddRow();
+            cell = row.Cells[0];
+            cell.AddParagraph("Patient Name:");
+            cell = row.Cells[1];
+            paragraph = cell.AddParagraph();
+            paragraph.AddFormattedText(_pcontext.Patient.LastName, TextFormat.Bold);
+            row = table.AddRow();
+            cell = row.Cells[0];
+            cell.AddParagraph("Date of Birth:");
+            cell = row.Cells[1];
+            if (!string.IsNullOrEmpty(_pinfo.PatientDOB))
+            {
+                cell.AddParagraph(_pinfo.PatientDOB);
+            }
+            row = table.AddRow();
+            cell = row.Cells[0];
+            cell.AddParagraph("Course ID:");
+            cell = row.Cells[1];
+            cell.AddParagraph(_pcontext.Course.Id);
+            row = table.AddRow();
+            cell = row.Cells[0];
+            cell.AddParagraph("Plan ID:");
+            cell = row.Cells[1];
+            cell.AddParagraph(_pcontext.PlanSetup.Id);
+            row = table.AddRow();
+            cell = row.Cells[0];
+            cell.AddParagraph("Approval Status:");
+            cell = row.Cells[1];
+            cell.AddParagraph(_pcontext.PlanSetup.ApprovalStatus.ToString());
+            row = table.AddRow();
+            cell = row.Cells[0];
+            cell.AddParagraph("Modification by:");
+            cell = row.Cells[1];
+            cell.AddParagraph(_pcontext.PlanSetup.HistoryUserName);
+            row = table.AddRow();
+            cell = row.Cells[0];
+            cell.AddParagraph("Modification Date/Time:");
+            cell = row.Cells[1];
+            cell.AddParagraph(_pcontext.PlanSetup.HistoryDateTime.ToString());
+
+            section.Add(table);
+            #endregion
+
+
+            #region pdf body
+            Paragraph paragraph2 = section.AddParagraph("\n\n");
+            paragraph2.AddFormattedText("Checks :\n\n", TextFormat.Bold);
+
+
+
+
+            //string msg1 = null;
+            foreach (CheckScreen_Global csg in ListChecks)
+            {
+                
+                //Section s = migraDoc.AddSection();
+                Paragraph paragraph1 = section.AddParagraph("\n\n" + csg._title + "\n\n");
+                paragraph1.Format.Font.Bold = true;
+                paragraph1.Format.Font.Size = 14;
+                //msg1 += "\n" + csg._title + "\n";
+
+
+                Table table1 = new Table();
+                table1.Borders.Width = 1;
+                table1.Borders.Color = MigraDoc.DocumentObjectModel.Colors.Olive;
+
+                table1.AddColumn(Unit.FromCentimeter(5.6));
+                table1.AddColumn(Unit.FromCentimeter(3.6));
+                table1.AddColumn(Unit.FromCentimeter(10.6));
+                //table1.AddColumn(Unit.FromCentimeter(5.6));
+                //table1.AddColumn(Unit.FromCentimeter(5.6));
+                //table1.AddColumn(Unit.FromCentimeter(2.6));
+                row = table1.AddRow();
+                row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.PaleGoldenrod;
+                cell = row.Cells[0];
+                cell.AddParagraph("Item");
+                cell = row.Cells[1];
+                cell.AddParagraph("Valeur du plan");
+                cell = row.Cells[2];
+                cell.AddParagraph("Info");
+                //cell = row.Cells[3];
+                //cell.AddParagraph("Infobulle");
+                //cell = row.Cells[4];
+                //cell.AddParagraph("Explication");
+
+                foreach (Item_Result ir in csg.Items)
+                {
+                    row = table1.AddRow();
+
+                    //row.Shading.Color = MigraDoc.DocumentObjectModel.Color.FromCmyk(ir.ResultStatus.Item2.Color.ScB, ir.ResultStatus.Item2.Color.ScR, ir.ResultStatus.Item2.Color.ScB, 0.0);
+                    if(ir.ResultStatus.Item1 == "X")
+                        row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.Red;
+                    if (ir.ResultStatus.Item1 == "OK")
+                        row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.Green;
+                    if (ir.ResultStatus.Item1 == "WARNING")
+                        row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.Orange;
+                    if (ir.ResultStatus.Item1 == "INFO")
+                        row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.AntiqueWhite;
+
+
+                    row.Cells[0].AddParagraph("\n\n"+ir.Label+"\n\n");
+
+
+                    row.Cells[1].AddParagraph("\n\n" + ir.MeasuredValue + "\n\n");
+                    row.Cells[2].AddParagraph("\n\n" + ir.Infobulle + "\n\n");
+                    //row.Cells[3].AddParagraph(ir.ResultStatus.Item1);
+                    //row.Cells[4].AddParagraph(ir.ResultStatus.Item1);
+                    // if (ir.ResultStatus.Item1 == "X")
+                         // 1321321;// "" ir.ResultStatus.Item2.Color.;
+                    //                    msg1 += "\t" + ir.MeasuredValue + "\n";
+                }
+                section.Add(table1);
+                section.AddPageBreak();
+                //              msg1 += "\n";
+            }
+            #endregion
+
+
+
+            PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(true, PdfSharp.Pdf.PdfFontEmbedding.None);
+
+            string pdfFile = @"\\srv015\sf_com\simon_lu\pc.pdf";
+            pdfRenderer.Document = migraDoc;
+            pdfRenderer.RenderDocument();
+            pdfRenderer.PdfDocument.Save(pdfFile);
+
+
+
+        }
     }
 }

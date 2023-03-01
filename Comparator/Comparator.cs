@@ -5,7 +5,7 @@ using System.Text;
 using System.Windows.Media;
 using System.Threading.Tasks;
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     public class Comparator
     {

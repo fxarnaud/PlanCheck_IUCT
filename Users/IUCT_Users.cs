@@ -6,7 +6,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Media;
 
-namespace PlanCheck_IUCT.Users
+namespace PlanCheck.Users
 {
     public class IUCT_Users
     {

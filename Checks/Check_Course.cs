@@ -12,7 +12,7 @@ using System.Globalization;
 
 
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     internal class Check_Course
     {

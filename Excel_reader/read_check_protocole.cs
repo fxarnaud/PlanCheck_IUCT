@@ -7,8 +7,8 @@ using VMS.TPS.Common.Model.API;
 using VMS.TPS.Common.Model.Types;
 using System.Runtime.CompilerServices;
 using System.Reflection;
-using PlanCheck_IUCT;
-using PlanCheck_IUCT.Users;
+using PlanCheck;
+using PlanCheck.Users;
 using System.Threading.Tasks;
 using System.Runtime.Remoting.Contexts;
 using System.Net.NetworkInformation;
@@ -18,7 +18,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.Text.RegularExpressions;
 
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     public class read_check_protocol
     {

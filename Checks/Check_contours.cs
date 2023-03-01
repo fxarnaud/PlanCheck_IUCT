@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using VMS.TPS.Common.Model.API;
 using System.Windows;
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     internal class Check_contours
     {
@@ -488,10 +488,10 @@ namespace PlanCheck_IUCT
 
             List<string> goodLaterality = new List<string>();
             List<string> badLaterality = new List<string>();
-            Structure sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == "BODY"); // find body
+            Structure sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "BODY"); // find body
 
             if (sbody == null)
-                sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == "CONTOUR EXTERNE"); // find body
+                sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CONTOUR EXTERNE"); // find body
 
             if (sbody == null)
                 MessageBox.Show("BODY NOT FOUND");

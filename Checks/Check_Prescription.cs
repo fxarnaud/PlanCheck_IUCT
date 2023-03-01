@@ -12,7 +12,7 @@ using System.Windows.Navigation;
 
 
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     internal class Check_Prescription
     {

@@ -9,7 +9,7 @@ using VMS.TPS.Common.Model.Types;
 using System.Windows;
 using System.Text.RegularExpressions;
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     internal class Check_doseDistribution
     {

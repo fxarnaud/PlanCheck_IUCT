@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     /// <summary>
     /// Interaction logic for CheckScreen_Global.xaml

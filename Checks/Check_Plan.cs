@@ -11,7 +11,7 @@ using System.Drawing;
 
 
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     internal class Check_Plan
     {
@@ -57,31 +57,42 @@ namespace PlanCheck_IUCT
             this._result.Add(gating);
             #endregion
 
-
-
-            String msg = null;
+            #region OPTIMISATION
+            
+           // String msg = null;
+//            if(_ctx.PlanSetup.OptimizationSetup)
+            foreach (OptimizationObjective oo in _ctx.PlanSetup.OptimizationSetup.Objectives)
+            {
+                MessageBox.Show("objective 1 " + oo.ToString() + " " + oo.StructureId + oo.Priority);
+            }
 
             foreach (OptimizationParameter op in _ctx.PlanSetup.OptimizationSetup.Parameters)
             {
-                OptimizationNormalTissueParameter ontp = op as OptimizationNormalTissueParameter;
-                OptimizationExcludeStructureParameter oesp = op as OptimizationExcludeStructureParameter;
-                OptimizationIMRTBeamParameter oibp = op as OptimizationIMRTBeamParameter;
-                OptimizationJawTrackingUsedParameter ojtup = op as OptimizationJawTrackingUsedParameter;
-                OptimizationPointCloudParameter opcp = op as OptimizationPointCloudParameter;
 
-
-                msg += "dist to string " + ontp.DistanceFromTargetBorderInMM.ToString();
+                if (op.GetType().Name == "OptimizationNormalTissueParameter")
+                {
+                    OptimizationNormalTissueParameter ontp = op as OptimizationNormalTissueParameter;
+                    /* msg += "dist to string " + ontp.DistanceFromTargetBorderInMM.ToString();
                 msg += "\nend dose " + ontp.EndDosePercentage.ToString();
                 msg += "\nstart dose " + ontp.StartDosePercentage.ToString();
                 msg += "\nfallof " + ontp.FallOff.ToString();
                 msg += "\nis auto " + ontp.IsAutomatic.ToString();
                 msg += "\npriotiy " + ontp.Priority.ToString();
+               */
+                }
+                /*
+                OptimizationExcludeStructureParameter oesp = op as OptimizationExcludeStructureParameter;
+                OptimizationIMRTBeamParameter oibp = op as OptimizationIMRTBeamParameter;
+                OptimizationJawTrackingUsedParameter ojtup = op as OptimizationJawTrackingUsedParameter;
+                OptimizationPointCloudParameter opcp = op as OptimizationPointCloudParameter;
 
- 
+                */
+
+
             }
-           // MessageBox.Show(_ctx.PlanSetup.OptimizationSetup.Parameters.Count() + " " + msg);
-
-
+            // MessageBox.Show(_ctx.PlanSetup.OptimizationSetup.Parameters.Count() + " " + msg);
+            
+            #endregion
         }
         public string Title
         {

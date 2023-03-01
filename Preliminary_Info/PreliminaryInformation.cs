@@ -1,4 +1,4 @@
-﻿using PlanCheck_IUCT.Users;
+﻿using PlanCheck.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using VMS.TPS.Common.Model.API;
 
-namespace PlanCheck_IUCT
+namespace PlanCheck
 {
     public class PreliminaryInformation
     {
