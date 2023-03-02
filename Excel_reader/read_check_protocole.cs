@@ -28,12 +28,14 @@ namespace PlanCheck
         private double _gridsize;
 
         private List<string> _optionComp = new List<string>();
+        private List<string> _POoptions = new List<string>();
         private String _prescriptionPercentage;
         private String _normalisationMode;
         private String _enableGating;
         private String _energy;
         private String _tolTable;
         private NTO myNTO;
+        private bool _jawTracking;
         //private List<Tuple<string, double>> _couchStructures = new List<Tuple<string, double>>();
         // private List<Tuple<string, double, double, double>> _clinicalStructures = new List<Tuple<string, double, double, double>>();
         // private List<Tuple<string, double>> _optStructures = new List<Tuple<string, double>>();
@@ -269,9 +271,17 @@ namespace PlanCheck
                     xlRange1.Cells[12, 6].Value2,
                     xlRange1.Cells[12, 4].Value2);
             }
-            //_tolTable = xlRange1.Cells[10, 2].Text;
+            // line 14
+            _jawTracking = false;
+            if(xlRange1.Cells[14, 2].Text == "true")
+                _jawTracking=true;
 
+            // line 16
+            int k = 0;
+            for (k = 16; k < 28; k++)
+                _POoptions.Add(xlRange1.Cells[k, 3].Text);
 
+                
             #endregion
 
             #region sheet 2 clinical structures
@@ -378,6 +388,10 @@ namespace PlanCheck
         {
             get { return _optionComp; }
         }
+        public List<string> POoptions
+        {
+            get { return _POoptions; }
+        }
         public string prescriptionPercentage
         {
             get { return _prescriptionPercentage; }
@@ -421,6 +435,10 @@ namespace PlanCheck
         public NTO NTOparams
         {
             get { return myNTO; }
+        }
+        public bool JawTracking
+        {
+            get { return _jawTracking; }
         }
         #endregion
 

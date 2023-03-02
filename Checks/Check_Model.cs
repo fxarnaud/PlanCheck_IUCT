@@ -39,7 +39,7 @@ namespace PlanCheck
         private read_check_protocol _rcp;
         public void Check()
         {
-            
+
             String machin = _pcontext.PlanSetup.Beams.First().TreatmentUnit.Id;
             bool isTomo = false;
             if (machin.Contains("TOM"))
@@ -47,7 +47,7 @@ namespace PlanCheck
 
             Comparator testing = new Comparator();
 
-  
+
             #region Nom de l'algo
             Item_Result algo_name = new Item_Result();
             algo_name.Label = "Algorithme de calcul";
@@ -67,7 +67,7 @@ namespace PlanCheck
             algo_grid.MeasuredValue = _pcontext.PlanSetup.Dose.XRes.ToString("0.00");
             //algo_grid.Comparator = "=";
             algo_grid.Infobulle = "Grille de calcul attendue pour le check-protocol " + _rcp.protocolName + " " + algo_grid.ExpectedValue + " mm";
-            
+
             //algo_grid.ResultStatus = testing.CompareDatas(algo_grid.ExpectedValue, algo_grid.MeasuredValue, algo_grid.Comparator);
             if (_rcp.gridSize == _pcontext.PlanSetup.Dose.XRes)
             {
@@ -77,7 +77,7 @@ namespace PlanCheck
             {
                 algo_grid.setToFALSE();
             }
-            if(isTomo)
+            if (isTomo)
             {
                 if (_pcontext.PlanSetup.Dose.XRes - 1.2695 < 0.01)
                 {
@@ -90,12 +90,12 @@ namespace PlanCheck
                 algo_grid.Infobulle = "Pour les tomos, la grille doit être 1.27 mm (check protocol ignoré)";
 
             }
-            
+
             this._result.Add(algo_grid);
             #endregion
-            
 
-            
+
+
             #region LES OPTIONS DE CALCUL
             if (algo_name.ResultStatus.Item1 != "X")// options are not checked if the algo is not the same
             {
@@ -136,7 +136,60 @@ namespace PlanCheck
             }
             #endregion
 
-  
+
+            #region LES OPTIONS DU PO
+            if (algo_name.ResultStatus.Item1 != "X")// options are not checked if the algo is not the same
+            {
+                Item_Result POoptions = new Item_Result();
+                POoptions.Label = "Options du PO";
+
+                POoptions.ExpectedValue = "N/A";// TO GET IN PRTOCOLE
+
+
+
+
+                int myOpt = 0;
+                string msg = null;
+                bool optionsPOareOK = true;
+                foreach (string s in _rcp.POoptions)
+                {
+                    //                    MessageBox.Show("Comp " + s + " vs. " + _pinfo.POoptions[myOpt]);
+                    if (s != _pinfo.POoptions[myOpt])
+                        optionsPOareOK = false;
+                    myOpt++;
+                }
+
+                if (!optionsPOareOK)
+                {
+                    POoptions.setToFALSE();
+                    POoptions.MeasuredValue = "Option(s) du PO non conforme au protocole (voir détail)";
+                    POoptions.Infobulle = "Une option du PO est différente du check-protocol " + _rcp.protocolName;
+                    myOpt = 0;
+                    foreach (string s in _rcp.POoptions)
+                    {
+                        POoptions.Infobulle += s + " vs. " + _pinfo.POoptions[myOpt] + "\n";
+                        myOpt++;
+                    }
+                }
+                else
+                {
+                    POoptions.setToTRUE();
+                    POoptions.Infobulle = "Les " + myOpt + " options du modèle PO sont en accord avec le check-protocol: " + _rcp.protocolName;
+                    POoptions.MeasuredValue = "OK";
+
+                }
+
+                this._result.Add(POoptions);
+            }
+            #endregion
+
+
+
+
+
+
+
+
         }
 
 

@@ -138,7 +138,7 @@ namespace PlanCheck
                 /*
                 OptimizationExcludeStructureParameter oesp = op as OptimizationExcludeStructureParameter;
                 OptimizationIMRTBeamParameter oibp = op as OptimizationIMRTBeamParameter;
-                OptimizationJawTrackingUsedParameter ojtup = op as OptimizationJawTrackingUsedParameter;
+                
                 OptimizationPointCloudParameter opcp = op as OptimizationPointCloudParameter;
 
                 */
@@ -148,8 +148,33 @@ namespace PlanCheck
 
 
             #endregion
+            #region Jaw tracking
+             //  This method doesnt work:
+             //  OptimizationJawTrackingUsedParameter ojtup = op as OptimizationJawTrackingUsedParameter;
+             //  (found on the reddit )
+            
+            if (_ctx.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
+            {
+                Item_Result jawTrack = new Item_Result();
+                jawTrack.Label = "Jaw Track";
+                //OptimizationJawTrackingUsedParameter ojtup = _ctx.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationJawTrackingUsedParameter") as OptimizationJawTrackingUsedParameter;
+                jawTrack.Infobulle = "Selon le protocole " + _rcp.protocolName + " le jaw tracking doit être " + _rcp.JawTracking;
 
-            // MessageBox.Show(_ctx.PlanSetup.OptimizationSetup.Parameters.Count() + " " + msg);
+                bool isJawTrackingOn = _ctx.PlanSetup.OptimizationSetup.Parameters.Any(x => x is OptimizationJawTrackingUsedParameter);
+                jawTrack.MeasuredValue = isJawTrackingOn.ToString();
+                
+                if (isJawTrackingOn != _rcp.JawTracking)
+                {
+                    jawTrack.setToFALSE();
+                }
+                else
+                {
+                    jawTrack.setToTRUE();
+                }
+                this._result.Add(jawTrack);
+            }
+            #endregion
+            
 
         }
 

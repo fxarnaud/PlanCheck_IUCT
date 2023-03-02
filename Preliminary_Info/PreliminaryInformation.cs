@@ -24,8 +24,8 @@ namespace PlanCheck
         private string _algoname;
         private string _mlctype;
         private string _treatmentType;
-        private string[] calculoptions;
-
+        private string[] _calculoptions;
+        private string[] _POoptions;
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
             _ctx = ctx;
@@ -61,10 +61,14 @@ namespace PlanCheck
 
             _mlctype = Check_mlc_type(ctx.PlanSetup);
 
-            calculoptions = new string[ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.Count];
-            calculoptions = ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.ToArray();
+            _calculoptions = new string[ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.Count];
+            _calculoptions = ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.ToArray();
 
-
+            
+            int n = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Values.Count;
+            _POoptions = new string[n];
+            _POoptions = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Values.ToArray();
+//            _POoptions = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Keys.ToArray(); // if option name are needed
 
             //MessageBox.Show(string.Format("test = {0}", calculoptions[0]));
             //MessageBox.Show(string.Format("test = {0}", calculoptions[1]));
@@ -143,7 +147,11 @@ namespace PlanCheck
 
         public string[] Calculoptions
         {
-            get { return calculoptions; }
+            get { return _calculoptions; }
+        }
+        public string[] POoptions
+        {
+            get { return _POoptions; }
         }
 
         public string PatientDOB

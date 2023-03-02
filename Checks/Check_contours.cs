@@ -464,7 +464,7 @@ namespace PlanCheck
                     nAnalysedStructures++;
                     m = getNumberOfMissingSlices(s, _ctx.StructureSet);
                     if (m > 0)
-                        structureswithAGap.Add(m.ToString() + "Contours manquantes pour: " + s.Id);
+                        structureswithAGap.Add(m.ToString() + " contour(s) manquantes pour la structure : " + s.Id);
                 }
             }
             if (structureswithAGap.Count > 0)
@@ -627,7 +627,7 @@ namespace PlanCheck
             if (CTVwithoutAnyPTV.Count() > 0) // at least one GTV/CTV has no PTV
             {
                 aPTVforEveryone.setToFALSE();
-                aPTVforEveryone.MeasuredValue = "Au moins un GTV/CTV n'a pas de PTV";
+                aPTVforEveryone.MeasuredValue = "Au moins un GTV/CTV n'a pas de PTV (ou un PTV trop petit)";
                 aPTVforEveryone.Infobulle = "Ces GTV/CTV n'ont pas de PTV : \n";
                 foreach (string s in CTVwithoutAnyPTV)
                     aPTVforEveryone.Infobulle += " - " + s + "\n";
@@ -641,7 +641,7 @@ namespace PlanCheck
                     aPTVforEveryone.Infobulle += " - " + s + "\n";
             }
 
-
+            aPTVforEveryone.Infobulle += "\n\nUn CTV/GTV doit avoir une structure dont le nom contient 'PTV' et donc chacune des  6 dimensions (X+, X-, ...) est supérieure à celle du GTV/CTV) \n";
 
 
 

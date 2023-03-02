@@ -8,8 +8,8 @@ namespace PlanCheck
 {
     public class NTO
     {
-        public double priority;
         public string mode;
+        public double priority;        
         public double falloff;
         public double startPercentageDose;
         public double stopPercentageDose;

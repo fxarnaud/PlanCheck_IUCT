@@ -22,10 +22,12 @@ CONTOURS
 traitements antérieurs 			OK
 
 Plan 	Enable gating ? 			OK
-
+	machoiresjaw tracking activé   --> OK
+	 valeurs NTO ?   --> FAIT
 CT	Densité forcée ? 			OK
 
 Finalisation	Plan CQ préparé ?    			OK
+
 
 A faire------------------------------------------------------------
  CT
@@ -46,8 +48,7 @@ Plan replanif ???
  
  - OPTIMISEUR : 
 	- si possible verifier les options : air cavity ; on (parametres du PO)
-	- 
-	- valeurs NTO ? 
+	-
 	- valeurs des obj ? existe il une dose moyenne vessie et rectum  ? (il faut l'ajouter systemeatiquement pour les prostates)
 	- existe t il un volume chauffe ? ((il faut l'ajouter systemeatiquement pour les prostates)
 
@@ -56,7 +57,6 @@ Faiscaux
 	Mode SRS
 	Nova SBRT/NOVA
 	Mode (DSP pour les elecs....)
-	machoiresjaw tracking activé
 	Bras (pour les tangentiels, pour les ptv latéralisés)
 	DOSE RATE
 	Delivery time
