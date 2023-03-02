@@ -27,6 +27,28 @@ namespace PlanCheck
             Check();
         }
 
+        public bool CompareNTO(OptimizationNormalTissueParameter planNTO, NTO protocolNTO)
+        {
+            bool result = true;
+
+            if (planNTO.DistanceFromTargetBorderInMM != protocolNTO.distanceTotTarget) result = false;
+            if (planNTO.StartDosePercentage != protocolNTO.startPercentageDose) result = false;
+            if (planNTO.EndDosePercentage != protocolNTO.stopPercentageDose) result = false;
+            if (planNTO.FallOff != protocolNTO.falloff) result = false;
+            if (planNTO.Priority != protocolNTO.priority) result = false;
+
+            bool autoMode = false;
+            if (protocolNTO.mode == "Manual") autoMode = false;
+            else if (protocolNTO.mode == "Auto") autoMode = true;
+
+            if (planNTO.IsAutomatic != autoMode) result = false;
+
+            return result;
+
+
+
+        }
+
         private List<Item_Result> _result = new List<Item_Result>();
         // private PreliminaryInformation _pinfo;
         private string _title = "Plan";
@@ -57,29 +79,62 @@ namespace PlanCheck
             this._result.Add(gating);
             #endregion
 
-            #region OPTIMISATION
-            
-           // String msg = null;
-//            if(_ctx.PlanSetup.OptimizationSetup)
-            foreach (OptimizationObjective oo in _ctx.PlanSetup.OptimizationSetup.Objectives)
-            {
-                MessageBox.Show("objective 1 " + oo.ToString() + " " + oo.StructureId + oo.Priority);
-            }
+            #region NTO
 
-            foreach (OptimizationParameter op in _ctx.PlanSetup.OptimizationSetup.Parameters)
-            {
 
-                if (op.GetType().Name == "OptimizationNormalTissueParameter")
+
+            if (_ctx.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
+            {
+                //foreach (OptimizationObjective oo in _ctx.PlanSetup.OptimizationSetup.Objectives)
+                // foreach (OptimizationParameter op in _ctx.PlanSetup.OptimizationSetup.Parameters)
+
+
+
+
+                OptimizationNormalTissueParameter ontp = _ctx.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationNormalTissueParameter") as OptimizationNormalTissueParameter;
+
+                // OptimizationNormalTissueParameter ontp = op as OptimizationNormalTissueParameter;
+                bool NTOparamsOk = CompareNTO(ontp, _rcp.NTOparams);
+
+                Item_Result NTO = new Item_Result();
+                NTO.Label = "NTO";
+                if (NTOparamsOk)
                 {
-                    OptimizationNormalTissueParameter ontp = op as OptimizationNormalTissueParameter;
-                    /* msg += "dist to string " + ontp.DistanceFromTargetBorderInMM.ToString();
-                msg += "\nend dose " + ontp.EndDosePercentage.ToString();
-                msg += "\nstart dose " + ontp.StartDosePercentage.ToString();
-                msg += "\nfallof " + ontp.FallOff.ToString();
-                msg += "\nis auto " + ontp.IsAutomatic.ToString();
-                msg += "\npriotiy " + ontp.Priority.ToString();
-               */
+                    NTO.MeasuredValue = "Paramètres NTO conformes au protocole";
+                    NTO.Infobulle = "Paramètres NTO conformes au protocole " + _rcp.protocolName;
+                    NTO.setToTRUE();
                 }
+                else
+                {
+                    NTO.MeasuredValue = "Paramètres NTO non conformes au protocole";
+                    NTO.Infobulle = "Paramètres NTO non conformes au protocole " + _rcp.protocolName;
+
+
+
+                    NTO.setToFALSE();
+                }
+                NTO.Infobulle += "\n Paramètres NTO du plan :";
+                NTO.Infobulle += "\n Distance : " + ontp.DistanceFromTargetBorderInMM;
+                NTO.Infobulle += "\n Fall off : " + ontp.FallOff;
+                NTO.Infobulle += "\n Start Dose : " + ontp.StartDosePercentage;
+                NTO.Infobulle += "\n End Dose : " + ontp.EndDosePercentage;
+                NTO.Infobulle += "\n Priority : " + ontp.Priority;
+                NTO.Infobulle += "\n Auto Mode : " + ontp.IsAutomatic;
+                if (ontp.IsAutomatic)
+                    NTO.Infobulle += " (Auto)";
+                else
+                    NTO.Infobulle += " (Manual)";
+
+                NTO.Infobulle += "\n Paramètres NTO du protocole :";
+                NTO.Infobulle += "\n Distance : " + _rcp.NTOparams.distanceTotTarget;
+                NTO.Infobulle += "\n Fall off : " + _rcp.NTOparams.falloff;
+                NTO.Infobulle += "\n Start Dose : " + _rcp.NTOparams.startPercentageDose;
+                NTO.Infobulle += "\n End Dose : " + _rcp.NTOparams.stopPercentageDose;
+                NTO.Infobulle += "\n Priority : " + _rcp.NTOparams.priority;
+                NTO.Infobulle += "\n Auto Mode : " + _rcp.NTOparams.mode;
+                this._result.Add(NTO);
+
+
                 /*
                 OptimizationExcludeStructureParameter oesp = op as OptimizationExcludeStructureParameter;
                 OptimizationIMRTBeamParameter oibp = op as OptimizationIMRTBeamParameter;
@@ -90,10 +145,14 @@ namespace PlanCheck
 
 
             }
-            // MessageBox.Show(_ctx.PlanSetup.OptimizationSetup.Parameters.Count() + " " + msg);
-            
+
+
             #endregion
+
+            // MessageBox.Show(_ctx.PlanSetup.OptimizationSetup.Parameters.Count() + " " + msg);
+
         }
+
         public string Title
         {
             get { return _title; }
@@ -105,3 +164,4 @@ namespace PlanCheck
         }
     }
 }
+

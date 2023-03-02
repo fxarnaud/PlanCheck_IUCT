@@ -33,6 +33,7 @@ namespace PlanCheck
         private String _enableGating;
         private String _energy;
         private String _tolTable;
+        private NTO myNTO;
         //private List<Tuple<string, double>> _couchStructures = new List<Tuple<string, double>>();
         // private List<Tuple<string, double, double, double>> _clinicalStructures = new List<Tuple<string, double, double, double>>();
         // private List<Tuple<string, double>> _optStructures = new List<Tuple<string, double>>();
@@ -258,6 +259,19 @@ namespace PlanCheck
             // line 10
             _tolTable = xlRange1.Cells[10, 2].Text;
 
+            // line 12
+            if(xlRange1.Cells[12, 2].Text != "")
+            {
+                myNTO = new NTO(xlRange1.Cells[12, 2].Text,
+                    xlRange1.Cells[12, 3].Value2,
+                    xlRange1.Cells[12, 7].Value2,
+                    xlRange1.Cells[12, 5].Value2,
+                    xlRange1.Cells[12, 6].Value2,
+                    xlRange1.Cells[12, 4].Value2);
+            }
+            //_tolTable = xlRange1.Cells[10, 2].Text;
+
+
             #endregion
 
             #region sheet 2 clinical structures
@@ -403,6 +417,10 @@ namespace PlanCheck
         public List<String> listQAplans
         {
             get { return _listQAplans; }
+        }
+        public NTO NTOparams
+        {
+            get { return myNTO; }
         }
         #endregion
 
