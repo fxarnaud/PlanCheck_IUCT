@@ -55,6 +55,14 @@ namespace PlanCheck
         {
 
 
+            String machin = _ctx.PlanSetup.Beams.First().TreatmentUnit.Id.ToUpper();
+            bool isTomo = false;
+            bool isHalcyon = false;
+            if (machin.Contains("TOM"))
+                isTomo = true;
+            if (machin.Contains("HALCYON"))
+                isHalcyon = true;
+
 
 
             #region QA plans
@@ -110,8 +118,8 @@ namespace PlanCheck
                                     if (p.ApprovalStatus.ToString() != "PlanningApproved")
                                         unapprovedQAplans.Add(p.Id);
 
-                                    String machine = _ctx.PlanSetup.Beams.FirstOrDefault().Id.ToUpper();
-                                    if (!machine.Contains("HALCYON")) // if not HALCYON 
+                                    //String machine = _ctx.PlanSetup.Beams.FirstOrDefault().Id.ToUpper();
+                                    if (!isHalcyon) // if not HALCYON 
                                     {
                                         if (p.PhotonCalculationModel != _ctx.PlanSetup.PhotonCalculationModel)
                                             wrongAlgoQAplans.Add(p.Id + " " + p.PhotonCalculationModel);
@@ -222,6 +230,13 @@ namespace PlanCheck
                 preparedQA.setToINFO();
                 preparedQA.MeasuredValue = "Aucun CQ attendu selon le protocole";// "Différent de Planning Approved";
                 preparedQA.Infobulle = "Aucun CQ attendu selon le protocole: " + _rcp.protocolName;
+            }
+
+            if(isTomo)
+            {
+                preparedQA.setToINFO();
+                preparedQA.MeasuredValue = "TOMO (vérifier QA plan)";// "Différent de Planning Approved";
+                preparedQA.Infobulle = "Machine Tomo, le check protocole " + _rcp.protocolName + " est ignoré. Vérifier QA plans";
             }
 
             this._result.Add(preparedQA);

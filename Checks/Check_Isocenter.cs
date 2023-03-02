@@ -27,6 +27,8 @@ namespace PlanCheck
 
         public void Check()
         {
+            
+            String machine = _ctx.PlanSetup.Beams.First().TreatmentUnit.Id;
 
 
 
@@ -159,6 +161,12 @@ namespace PlanCheck
                 isoAtCenterOfPTV.Infobulle += "Pas de vérification de la position de l'isocentre dans le volume cible";
 
             }
+            if (machine.Contains("TOM"))
+            {
+                isoAtCenterOfPTV.setToINFO();
+                isoAtCenterOfPTV.Infobulle += "\nPour les Tomos, cet item n'est pas vérifié";
+            }
+
             this._result.Add(isoAtCenterOfPTV);
             #endregion
 

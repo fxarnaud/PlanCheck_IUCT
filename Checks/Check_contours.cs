@@ -63,6 +63,7 @@ namespace PlanCheck
 
         public void Check()
         {
+            string machine = _ctx.PlanSetup.Beams.First().TreatmentUnit.Id;
 
             #region APPROVE ?  
             Item_Result approbationStatus = new Item_Result();
@@ -158,8 +159,11 @@ namespace PlanCheck
                     couchStructExist.Infobulle += " - " + ms + "\n";
 
             }
-
-
+            if(machine.Contains("TOM"))
+            {
+                couchStructExist.setToINFO();
+                couchStructExist.Infobulle += "\n\n\nMachine TOMO (item INFO) : (vérifier la table)";
+            }
             this._result.Add(couchStructExist);
             #endregion
 

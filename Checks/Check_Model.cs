@@ -39,6 +39,12 @@ namespace PlanCheck
         private read_check_protocol _rcp;
         public void Check()
         {
+            
+            String machin = _pcontext.PlanSetup.Beams.First().TreatmentUnit.Id;
+            bool isTomo = false;
+            if (machin.Contains("TOM"))
+                isTomo = true;
+
             Comparator testing = new Comparator();
 
   
@@ -58,10 +64,33 @@ namespace PlanCheck
             Item_Result algo_grid = new Item_Result();
             algo_grid.Label = "Taille grille de calcul (mm)";
             algo_grid.ExpectedValue = _rcp.gridSize.ToString();//"1.25";// TO GET IN PRTOCOLE
-            algo_grid.MeasuredValue = _pcontext.PlanSetup.Dose.XRes.ToString();
-            algo_grid.Comparator = "=";
+            algo_grid.MeasuredValue = _pcontext.PlanSetup.Dose.XRes.ToString("0.00");
+            //algo_grid.Comparator = "=";
             algo_grid.Infobulle = "Grille de calcul attendue pour le check-protocol " + _rcp.protocolName + " " + algo_grid.ExpectedValue + " mm";
-            algo_grid.ResultStatus = testing.CompareDatas(algo_grid.ExpectedValue, algo_grid.MeasuredValue, algo_grid.Comparator);
+            
+            //algo_grid.ResultStatus = testing.CompareDatas(algo_grid.ExpectedValue, algo_grid.MeasuredValue, algo_grid.Comparator);
+            if (_rcp.gridSize == _pcontext.PlanSetup.Dose.XRes)
+            {
+                algo_grid.setToTRUE();
+            }
+            else
+            {
+                algo_grid.setToFALSE();
+            }
+            if(isTomo)
+            {
+                if (_pcontext.PlanSetup.Dose.XRes - 1.2695 < 0.01)
+                {
+                    algo_grid.setToTRUE();
+                }
+                else
+                {
+                    algo_grid.setToFALSE();
+                }
+                algo_grid.Infobulle = "Pour les tomos, la grille doit être 1.27 mm (check protocol ignoré)";
+
+            }
+            
             this._result.Add(algo_grid);
             #endregion
             

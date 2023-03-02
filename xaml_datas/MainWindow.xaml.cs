@@ -480,68 +480,81 @@ namespace PlanCheck
 
             Document migraDoc = new Document();
             Section section = migraDoc.AddSection();
-            section.PageSetup.Orientation = MigraDoc.DocumentObjectModel.Orientation.Landscape;
-            //Paragraph paragraph = section.AddParagraph();
+            section.PageSetup.Orientation = MigraDoc.DocumentObjectModel.Orientation.Portrait;
+
 
             #region header
             Table table = new Table();
             table.Borders.Width = 1;
             table.Borders.Color = MigraDoc.DocumentObjectModel.Colors.White;
             table.AddColumn(Unit.FromCentimeter(6));
-            table.AddColumn(Unit.FromCentimeter(6));
+            table.AddColumn(Unit.FromCentimeter(10));
+
             Row row = table.AddRow();
             Cell cell = row.Cells[0];
-            cell.AddParagraph("Patient ID:");
+            cell.AddParagraph("Patient :");
             cell = row.Cells[1];
             Paragraph paragraph = cell.AddParagraph();
-            paragraph.AddFormattedText(_pcontext.Patient.Id, TextFormat.Bold);
+            paragraph.AddFormattedText(PatientFullName, TextFormat.Bold);
+
+
             row = table.AddRow();
             cell = row.Cells[0];
-            cell.AddParagraph("Patient Name:");
+            cell.AddParagraph("Oncologue :");
             cell = row.Cells[1];
             paragraph = cell.AddParagraph();
-            paragraph.AddFormattedText(_pcontext.Patient.LastName, TextFormat.Bold);
+            paragraph.AddFormattedText(DoctorName, TextFormat.Bold);
+
             row = table.AddRow();
             cell = row.Cells[0];
-            cell.AddParagraph("Date of Birth:");
+            cell.AddParagraph("Commentaire : ");
             cell = row.Cells[1];
-            if (!string.IsNullOrEmpty(_pinfo.PatientDOB))
-            {
-                cell.AddParagraph(_pinfo.PatientDOB);
-            }
+            cell.AddParagraph(prescriptionComment);
+
+
+
             row = table.AddRow();
             cell = row.Cells[0];
-            cell.AddParagraph("Course ID:");
+            cell.AddParagraph("Plan (Course) :");
             cell = row.Cells[1];
-            cell.AddParagraph(_pcontext.Course.Id);
+            cell.AddParagraph(PlanAndCourseID);
+
             row = table.AddRow();
             cell = row.Cells[0];
-            cell.AddParagraph("Plan ID:");
+            cell.AddParagraph("Plan créé par :");
             cell = row.Cells[1];
-            cell.AddParagraph(_pcontext.PlanSetup.Id);
+            paragraph = cell.AddParagraph();
+            paragraph.AddFormattedText(PlanCreatorName, TextFormat.Bold);
+
             row = table.AddRow();
             cell = row.Cells[0];
-            cell.AddParagraph("Approval Status:");
+            cell.AddParagraph("Machine : ");
             cell = row.Cells[1];
-            cell.AddParagraph(_pcontext.PlanSetup.ApprovalStatus.ToString());
+            cell.AddParagraph(theMachine);
+
             row = table.AddRow();
             cell = row.Cells[0];
-            cell.AddParagraph("Modification by:");
+            cell.AddParagraph("Technique :");
             cell = row.Cells[1];
-            cell.AddParagraph(_pcontext.PlanSetup.HistoryUserName);
+            cell.AddParagraph(theFields);
+
             row = table.AddRow();
             cell = row.Cells[0];
-            cell.AddParagraph("Modification Date/Time:");
+            cell.AddParagraph("Imprimé par :");
             cell = row.Cells[1];
-            cell.AddParagraph(_pcontext.PlanSetup.HistoryDateTime.ToString());
+            cell.AddParagraph(CurrentUserName);
+
+
 
             section.Add(table);
             #endregion
 
 
             #region pdf body
+
+
             Paragraph paragraph2 = section.AddParagraph("\n\n");
-            paragraph2.AddFormattedText("Checks :\n\n", TextFormat.Bold);
+            paragraph2.AddFormattedText("\n", TextFormat.Bold);
 
 
 
@@ -549,66 +562,69 @@ namespace PlanCheck
             //string msg1 = null;
             foreach (CheckScreen_Global csg in ListChecks)
             {
-                
-                //Section s = migraDoc.AddSection();
+
+
                 Paragraph paragraph1 = section.AddParagraph("\n\n" + csg._title + "\n\n");
                 paragraph1.Format.Font.Bold = true;
                 paragraph1.Format.Font.Size = 14;
-                //msg1 += "\n" + csg._title + "\n";
-
 
                 Table table1 = new Table();
                 table1.Borders.Width = 1;
                 table1.Borders.Color = MigraDoc.DocumentObjectModel.Colors.Olive;
 
-                table1.AddColumn(Unit.FromCentimeter(5.6));
-                table1.AddColumn(Unit.FromCentimeter(3.6));
-                table1.AddColumn(Unit.FromCentimeter(10.6));
-                //table1.AddColumn(Unit.FromCentimeter(5.6));
-                //table1.AddColumn(Unit.FromCentimeter(5.6));
-                //table1.AddColumn(Unit.FromCentimeter(2.6));
+                table1.AddColumn(Unit.FromCentimeter(4.0));
+                table1.AddColumn(Unit.FromCentimeter(2.8));
+                table1.AddColumn(Unit.FromCentimeter(10.0));
                 row = table1.AddRow();
                 row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.PaleGoldenrod;
+                row.Format.Font.Size = 8;
+                row.Format.Font.Bold = true;
+
                 cell = row.Cells[0];
                 cell.AddParagraph("Item");
                 cell = row.Cells[1];
                 cell.AddParagraph("Valeur du plan");
                 cell = row.Cells[2];
                 cell.AddParagraph("Info");
-                //cell = row.Cells[3];
-                //cell.AddParagraph("Infobulle");
-                //cell = row.Cells[4];
-                //cell.AddParagraph("Explication");
 
                 foreach (Item_Result ir in csg.Items)
                 {
                     row = table1.AddRow();
-
+                    row.Format.Font.Size = 6;
                     //row.Shading.Color = MigraDoc.DocumentObjectModel.Color.FromCmyk(ir.ResultStatus.Item2.Color.ScB, ir.ResultStatus.Item2.Color.ScR, ir.ResultStatus.Item2.Color.ScB, 0.0);
-                    if(ir.ResultStatus.Item1 == "X")
+                    if (ir.ResultStatus.Item1 == "X")
+                    {
                         row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.Red;
+                        row.Format.Font.Color = MigraDoc.DocumentObjectModel.Colors.AntiqueWhite;
+                    }
                     if (ir.ResultStatus.Item1 == "OK")
-                        row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.Green;
+                    {
+                        row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.LightGreen;
+                        row.Format.Font.Color = MigraDoc.DocumentObjectModel.Colors.Black;
+
+                    }
                     if (ir.ResultStatus.Item1 == "WARNING")
+                    {
                         row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.Orange;
+                        row.Format.Font.Color = MigraDoc.DocumentObjectModel.Colors.DarkBlue;
+                    }
                     if (ir.ResultStatus.Item1 == "INFO")
+                    {
                         row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.AntiqueWhite;
+                        row.Format.Font.Color = MigraDoc.DocumentObjectModel.Colors.Black;
+                    }
 
 
-                    row.Cells[0].AddParagraph("\n\n"+ir.Label+"\n\n");
+                    row.Cells[0].AddParagraph("\n\n" + ir.Label + "\n\n");
 
 
                     row.Cells[1].AddParagraph("\n\n" + ir.MeasuredValue + "\n\n");
                     row.Cells[2].AddParagraph("\n\n" + ir.Infobulle + "\n\n");
-                    //row.Cells[3].AddParagraph(ir.ResultStatus.Item1);
-                    //row.Cells[4].AddParagraph(ir.ResultStatus.Item1);
-                    // if (ir.ResultStatus.Item1 == "X")
-                         // 1321321;// "" ir.ResultStatus.Item2.Color.;
-                    //                    msg1 += "\t" + ir.MeasuredValue + "\n";
+
                 }
                 section.Add(table1);
                 section.AddPageBreak();
-                //              msg1 += "\n";
+
             }
             #endregion
 
@@ -616,10 +632,13 @@ namespace PlanCheck
 
             PdfDocumentRenderer pdfRenderer = new PdfDocumentRenderer(true, PdfSharp.Pdf.PdfFontEmbedding.None);
 
-            string pdfFile = @"\\srv015\sf_com\simon_lu\pc.pdf";
+            string pdfFile = @"\\srv015\sf_com\simon_lu\";
+            pdfFile += "PlanCheck_" + _pcontext.Patient.Id + "_" + _pcontext.Patient.LastName + "_" + _pcontext.Patient.FirstName + "_" + _pcontext.PlanSetup.Id;
+            pdfFile += Path.GetFileNameWithoutExtension(myFullFilename) + "_"+ DateTime.Now.ToString("MM.dd.yyyy_H.mm.ss") + ".pdf";
             pdfRenderer.Document = migraDoc;
             pdfRenderer.RenderDocument();
-            pdfRenderer.PdfDocument.Save(pdfFile);
+           MessageBox.Show(pdfFile);
+          pdfRenderer.PdfDocument.Save(pdfFile);
 
 
 

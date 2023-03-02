@@ -34,6 +34,7 @@ namespace PlanCheck
 
         public void Check()
         {
+            string machineID = _ctx.PlanSetup.Beams.First().TreatmentUnit.Id;
 
             #region LISTE DES CIBLES DE LA PRESCRIPTION
             Item_Result prescriptionVolumes = new Item_Result();
@@ -65,23 +66,7 @@ namespace PlanCheck
 
             #endregion
 
-            /*
-            #region APPROBATION DE LA PRESCRIPTION
-            Item_Result prescriptionStatus = new Item_Result();
-            prescriptionStatus.Label = "Approbation de la prescription (" + _ctx.PlanSetup.RTPrescription.Name + ")";
-            prescriptionStatus.ExpectedValue = "Approved";
-            prescriptionStatus.MeasuredValue = _ctx.PlanSetup.RTPrescription.Status;
-
-            if (prescriptionStatus.MeasuredValue == "Approved")
-                prescriptionStatus.setToTRUE();
-            else
-                prescriptionStatus.setToFALSE();
-
-
-            prescriptionStatus.Infobulle = "OK si la prescription est approuvée";
-            this._result.Add(prescriptionStatus);
-            #endregion
-            */
+            
             #region FRACTIONNEMENT - CIBLE LA PLUS HAUTE
             Item_Result fractionation = new Item_Result();
             //fractionation.Label = "Fractionnement du PTV principal";
@@ -111,15 +96,21 @@ namespace PlanCheck
             fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction + " Gy";
             fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.Dose.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
 
+            
+
             if ((nPrescribedNFractions == nFraction) && (nPrescribedDosePerFraction == myDosePerFraction.Dose))
                 fractionation.setToTRUE();
+            else if (machineID == "TOM")
+                fractionation.setToINFO();
             else
                 fractionation.setToFALSE();
 
 
             fractionation.Infobulle = "Le 'nombre de fractions' et la 'dose par fraction' du plan doivent\nêtre conformes à la prescription " + _ctx.PlanSetup.RTPrescription.Id +
                 " : " + nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
-            this._result.Add(fractionation);
+            fractionation.Infobulle += "\nNe fonctionne pas pour la TOMO : l'item est mis en INFO";
+
+             this._result.Add(fractionation);
             #endregion
 
 
@@ -179,19 +170,17 @@ namespace PlanCheck
                 }
             }
 
-            //if (normMethod == "100.00% couvre 50.00% du volume cible")
-            //  normalisation.MeasuredValue = normMethod + " au " + _ctx.PlanSetup.TargetVolumeID;
-            //else if (normMethod == "100% au point de référence principal")
-            //  normalisation.MeasuredValue = normMethod + " au point " + _ctx.PlanSetup.PrimaryReferencePoint.Id;
-
+            if (normalisation.MeasuredValue == "Aucune normalisation de plan")
+                normalisation.setToWARNING();
+            if (machineID == "TOM")
+            {
+                normalisation.MeasuredValue = "TOMO (vérifier la normalisation)";
+                normalisation.setToINFO();
+            }
 
 
             normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le check-protocol. Cet item est en WARNING si Aucune normalisation";
-
-
-
-            if (normalisation.MeasuredValue == "Aucune normalisation de plan")
-                normalisation.setToWARNING();
+            normalisation.Infobulle += "\nPour la TOMO l'item est mis en INFO";
 
             this._result.Add(normalisation);
             #endregion

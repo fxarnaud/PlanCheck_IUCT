@@ -67,10 +67,11 @@ Faiscaux
 	MLC		MLC minimal ? 		Facteur de moculation ? 
 	présence kv/cbct
 
-Documents?  
+ 
 
 
 Pas possible ou Bof ---------------------------------------------------------------
+Documents? 
 suppression ORFIT TETE			NON FAIT
  - Body bien fait (voir table)
  - structure de contentions : 	est elle bien positionné ? 		IMPOSSIBLE	

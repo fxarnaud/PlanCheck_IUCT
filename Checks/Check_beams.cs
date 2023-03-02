@@ -45,14 +45,14 @@ namespace PlanCheck
         public void Check()
         {
 
-
+            String machine = _ctx.PlanSetup.Beams.FirstOrDefault().TreatmentUnit.Id;
 
             #region ENERGY 
             Item_Result energy = new Item_Result();
             energy.Label = "Energie";
             energy.ExpectedValue = "NA";
 
-            if ((_rcp.energy == "") || (_rcp.energy == null)) // no energy specified in check-protocol
+            if ((_rcp.energy == "") || (_rcp.energy == null) || (machine.Contains("TOM"))) // no energy specified in check-protocol
             {
                 energy.setToINFO();
                 energy.MeasuredValue = "Aucune énergie spécifiée dans le check-protocol " + _rcp.protocolName;
@@ -157,6 +157,12 @@ namespace PlanCheck
             foreach (String field in listOfTolTable)
                 toleranceTable.Infobulle += "\n - " + field;
 
+            if(machine.Contains("TOM"))
+            {
+                toleranceTable.Infobulle += "\nNon vérifié pour les tomos\n";
+                toleranceTable.MeasuredValue = "Tomo (pas de table de tolérance)";
+                toleranceTable.setToINFO();
+            }
             this._result.Add(toleranceTable);
             #endregion
 
@@ -186,7 +192,7 @@ namespace PlanCheck
 
 
             #region FIELD SIZE GENERAL
-            String machine = _ctx.PlanSetup.Beams.FirstOrDefault().TreatmentUnit.Id;
+            
             bool giveup = false;
             Item_Result fieldTooSmall = new Item_Result();
             List<String> fieldTooSmallList = new List<String>();
