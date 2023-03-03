@@ -93,6 +93,7 @@ namespace PlanCheck
 
             List<string> missingCouchStructures = new List<string>();
             List<string> wrongHUCouchStructures = new List<string>();
+            List<string> mandatoryMissingCouchStructures = new List<string>();
             List<string> overlapStructList = new List<string>();
             double tolerancedOV = 4.0; // Tolerance for overlap couch vs. body
             foreach (expectedStructure es in _rcp.myCouchExpectedStructures) // foreach couch element in the xls protocol file
@@ -100,15 +101,23 @@ namespace PlanCheck
                 double mydouble = 0;
                 Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
                 if (struct1 == null) // if structure doesnt exist in ss
+                {
                     missingCouchStructures.Add(es.Name);
+                    if (es.isMandatory)
+                        mandatoryMissingCouchStructures.Add(es.Name);
+                }
                 else if (struct1.IsEmpty) // else if it exists but empty --> same
+                {
                     missingCouchStructures.Add(es.Name);
+                    if (es.isMandatory)
+                        mandatoryMissingCouchStructures.Add(es.Name);
+                }
                 else // else struct is not empty
                 {
                     struct1.GetAssignedHU(out mydouble);   // check assigned HU
                     if (mydouble != es.HU)
                         wrongHUCouchStructures.Add(es.Name);
-                    //MessageBox.Show(struct1.Id + " " + struct1.MeshGeometry.Bounds.Y + " " + struct1.MeshGeometry.Bounds.SizeY);
+
 
                     try
                     {
@@ -147,7 +156,7 @@ namespace PlanCheck
             }
             else
             {
-                couchStructExist.setToFALSE();
+                couchStructExist.setToWARNING();
                 couchStructExist.MeasuredValue = "Absentes, vides ou UH incorrectes (voir infobulle)";
                 if (missingCouchStructures.Count > 0)
                     couchStructExist.Infobulle = "Structures attendues pour le protocole " + _rcp.protocolName + " absentes ou vides dans le plan :\n";
@@ -158,8 +167,18 @@ namespace PlanCheck
                 foreach (string ms in wrongHUCouchStructures)
                     couchStructExist.Infobulle += " - " + ms + "\n";
 
+                if (mandatoryMissingCouchStructures.Count > 0)
+                {
+                    couchStructExist.setToFALSE();
+                    couchStructExist.Infobulle += "\nAu moins une structure de table obligatoire est absente : \n";
+                    foreach (string ms in mandatoryMissingCouchStructures)
+                        couchStructExist.Infobulle += " - " + ms + "\n";
+
+
+                }
+
             }
-            if(machine.Contains("TOM"))
+            if (machine.Contains("TOM"))
             {
                 couchStructExist.setToINFO();
                 couchStructExist.Infobulle += "\n\n\nMachine TOMO (item INFO) : (vérifier la table)";
@@ -203,6 +222,7 @@ namespace PlanCheck
 
             List<string> missingClinicalStructures = new List<string>();
             List<string> wrongHUClinicalStructures = new List<string>();
+            List<string> mandatoryMissingClinicalStructures = new List<string>();
 
             foreach (expectedStructure es in _rcp.myClinicalExpectedStructures) // foreach clinical struct in the xls check-protocol file
             {
@@ -210,9 +230,17 @@ namespace PlanCheck
                 double mydouble = 0;
                 Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
                 if (struct1 == null) // if structure doesnt exist in ss
+                {
                     missingClinicalStructures.Add(es.Name);
+                    if (es.isMandatory)
+                        mandatoryMissingClinicalStructures.Add(es.Name);
+                }
                 else if (struct1.IsEmpty) // else if it exists but empty --> same
+                {
                     missingClinicalStructures.Add(es.Name);
+                    if (es.isMandatory)
+                        mandatoryMissingClinicalStructures.Add(es.Name);
+                }
                 else
                 {
                     if (es.HU != 9999) // 9999 if no assigned HU 
@@ -250,6 +278,14 @@ namespace PlanCheck
                 foreach (string ms in wrongHUClinicalStructures)
                     clinicalStructuresItem.Infobulle += " - " + ms + "\n";
 
+                if (mandatoryMissingClinicalStructures.Count > 0)
+                {
+                    clinicalStructuresItem.setToFALSE();
+                    clinicalStructuresItem.Infobulle += "Structures obligatoires manquantes :\n";
+                    foreach (string ms in mandatoryMissingClinicalStructures)
+                        clinicalStructuresItem.Infobulle += " - " + ms + "\n";
+                }
+
             }
 
 
@@ -265,14 +301,24 @@ namespace PlanCheck
 
             List<string> missingOptStructures = new List<string>();
             List<string> wrongHUOptStructures = new List<string>();
+            List<string> mandatoryMissingOptStructures = new List<string>();
             foreach (expectedStructure es in _rcp.myOptExpectedStructures)
             {
                 double mydouble = 0;
                 Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
                 if (struct1 == null) // if structure doesnt exist in ss
+                {
                     missingOptStructures.Add(es.Name);
+                    if (es.isMandatory)
+                        mandatoryMissingOptStructures.Add(es.Name);
+                }
                 else if (struct1.IsEmpty) // else if it exists but empty --> same
+                {
                     missingOptStructures.Add(es.Name);
+
+                    if (es.isMandatory)
+                        mandatoryMissingOptStructures.Add(es.Name);
+                }
                 else
                 {
                     if (es.HU != 9999) // 9999 if no assigned HU 
@@ -310,6 +356,13 @@ namespace PlanCheck
                 foreach (string ms in wrongHUOptStructures)
                     optStructuresItem.Infobulle += " - " + ms + "\n";
 
+                if(mandatoryMissingOptStructures.Count > 0)
+                {
+                    optStructuresItem.setToFALSE();
+                    optStructuresItem.Infobulle += "Structures obligatoires manquantes : \n";
+                    foreach (string ms in mandatoryMissingOptStructures)
+                        optStructuresItem.Infobulle += " - " + ms + "\n";
+                }
             }
 
 
@@ -370,7 +423,7 @@ namespace PlanCheck
             {
                 anormalVolumeItem.setToINFO();
                 anormalVolumeItem.MeasuredValue = "Aucune analyse de volumes de structures";
-                anormalVolumeItem.Infobulle = "Les structures présentes n'ont pas de valeur de volumes (cc) attendus dans le check-protocol\n";
+                anormalVolumeItem.Infobulle = "Les structures présentes n'ont pas une valeur de volume (cc) attendu dans le check-protocol\n";
             }
 
             this._result.Add(anormalVolumeItem);
@@ -546,12 +599,17 @@ namespace PlanCheck
             }
             else
             {
-                laterality.MeasuredValue = "Vérifiée pour " + goodLaterality.Count() + " structures";
+                laterality.MeasuredValue = "Vérifiée pour " + goodLaterality.Count() + " structure(s)";
                 laterality.setToTRUE();
 
                 laterality.Infobulle = "Ces structures sont attendues à gauche ou à droite et semblent du bon côté : \n";
                 foreach (string s in goodLaterality)
                     laterality.Infobulle += " - " + s + "\n";
+
+                if (goodLaterality.Count == 0)
+                {
+                    laterality.Infobulle = "Aucune structure n'a une latéralité (G ou D) attendue dans le check-protocol\n";
+                }
 
             }
 
@@ -641,7 +699,7 @@ namespace PlanCheck
                     aPTVforEveryone.Infobulle += " - " + s + "\n";
             }
 
-            aPTVforEveryone.Infobulle += "\n\nUn CTV/GTV doit avoir une structure dont le nom contient 'PTV' et donc chacune des  6 dimensions (X+, X-, ...) est supérieure à celle du GTV/CTV) \n";
+            aPTVforEveryone.Infobulle += "\n\nUn CTV/GTV doit avoir une structure dont le nom contient 'PTV' et donc chacune des  6 dimensions (X+, X-, ...) est supérieure à celle du GTV/CTV \n";
 
 
 

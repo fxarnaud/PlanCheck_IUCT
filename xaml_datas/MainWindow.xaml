@@ -106,7 +106,7 @@
                     </ListView>
                 </StackPanel>
 
-                <StackPanel Style="{x:Null}" Height="150">
+                <StackPanel Style="{x:Null}" Height="60">
                     <!-- ADD A SPACING -->
                 </StackPanel>
                 <StackPanel Style="{x:Null}" Height="60" Width="800">

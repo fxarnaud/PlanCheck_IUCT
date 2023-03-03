@@ -157,6 +157,7 @@ namespace PlanCheck
             if (_context.Image.Id.Contains(imageDate))
             {
                 image3Dnaming.setToTRUE();
+
             }
             else if (_context.Image.Id.Contains(imageDate2))
             {
@@ -165,11 +166,12 @@ namespace PlanCheck
             else
             {
                 image3Dnaming.setToWARNING();
+
             }
 
             image3Dnaming.ExpectedValue = imageDate;
             image3Dnaming.MeasuredValue = _context.Image.Id;
-            image3Dnaming.Infobulle = "Le nom de l'image 3D doit contenir la date du CT au format jjmmaa (" + imageDate + ") ou jjmmaaa";
+            image3Dnaming.Infobulle = "Le nom de l'image 3D doit contenir la date du CT au format jjmmaa (" + imageDate + ") ou jjmmaaaa";
             //image3Dnaming.ResultStatus = testing.CompareDatas(image3Dnaming.ExpectedValue, image3Dnaming.MeasuredValue, image3Dnaming.Comparator);
             //image3Dnaming.Comparator = "=";
             this._result.Add(image3Dnaming);

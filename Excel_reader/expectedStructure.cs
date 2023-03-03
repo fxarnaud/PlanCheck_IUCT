@@ -15,5 +15,6 @@ namespace PlanCheck
         public int expectedNumberOfPart { get; set; }
         public string laterality { get; set; }
 
+        public bool isMandatory { get; set; }
     }
 }

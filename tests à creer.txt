@@ -1,6 +1,44 @@
 ﻿
 
 
+
+A faire------------------------------------------------------------
+ CT
+	orientation FF/HF
+	MAR ? 
+	4DCT 3ph ? Ave ? 6 Ph
+	DIBH ?
+
+prescription
+	accord avec les standards ? 
+	accord avec un essai ?
+	
+BEAM Pondération 
+	
+	
+Plan replanif ??? 
+	
+ 
+ - OPTIMISEUR : 
+	- valeurs des obj ? existe il une dose moyenne vessie et rectum  ? (il faut l'ajouter systemeatiquement pour les prostates)
+	- existe t il un volume chauffe ? ((il faut l'ajouter systemeatiquement pour les prostates)
+
+Faiscaux
+	Blocage ? 
+	Mode SRS
+	Nova SBRT/NOVA
+	Mode (DSP pour les elecs....)
+	Bras (pour les tangentiels, pour les ptv latéralisés)
+	DOSE RATE
+	Delivery time
+	Bolus ? 
+	180E ?
+	DRR
+	Telemetre visible ? 
+	MLC		MLC minimal ? 		Facteur de moculation ? 
+	présence kv/cbct
+
+ 
 Fait ------------------------------------------------------------
 - intersection avec body --> 		FAIT
 - Nom du plan = nom de la prescription = commentaire du course  --> FAIT
@@ -24,50 +62,11 @@ traitements antérieurs 			OK
 Plan 	Enable gating ? 			OK
 	machoiresjaw tracking activé   --> OK
 	 valeurs NTO ?   --> FAIT
+	 si possible verifier les options : air cavity ; on (parametres du PO) OK
 CT	Densité forcée ? 			OK
 
 Finalisation	Plan CQ préparé ?    			OK
 
-
-A faire------------------------------------------------------------
- CT
-	orientation FF/HF
-	MAR ? 
-	4DCT 3ph ? Ave ? 6 Ph
-	DIBH ?
-
-prescription
-	accord avec les standards ? 
-	accord avec un essai ?
-	
-BEAM Pondération 
-	
-	
-Plan replanif ??? 
-	
- 
- - OPTIMISEUR : 
-	- si possible verifier les options : air cavity ; on (parametres du PO)
-	-
-	- valeurs des obj ? existe il une dose moyenne vessie et rectum  ? (il faut l'ajouter systemeatiquement pour les prostates)
-	- existe t il un volume chauffe ? ((il faut l'ajouter systemeatiquement pour les prostates)
-
-Faiscaux
-	Blocage ? 
-	Mode SRS
-	Nova SBRT/NOVA
-	Mode (DSP pour les elecs....)
-	Bras (pour les tangentiels, pour les ptv latéralisés)
-	DOSE RATE
-	Delivery time
-	Bolus ? 
-	180E ?
-	DRR
-	Telemetre visible ? 
-	MLC		MLC minimal ? 		Facteur de moculation ? 
-	présence kv/cbct
-
- 
 
 
 Pas possible ou Bof ---------------------------------------------------------------

@@ -634,11 +634,11 @@ namespace PlanCheck
 
             string pdfFile = @"\\srv015\sf_com\simon_lu\";
             pdfFile += "PlanCheck_" + _pcontext.Patient.Id + "_" + _pcontext.Patient.LastName + "_" + _pcontext.Patient.FirstName + "_" + _pcontext.PlanSetup.Id;
-            pdfFile += Path.GetFileNameWithoutExtension(myFullFilename) + "_"+ DateTime.Now.ToString("MM.dd.yyyy_H.mm.ss") + ".pdf";
+            pdfFile += Path.GetFileNameWithoutExtension(myFullFilename) + "_" + DateTime.Now.ToString("MM.dd.yyyy_H.mm.ss") + ".pdf";
             pdfRenderer.Document = migraDoc;
             pdfRenderer.RenderDocument();
-           MessageBox.Show(pdfFile);
-          pdfRenderer.PdfDocument.Save(pdfFile);
+            MessageBox.Show("Rapport PDF sauvegardé :\n" + pdfFile);
+            pdfRenderer.PdfDocument.Save(pdfFile);
 
 
 

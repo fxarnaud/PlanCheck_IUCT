@@ -104,6 +104,7 @@ namespace PlanCheck
                 string temp4 = r.Cells[row, 4].Text; // column 4
                 string temp5 = r.Cells[row, 5].Text; // column 5
                 string temp6 = r.Cells[row, 6].Text; // column 6
+                string temp7 = r.Cells[row, 7].Text; // column 7
 
                 es.Name = (r.Cells[row, 1].Value2).ToString();
                 es.HU = giveMeTheDouble(temp2, row, 2, r.Worksheet.Name);
@@ -115,6 +116,9 @@ namespace PlanCheck
                 else
                     es.laterality = "NONE"; // laterality cell is simply ignored if it is not L or R
 
+                es.isMandatory = false;
+                if (temp7.ToUpper() == "OUI") es.isMandatory = true;
+
             }
             if (temp1 != null)
                 return es;
@@ -122,7 +126,7 @@ namespace PlanCheck
                 return null;
         }
 
-        public DOstructure readADOStructRow(Excel.Range r, int row)
+        public DOstructure readADOStructRow(Excel.Range r, int row) /// read Dose Objective
         {
 
             DOstructure dos = new DOstructure();
