@@ -61,7 +61,7 @@ namespace PlanCheck
 
            // MessageBox.Show(n_um_per_gray.ToString("N2") + myMLCType);
 
-            if ((myMLCType == "VMAT") || (myMLCType == "IMRT"))
+            if ((myMLCType == "VMAT") || (myMLCType == "IMRT") || (myMLCType == "DoseDynamic"))
             {
                 um.setToTRUE();
                 if (n_um_per_gray > 3.5)
@@ -70,7 +70,7 @@ namespace PlanCheck
                 if (n_um_per_gray > 4.5)
                     um.setToFALSE();
 
-                
+                //MessageBox.Show("IMRT " + n_um_per_gray);
             }
             else
             {
@@ -78,6 +78,8 @@ namespace PlanCheck
                     um.setToFALSE();
                 else
                     um.setToTRUE();
+
+                //MessageBox.Show("IMRT " + n_um_per_gray + " " + myMLCType);
 
             }
 

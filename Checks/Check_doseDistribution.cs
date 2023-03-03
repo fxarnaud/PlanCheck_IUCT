@@ -24,6 +24,30 @@ namespace PlanCheck
             Check();
 
         }
+        public string replaceHomoIn(string _structName)  // get poumonHOMO and return PoumonGche or PoumonDt depending on iso x position (return null if they don t exist)
+        {
+            String structname = _structName;
+            bool isLeft = false;
+            Beam b = _ctx.PlanSetup.Beams.First();
+            if (b.IsocenterPosition.x > 0)  // if iso is left
+            {
+                isLeft = true;
+
+                structname = _structName.Replace("HOMO", "Gche");
+            }
+            else
+                structname = _structName.Replace("HOMO", "Dt");
+
+            Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == structname.ToUpper());
+
+            if (s != null)
+                return structname;
+            else
+                return null;
+
+
+
+        }
 
         public string getTheUnit(string theValueWithUnit) // get 20Gy or 12.5cc and return Gy or cc
         {
@@ -245,88 +269,95 @@ namespace PlanCheck
             double result = 0.0;
             foreach (DOstructure dos in _rcp.myDOStructures) // loop on list structures with > 0 objectives in check-protocol
             {
-                Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == dos.Name); // get the chosen structure
-                String structName = null;
-                DVHData dvh = null;
+                string structName = dos.Name.ToUpper();
+                if (dos.Name.ToUpper().Contains("HOMO"))
+                    structName = replaceHomoIn(dos.Name);
 
-                if (s != null) // get the dvh once per struct
+
+                if (structName != null)
                 {
-                    dvh = _ctx.PlanSetup.GetDVHCumulativeData(s, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
-                    structName = s.Id;
-                }
-                if (dvh != null)
-                    foreach (string obj in dos.listOfObjectives) // loop on list of objectives in check-protocol. 
+                    Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == structName.ToUpper()); // get the chosen structure
+                    structName = null;
+                    DVHData dvh = null;
+
+                    if (s != null) // get the dvh once per struct
                     {
-                        //----------------------------------
-                        //  Ex. of objective V20.0Gy<33.1%
-                        //----------------------------------
-
-                        //MessageBox.Show("start processing " + obj);
-
-                        string theObjective = "";
-                        string theValue = "";
-                        double theValueDouble = 0.0;
-                        string theValueWithUnit = "";//0.0;
-                        string theUnit = "";
-                        string[] elementI = null;
-                        string[] elementS = null;
-                        bool isInfObj = false;
-                        bool isSupObj = false;
-
-                        elementS = obj.Split('>');  // split around > or <   Get V20.0Gy an 33.1%
-                        elementI = obj.Split('<');
-
-                        if (elementS.Length > 1)
+                        dvh = _ctx.PlanSetup.GetDVHCumulativeData(s, DoseValuePresentation.Absolute, VolumePresentation.Relative, 0.1);
+                        structName = s.Id;
+                    }
+                    if (dvh != null)
+                        foreach (string obj in dos.listOfObjectives) // loop on list of objectives in check-protocol. 
                         {
-                            isSupObj = true; // it is a sup obective
-                            theObjective = elementS[0];
-                            theValueWithUnit = elementS[1];
-                        }
-                        else if (elementI.Length > 1)
-                        {
-                            isInfObj = true; // it is a inf obective
-                            theObjective = elementI[0];
-                            theValueWithUnit = elementI[1];
-                        }
-                        else
-                        {
-                            MessageBox.Show("This objective is not correct " + obj + "(must contain < or >). It will be ignored");
-                            break;
-                        }
+                            //----------------------------------
+                            //  Ex. of objective V20.0Gy<33.1%
+                            //----------------------------------
 
-                        if (isInfObj || isSupObj)
-                        {
-                            theUnit = getTheUnit(theValueWithUnit); // extract Gy from 20.4Gy
-                            if (theUnit != "failed")
+                            //MessageBox.Show("start processing " + obj);
+
+                            string theObjective = "";
+                            string theValue = "";
+                            double theValueDouble = 0.0;
+                            string theValueWithUnit = "";//0.0;
+                            string theUnit = "";
+                            string[] elementI = null;
+                            string[] elementS = null;
+                            bool isInfObj = false;
+                            bool isSupObj = false;
+
+                            elementS = obj.Split('>');  // split around > or <   Get V20.0Gy an 33.1%
+                            elementI = obj.Split('<');
+
+                            if (elementS.Length > 1)
                             {
-                                theValue = theValueWithUnit.Replace(theUnit, "");// extract 20.4 from 20.4Gy
-                                theValueDouble = Convert.ToDouble(theValue);
-                                result = getValueForThisObjective(s, dvh, theObjective, theUnit); // no need to pass the value, just the indicator and the output unit
-                                if (isInfObj)
-                                {
-                                    if (result <= theValueDouble)//success
-                                        successList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
-                                    else // failed
-                                        failedList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
-
-                                }
-                                else if (isSupObj)
-                                {
-                                    if (result >= theValueDouble)//success
-                                        successList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
-                                    else // failed
-                                        failedList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
-                                }
+                                isSupObj = true; // it is a sup obective
+                                theObjective = elementS[0];
+                                theValueWithUnit = elementS[1];
+                            }
+                            else if (elementI.Length > 1)
+                            {
+                                isInfObj = true; // it is a inf obective
+                                theObjective = elementI[0];
+                                theValueWithUnit = elementI[1];
                             }
                             else
-                                MessageBox.Show("error in this objective: wrong unit: " + structName + " " + obj + "It will be ignored.");
+                            {
+                                MessageBox.Show("This objective is not correct " + obj + "(must contain < or >). It will be ignored");
+                                break;
+                            }
+
+                            if (isInfObj || isSupObj)
+                            {
+                                theUnit = getTheUnit(theValueWithUnit); // extract Gy from 20.4Gy
+                                if (theUnit != "failed")
+                                {
+                                    theValue = theValueWithUnit.Replace(theUnit, "");// extract 20.4 from 20.4Gy
+                                    theValueDouble = Convert.ToDouble(theValue);
+                                    result = getValueForThisObjective(s, dvh, theObjective, theUnit); // no need to pass the value, just the indicator and the output unit
+                                    if (isInfObj)
+                                    {
+                                        if (result <= theValueDouble)//success
+                                            successList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                        else // failed
+                                            failedList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
+
+                                    }
+                                    else if (isSupObj)
+                                    {
+                                        if (result >= theValueDouble)//success
+                                            successList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                        else // failed
+                                            failedList.Add(structName + " " + obj + " --> " + result.ToString("0.00") + " " + theUnit);
+                                    }
+                                }
+                                else
+                                    MessageBox.Show("error in this objective: wrong unit: " + structName + " " + obj + "It will be ignored.");
 
 
-                            // MessageBox.Show("End of process for " + obj + " Result : " + result.ToString("0.00") + " " + theUnit);
+                                // MessageBox.Show("End of process for " + obj + " Result : " + result.ToString("0.00") + " " + theUnit);
+                            }
+
                         }
-
-                    }
-
+                }
 
             }
             dd.setToINFO();

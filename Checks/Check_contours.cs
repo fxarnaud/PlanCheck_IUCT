@@ -474,7 +474,7 @@ namespace PlanCheck
             }
             if (uncorrectStructs.Count > 0)
             {
-                shapeAnalyser.setToFALSE();
+                shapeAnalyser.setToWARNING();
                 shapeAnalyser.MeasuredValue = " Nombres de parties des structures incorrects";
                 shapeAnalyser.Infobulle = "Les structures suivantes ont un de nombre de parties non-conforme au check-protocol :\n";
                 foreach (string s in uncorrectStructs)

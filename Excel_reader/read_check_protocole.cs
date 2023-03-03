@@ -282,8 +282,8 @@ namespace PlanCheck
 
             // line 16
             int k = 0;
-            for (k = 16; k < 28; k++)
-                _POoptions.Add(xlRange1.Cells[k, 3].Text);
+            for (k = 17; k < 29; k++)
+                _POoptions.Add(xlRange1.Cells[k, 2].Text);
 
                 
             #endregion

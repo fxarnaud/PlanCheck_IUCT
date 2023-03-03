@@ -180,11 +180,20 @@ namespace PlanCheck
                     nFractions = target.NumberOfFractions;
                     nDosePerFraction.Add(target.DosePerFraction.Dose);
                 }
-                string listOfDoses = nFractions.ToString() + " x " + nDosePerFraction[0];
+                string listOfDoses = nFractions.ToString() + " x " + nDosePerFraction[0].ToString("0.##");
                 for (int i = 1; i < nDosePerFraction.Count(); i++)
                     if (nDosePerFraction[i] != nDosePerFraction[i - 1])
-                        listOfDoses += "/" + nDosePerFraction[i].ToString("0.00");
-
+                    {
+                        //MessageBox.Show(nDosePerFraction[i].ToString("0.##"));
+                        listOfDoses += "/" + nDosePerFraction[i].ToString("0.##");
+                    }
+                /*
+                 
+d0.ToString("0.##");   //24.15
+d1.ToString("0.##");   //24.16 (rounded up)
+d2.ToString("0.##");   //24.1  
+d3.ToString("0.##");   //24
+                 */
                 listOfDoses += " Gy (";
                 prescriptionComment = listOfDoses;
 

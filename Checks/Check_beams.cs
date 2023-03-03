@@ -102,21 +102,21 @@ namespace PlanCheck
             {
                 
 
-                listOfTolTable.Add(b.Id + "\t(" + b.ToleranceTableLabel + ")");
+                listOfTolTable.Add(b.Id + "\t(" + b.ToleranceTableLabel.ToUpper() + ")");
                 // this part is to check if the tol table are all the same
                 if (!firstTTfound)
                 {
                     firstTTfound = true;
                     allSame = true;
-                    firstTT = b.ToleranceTableLabel;
+                    firstTT = b.ToleranceTableLabel.ToUpper();
                 }
                 else
                 {
-                    if (b.ToleranceTableLabel != firstTT)
+                    if (b.ToleranceTableLabel.ToUpper() != firstTT)
                         allSame = false;
                 }
                 // this part is to check if the tol table are as specified in schek protocol
-                if (b.ToleranceTableLabel != _rcp.toleranceTable)
+                if (b.ToleranceTableLabel.ToUpper() != _rcp.toleranceTable.ToUpper())
                 {
                     toleranceOK = false;
 
