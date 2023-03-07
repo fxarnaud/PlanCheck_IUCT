@@ -367,7 +367,7 @@ namespace PlanCheck
             {
                 if (failedList.Count > 0)
                 {
-                    dd.setToFALSE();
+                    dd.setToWARNING();
                     dd.MeasuredValue = "Au moins un objectif non atteint (voir détail)";
                 }
                 else

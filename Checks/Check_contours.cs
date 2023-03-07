@@ -95,7 +95,7 @@ namespace PlanCheck
             List<string> wrongHUCouchStructures = new List<string>();
             List<string> mandatoryMissingCouchStructures = new List<string>();
             List<string> overlapStructList = new List<string>();
-            double tolerancedOV = 4.0; // Tolerance for overlap couch vs. body
+           // double tolerancedOV = 4.0; // Tolerance for overlap couch vs. body
             foreach (expectedStructure es in _rcp.myCouchExpectedStructures) // foreach couch element in the xls protocol file
             {
                 double mydouble = 0;
@@ -187,7 +187,7 @@ namespace PlanCheck
             #endregion
 
             #region overlap body vs couch structs. 
-
+            /* marche pas
             Item_Result overlapCouchBody = new Item_Result();
             overlapCouchBody.Label = "Overlap Body vs. Table";
             overlapCouchBody.ExpectedValue = "EN COURS";
@@ -210,7 +210,7 @@ namespace PlanCheck
             }
             this._result.Add(overlapCouchBody);
 
-
+            */
             #endregion
 
             #region CLINICAL STRUCTURES 

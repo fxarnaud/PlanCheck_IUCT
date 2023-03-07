@@ -26,7 +26,7 @@ namespace PlanCheck
 
         public void Check()
         {
-           
+            string machine = _ctx.PlanSetup.Beams.First().TreatmentUnit.Name.ToUpper();
 
             #region UM per Gray
             Item_Result um = new Item_Result();
@@ -83,10 +83,14 @@ namespace PlanCheck
 
             }
 
+            if(machine.Contains("TOM"))
+            {
+                um.setToINFO();
+                um.MeasuredValue = "TOMO : non vérifié";
+            }
 
 
-
-            um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT. En VMAT/IMRT warning si > 3.5 et ERREUR si > 4.5. A noter que pour Halcyon pelvis on accepte < 4.5 et pour les RA vertebre < 5";
+                um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT. En VMAT/IMRT warning si > 3.5 et ERREUR si > 4.5. A noter que pour Halcyon pelvis on accepte < 4.5 et pour les RA vertebre < 5";
 
 
             // um.Infobulle = thereIsAFieldWithaWedge;
@@ -114,6 +118,11 @@ namespace PlanCheck
                 wedged.Infobulle = "Pas de champs filtré avec moins de 20 UM";
 
             }
+            if ( machine.Contains("TOM") || machine.Contains("HALCYON") )
+            {
+                wedged.setToINFO();
+                wedged.MeasuredValue = "TOMO ou HALCYON: non vérifié";
+            }
 
             this._result.Add(wedged);
             #endregion
@@ -138,7 +147,11 @@ namespace PlanCheck
                 less10UM.Infobulle = "Pas de champs < 10 UM";
 
             }
-
+            if (machine.Contains("TOM") )
+            {
+                less10UM.setToINFO();
+                less10UM.MeasuredValue = "TOMO : non vérifié";
+            }
             this._result.Add(less10UM);
             #endregion
 

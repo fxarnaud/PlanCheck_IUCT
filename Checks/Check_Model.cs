@@ -23,6 +23,14 @@ namespace PlanCheck
 {
     internal class Check_Model
     {
+
+
+        private List<Item_Result> _result = new List<Item_Result>();
+        private PreliminaryInformation _pinfo;
+        private ScriptContext _pcontext;
+        private string _title = "Modèle de calcul";
+        private read_check_protocol _rcp;
+
         public Check_Model(PreliminaryInformation pinfo, ScriptContext context, read_check_protocol rcp)  //Constructor
         {
             // _testpartlabel = "Algorithme";
@@ -53,11 +61,37 @@ namespace PlanCheck
 
 
         }
-        private List<Item_Result> _result = new List<Item_Result>();
-        private PreliminaryInformation _pinfo;
-        private ScriptContext _pcontext;
-        private string _title = "Modèle de calcul";
-        private read_check_protocol _rcp;
+        private bool isField3x3() // check if a least a CP has jaw aperture < 31x31 mm
+        {
+            bool itis = false;
+            //Beam b = _pcontext.PlanSetup.Beams.FirstOrDefault(x => x.IsSetupField == false);
+            foreach (Beam b in _pcontext.PlanSetup.Beams)
+            {
+                if (!b.IsSetupField)
+                {
+
+                    // must check if it works for rtc
+                    foreach (ControlPoint cp in b.ControlPoints)
+                    {
+                        if ((-cp.JawPositions.X1 + cp.JawPositions.X2 < 31) || (-cp.JawPositions.Y1 + cp.JawPositions.Y2 < 31))
+                        {
+                           // MessageBox.Show(cp.JawPositions.X1.ToString() + " " + cp.JawPositions.X2.ToString() + " " + cp.JawPositions.Y1 + " " + cp.JawPositions.Y2);
+                            itis = true;
+                            break;
+                        }
+                    }
+
+                }
+                if (itis)
+                    break;
+
+            }
+         
+            return itis;
+
+        }
+
+
         public void Check()
         {
 
@@ -225,31 +259,51 @@ namespace PlanCheck
 
 
             #endregion
+
             #region Jaw tracking
             //  This method doesnt work:
             //  OptimizationJawTrackingUsedParameter ojtup = op as OptimizationJawTrackingUsedParameter;
             //  (found on the reddit )
+            // check only for nova
 
-            if (_pcontext.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
-            {
-                Item_Result jawTrack = new Item_Result();
-                jawTrack.Label = "Jaw Track";
-                //OptimizationJawTrackingUsedParameter ojtup = _ctx.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationJawTrackingUsedParameter") as OptimizationJawTrackingUsedParameter;
-                jawTrack.Infobulle = "Selon le protocole " + _rcp.protocolName + " le jaw tracking doit être " + _rcp.JawTracking;
+            // en fait c'est actif systemetiquement au nova. pas fait a l'halcyon 
+            // sauf toute petite lésion : 3x3
 
-                bool isJawTrackingOn = _pcontext.PlanSetup.OptimizationSetup.Parameters.Any(x => x is OptimizationJawTrackingUsedParameter);
-                jawTrack.MeasuredValue = isJawTrackingOn.ToString();
-
-                if (isJawTrackingOn != _rcp.JawTracking)
+            if (machin.Contains("NOVA"))
+                if (_pcontext.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
                 {
-                    jawTrack.setToFALSE();
+                    Item_Result jawTrack = new Item_Result();
+                    jawTrack.Label = "Jaw Track";
+                    //OptimizationJawTrackingUsedParameter ojtup = _ctx.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationJawTrackingUsedParameter") as OptimizationJawTrackingUsedParameter;
+                    jawTrack.Infobulle = "Selon le protocole " + _rcp.protocolName + " le jaw tracking doit être " + _rcp.JawTracking;
+
+                    bool isJawTrackingOn = _pcontext.PlanSetup.OptimizationSetup.Parameters.Any(x => x is OptimizationJawTrackingUsedParameter);
+                    jawTrack.MeasuredValue = isJawTrackingOn.ToString();
+
+                    if (!isJawTrackingOn)
+                    {
+                        if (isField3x3())
+                        {
+                            jawTrack.setToTRUE();
+                            jawTrack.Infobulle += "\nJaw Track désactivé car jaws < 3.1 cm";
+                        }
+                        else
+                        {
+                            jawTrack.setToFALSE();
+                            jawTrack.Infobulle += "\nJaw Track désactivé";
+                        }
+                    }
+                    else if (isJawTrackingOn) // != _rcp.JawTracking)
+                    {
+                        jawTrack.setToTRUE();
+                        if (isField3x3())
+                        {
+                            jawTrack.setToFALSE();
+                            jawTrack.Infobulle += "\nJawTrack activé mais jaws < 3.1";
+                        }
+                    }
+                    this._result.Add(jawTrack);
                 }
-                else
-                {
-                    jawTrack.setToTRUE();
-                }
-                this._result.Add(jawTrack);
-            }
             #endregion
 
 
@@ -265,7 +319,7 @@ namespace PlanCheck
 
 
                 int myOpt = 0;
-                
+
                 bool optionsPOareOK = true;
                 foreach (string s in _rcp.POoptions)
                 {

@@ -35,7 +35,7 @@ namespace PlanCheck
             bool itIsTooSmall = false;
             double tolerance = 1.2;
             double surfaceJaw = tolerance * (Math.Abs(X1) + Math.Abs(X2)) * (Math.Abs(Y1) + Math.Abs(Y2));
-            if ((surfaceJaw < surfaceZX) || (surfaceJaw < surfaceZY))
+            if ((surfaceJaw < surfaceZX) && (surfaceJaw < surfaceZY))
                 itIsTooSmall = true;
             return itIsTooSmall;
 
@@ -52,11 +52,11 @@ namespace PlanCheck
             energy.Label = "Energie";
             energy.ExpectedValue = "NA";
 
-            if ((_rcp.energy == "") || (_rcp.energy == null) || (machine.Contains("TOM"))) // no energy specified in check-protocol
+            if ((_rcp.energy == "") || (_rcp.energy == null) || (machine.Contains("TOM")) || (machine.Contains("HALCYON"))) // no energy specified in check-protocol
             {
                 energy.setToINFO();
-                energy.MeasuredValue = "Aucune énergie spécifiée dans le check-protocol " + _rcp.protocolName;
-                energy.Infobulle = "Aucune énergie spécifiée dans le check-protocol " + _rcp.protocolName;
+                energy.MeasuredValue = "Energie non vérifiée";
+                energy.Infobulle = "Aucune énergie spécifiée dans le check-protocol ou machine mono énergie";
             }
             else
             {
@@ -203,7 +203,8 @@ namespace PlanCheck
             Structure target = null;
             double surfaceZX = 0;
             double surfaceZY = 0;
-            int n = 0;
+            //int n = 0;
+            string listOfWrongBeam=null;
             try // do we have a target volume ? 
             {
                 target = _ctx.StructureSet.Structures.Where(s => s.Id == targetName).FirstOrDefault();
@@ -229,7 +230,11 @@ namespace PlanCheck
                         foreach (ControlPoint cp in b.ControlPoints)
                         {
                             if (fieldIsTooSmall(surfaceZX, surfaceZY, cp.JawPositions.X1, cp.JawPositions.X2, cp.JawPositions.Y1, cp.JawPositions.Y2))
-                                n++;
+                            {
+                                listOfWrongBeam += "\n - " + b.Id;
+                                break;
+                            }
+//                            n++;
                         }
                     }
                 }
@@ -244,7 +249,7 @@ namespace PlanCheck
             }
             else
             {
-                if (n == 0)
+                if (listOfWrongBeam == null)
                 {
                     fieldTooSmall.setToTRUE();
                     fieldTooSmall.MeasuredValue = "Dimensions des Jaws correctes";
@@ -254,7 +259,7 @@ namespace PlanCheck
                 {
                     fieldTooSmall.setToWARNING();
                     fieldTooSmall.MeasuredValue = "Un ou plusieurs champs trop petits";
-                    fieldTooSmall.Infobulle += "\n\nAu moins un champ ou un Control Point a des dimensions de machoîres trop petites par rapport au volume cible";
+                    fieldTooSmall.Infobulle += "\n\nAu moins un champ ou un Control Point a des dimensions de machoîres trop petites par rapport au volume cible" + listOfWrongBeam;
                 }
 
 
@@ -267,61 +272,60 @@ namespace PlanCheck
             Item_Result maxPositionMLCHalcyon = new Item_Result();
             maxPositionMLCHalcyon.Label = "Lames MLC Halcyon < 10 cm";
             maxPositionMLCHalcyon.ExpectedValue = "NA";
-            maxPositionMLCHalcyon.Infobulle = "Les lames du MLC pour l'Halcyon doivent être < 10 cm";
-
-           // List<String> mlcTooLarge = new List<String>();
+            maxPositionMLCHalcyon.Infobulle = "Les lames du MLC pour l'Halcyon doivent être < 100 mm (tolérance 5 mm)";
+            
+            // List<String> mlcTooLarge = new List<String>();
             float thisleafnotok = 0;
             bool allLeavesOK = true;
 
             if (machine.Contains("HALCYON")) // if  HALCYON XxY must be < 20x20
             {
                 //int i = 0;
-                
+
                 foreach (Beam b in _ctx.PlanSetup.Beams)
                 {
                     if (!b.IsSetupField)
+                    {
                         foreach (ControlPoint cp in b.ControlPoints)
                         {
-                            //          i = 0;
-
-                            allLeavesOK = true;
                             foreach (float f in cp.LeafPositions)
                             {
-                                if ((f > 100.01) || (f < -100.01))
+                                if ((f > 105) || (f < -105))
                                 {
                                     allLeavesOK = false; // break loop on leaves
                                     thisleafnotok = f;
-                                    MessageBox.Show("this leaf not ok " + thisleafnotok.ToString());
+                                    //MessageBox.Show("NOT GOOD " + f + " beam " + b.Id + " cp " + cp.Index.ToString());
                                     break;
                                 }
                             }
 
                             if (!allLeavesOK)
                             {
-                            
+
                                 break; // break loop on cp
                             }
                         }
-                    // +" "+ cp.JawPositions.X1.ToString()  +" " +cp.JawPositions.X2.ToString()+" ");
+                        // +" "+ cp.JawPositions.X1.ToString()  +" " +cp.JawPositions.X2.ToString()+" ");
 
-                    if (!allLeavesOK)
-                    {
-                        //mlcTooLarge.Add(b.Id);
-                        break; // break beam loop
+                        if (!allLeavesOK)
+                        {
+                            break; // break beam loop
+                        }
                     }
                 }
 
 
-               // if (mlcTooLarge.Count > 0)
-                if(!allLeavesOK)
+                // if (mlcTooLarge.Count > 0)
+                if (!allLeavesOK)
                 {
+                    //MessageBox.Show("i = " + i.ToString());
                     maxPositionMLCHalcyon.setToFALSE();
-                    maxPositionMLCHalcyon.MeasuredValue = "Au moins une lame MLC > 10.0 cm";
+                    maxPositionMLCHalcyon.MeasuredValue = "Au moins une lame MLC > 100 mm (" + thisleafnotok + ")";
                 }
                 else
                 {
                     maxPositionMLCHalcyon.setToTRUE();
-                    maxPositionMLCHalcyon.MeasuredValue = "Lames MLC < 10.0 cm";
+                    maxPositionMLCHalcyon.MeasuredValue = "Toutes les lames MLC < 100 mm";
                 }
                 this._result.Add(maxPositionMLCHalcyon);
 
