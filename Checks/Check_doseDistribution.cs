@@ -27,11 +27,11 @@ namespace PlanCheck
         public string replaceHomoIn(string _structName)  // get poumonHOMO and return PoumonGche or PoumonDt depending on iso x position (return null if they don t exist)
         {
             String structname = _structName;
-            bool isLeft = false;
+           // bool isLeft = false;
             Beam b = _ctx.PlanSetup.Beams.First();
             if (b.IsocenterPosition.x > 0)  // if iso is left
             {
-                isLeft = true;
+             //   isLeft = true;
 
                 structname = _structName.Replace("HOMO", "Gche");
             }

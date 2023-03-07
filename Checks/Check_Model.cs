@@ -212,11 +212,10 @@ namespace PlanCheck
                 NTO.Infobulle += "\n Auto Mode : " + _rcp.NTOparams.mode;
                 this._result.Add(NTO);
 
-
+                //OptimizationIMRTBeamParameter oibp = _pcontext.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationIMRTBeamParameter") as OptimizationIMRTBeamParameter;
                 /*
                 OptimizationExcludeStructureParameter oesp = op as OptimizationExcludeStructureParameter;
-                OptimizationIMRTBeamParameter oibp = op as OptimizationIMRTBeamParameter;
-                
+                OptimizationIMRTBeamParameter oibp = op as OptimizationIMRTBeamParameter;                
                 OptimizationPointCloudParameter opcp = op as OptimizationPointCloudParameter;
 
                 */

@@ -41,7 +41,7 @@ namespace PlanCheck
 
         }
 
-       
+
         public void Check()
         {
 
@@ -100,7 +100,7 @@ namespace PlanCheck
 
             foreach (Beam b in _ctx.PlanSetup.Beams)
             {
-                
+
 
                 listOfTolTable.Add(b.Id + "\t(" + b.ToleranceTableLabel.ToUpper() + ")");
                 // this part is to check if the tol table are all the same
@@ -157,7 +157,7 @@ namespace PlanCheck
             foreach (String field in listOfTolTable)
                 toleranceTable.Infobulle += "\n - " + field;
 
-            if(machine.Contains("TOM"))
+            if (machine.Contains("TOM"))
             {
                 toleranceTable.Infobulle += "\nNon vérifié pour les tomos\n";
                 toleranceTable.MeasuredValue = "Tomo (pas de table de tolérance)";
@@ -192,7 +192,7 @@ namespace PlanCheck
 
 
             #region FIELD SIZE GENERAL
-            
+
             bool giveup = false;
             Item_Result fieldTooSmall = new Item_Result();
             List<String> fieldTooSmallList = new List<String>();
@@ -225,7 +225,7 @@ namespace PlanCheck
                     if (!b.IsSetupField)
                     {
 
-                        
+
                         foreach (ControlPoint cp in b.ControlPoints)
                         {
                             if (fieldIsTooSmall(surfaceZX, surfaceZY, cp.JawPositions.X1, cp.JawPositions.X2, cp.JawPositions.Y1, cp.JawPositions.Y2))
@@ -244,7 +244,7 @@ namespace PlanCheck
             }
             else
             {
-                if(n==0)
+                if (n == 0)
                 {
                     fieldTooSmall.setToTRUE();
                     fieldTooSmall.MeasuredValue = "Dimensions des Jaws correctes";
@@ -264,36 +264,66 @@ namespace PlanCheck
             #endregion
 
             #region FIELD SIZE HALCYON
-            Item_Result fieldTooLargeHalcyon = new Item_Result();
-            fieldTooLargeHalcyon.Label = "Champs Halcyon > 20x20";
-            fieldTooLargeHalcyon.ExpectedValue = "NA";
-            fieldTooLargeHalcyon.Infobulle = "Les machoîres Halcyon doivent être < 10 cm";
+            Item_Result maxPositionMLCHalcyon = new Item_Result();
+            maxPositionMLCHalcyon.Label = "Lames MLC Halcyon < 10 cm";
+            maxPositionMLCHalcyon.ExpectedValue = "NA";
+            maxPositionMLCHalcyon.Infobulle = "Les lames du MLC pour l'Halcyon doivent être < 10 cm";
 
-            List<String> fieldTooLarge = new List<String>();
+           // List<String> mlcTooLarge = new List<String>();
+            float thisleafnotok = 0;
+            bool allLeavesOK = true;
 
-            
             if (machine.Contains("HALCYON")) // if  HALCYON XxY must be < 20x20
             {
+                //int i = 0;
+                
                 foreach (Beam b in _ctx.PlanSetup.Beams)
                 {
                     if (!b.IsSetupField)
                         foreach (ControlPoint cp in b.ControlPoints)
-                            if ((cp.JawPositions.X1 > 10.0) || (cp.JawPositions.X2 > 10.0) || (cp.JawPositions.Y1 > 10.0) || (cp.JawPositions.Y2 > 10.0))
-                                fieldTooLarge.Add(b.Id);
+                        {
+                            //          i = 0;
+
+                            allLeavesOK = true;
+                            foreach (float f in cp.LeafPositions)
+                            {
+                                if ((f > 100.01) || (f < -100.01))
+                                {
+                                    allLeavesOK = false; // break loop on leaves
+                                    thisleafnotok = f;
+                                    MessageBox.Show("this leaf not ok " + thisleafnotok.ToString());
+                                    break;
+                                }
+                            }
+
+                            if (!allLeavesOK)
+                            {
+                            
+                                break; // break loop on cp
+                            }
+                        }
+                    // +" "+ cp.JawPositions.X1.ToString()  +" " +cp.JawPositions.X2.ToString()+" ");
+
+                    if (!allLeavesOK)
+                    {
+                        //mlcTooLarge.Add(b.Id);
+                        break; // break beam loop
+                    }
                 }
 
 
-                if (fieldTooLarge.Count > 0)
+               // if (mlcTooLarge.Count > 0)
+                if(!allLeavesOK)
                 {
-                    fieldTooLargeHalcyon.setToFALSE();
-                    fieldTooLargeHalcyon.MeasuredValue = fieldTooLarge.Count + " Control Point(s) hors limite";
+                    maxPositionMLCHalcyon.setToFALSE();
+                    maxPositionMLCHalcyon.MeasuredValue = "Au moins une lame MLC > 10.0 cm";
                 }
                 else
                 {
-                    fieldTooLargeHalcyon.setToTRUE();
-                    fieldTooLargeHalcyon.MeasuredValue = " Aucun Control Point hors limite";
+                    maxPositionMLCHalcyon.setToTRUE();
+                    maxPositionMLCHalcyon.MeasuredValue = "Lames MLC < 10.0 cm";
                 }
-                this._result.Add(fieldTooLargeHalcyon);
+                this._result.Add(maxPositionMLCHalcyon);
 
             }
 
