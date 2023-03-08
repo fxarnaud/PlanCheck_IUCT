@@ -24,19 +24,80 @@ namespace PlanCheck
             Check();
 
         }
+
+        private bool treatmentIsOnTheLeft() // looks if iso is left or right. For Tomo, looks if the first founded PTV is left or right
+        {
+            bool itisleft = false;
+
+
+
+            if (_pinfo.isTOMO)
+            {
+                // if(_ctx.PlanSetup.RTPrescription.Id.ToLower().Contains("gche"))
+
+                Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper().Contains("PTV"));
+                if (s.MeshGeometry.Bounds.X > 0)
+                    itisleft = true;
+            }
+            else
+            {
+                Beam b = _ctx.PlanSetup.Beams.First();
+                if (b.IsocenterPosition.x > 0)  // if iso is left
+                    itisleft = true;
+            }
+
+            return itisleft;
+
+
+        }
         public string replaceHomoIn(string _structName)  // get poumonHOMO and return PoumonGche or PoumonDt depending on iso x position (return null if they don t exist)
         {
             String structname = _structName;
-           // bool isLeft = false;
-            Beam b = _ctx.PlanSetup.Beams.First();
-            if (b.IsocenterPosition.x > 0)  // if iso is left
-            {
-             //   isLeft = true;
+            // bool isLeft = false;
 
-                structname = _structName.Replace("HOMO", "Gche");
+            if (treatmentIsOnTheLeft())
+            {
+                if (_structName.Contains("HOMOE"))
+                    structname = _structName.Replace("HOMOE", "Gche");
+                else
+                    structname = _structName.Replace("HOMO", "Gche");
             }
             else
-                structname = _structName.Replace("HOMO", "Dt");
+            {
+                if (_structName.Contains("HOMOE"))
+                    structname = _structName.Replace("HOMOE", "Dte");
+                else
+                    structname = _structName.Replace("HOMO", "Dt");
+            }
+            Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == structname.ToUpper());
+
+            if (s != null)
+                return structname;
+            else
+                return null;
+        }
+        public string replaceControIn(string _structName)  // get poumonHOMO and return PoumonGche or PoumonDt depending on iso x position (return null if they don t exist)
+        {
+            String structname = _structName;
+            // bool isLeft = false;
+            Beam b = _ctx.PlanSetup.Beams.First();
+            if (treatmentIsOnTheLeft())  // if iso is left
+            {
+                if (_structName.Contains("CONTROE"))
+                    structname = _structName.Replace("CONTROE", "Dte");
+                else
+                    structname = _structName.Replace("CONTRO", "Dt");
+
+            }
+            else
+            {
+                if (_structName.Contains("CONTROE"))
+                    structname = _structName.Replace("CONTROE", "Gche");
+                else
+                    structname = _structName.Replace("CONTRO", "Gche");
+
+
+            }
 
             Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == structname.ToUpper());
 
@@ -44,9 +105,6 @@ namespace PlanCheck
                 return structname;
             else
                 return null;
-
-
-
         }
 
         public string getTheUnit(string theValueWithUnit) // get 20Gy or 12.5cc and return Gy or cc
@@ -240,7 +298,7 @@ namespace PlanCheck
                 }
                 catch { foundIt = false; }
 
-                
+
 
                 if (foundIt)
                 {
@@ -272,7 +330,8 @@ namespace PlanCheck
                 string structName = dos.Name.ToUpper();
                 if (dos.Name.ToUpper().Contains("HOMO"))
                     structName = replaceHomoIn(dos.Name);
-
+                if (dos.Name.ToUpper().Contains("CONTRO"))
+                    structName = replaceControIn(dos.Name);
 
                 if (structName != null)
                 {
