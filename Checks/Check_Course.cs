@@ -52,7 +52,6 @@ namespace PlanCheck
             this._result.Add(currentCourseStatus);
             #endregion
 
-
             #region Is actual Plan PlanningApproved ? 
             Item_Result approve = new Item_Result();
             approve.Label = "Statut d'approbation du plan";
@@ -61,7 +60,7 @@ namespace PlanCheck
 
 
             approve.Infobulle = "Le plan doit être Planning Approved";
-            if (_ctx.PlanSetup.Beams.FirstOrDefault().TreatmentUnit.Id != "TOM")
+            if (!_pinfo.isTOMO)
             {
                 String[] beautifulDoctorName = _ctx.PlanSetup.PlanningApprover.Split('\\');
                 String[] TAname = _ctx.PlanSetup.TreatmentApprover.Split('\\');
@@ -133,7 +132,6 @@ namespace PlanCheck
 
             this._result.Add(approve);
             #endregion
-
 
             #region other courses
             Item_Result myCourseStatus = new Item_Result();
@@ -241,7 +239,6 @@ namespace PlanCheck
             }
             this._result.Add(myCourseStatus);
             #endregion
-
 
             #region Traitements antérieurs
             Item_Result anteriorTraitement = new Item_Result();

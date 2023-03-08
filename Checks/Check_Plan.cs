@@ -36,6 +36,7 @@ namespace PlanCheck
         {
 
             #region Gating
+
             Item_Result gating = new Item_Result();
             gating.Label = "Gating";
 
@@ -56,6 +57,7 @@ namespace PlanCheck
 
             gating.Infobulle = "La case Enable gating doit être en accord avec le check-protocol " + _rcp.protocolName + " (" + gating.ExpectedValue + ")";
             this._result.Add(gating);
+
             #endregion
 
 

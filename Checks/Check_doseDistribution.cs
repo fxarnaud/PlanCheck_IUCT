@@ -393,7 +393,6 @@ namespace PlanCheck
             this._result.Add(dd);
             #endregion
 
-
         }
         public string Title
         {

@@ -63,7 +63,7 @@ namespace PlanCheck
 
         public void Check()
         {
-            string machine = _ctx.PlanSetup.Beams.First().TreatmentUnit.Id;
+            var allStructures = _rcp.myClinicalExpectedStructures.Concat(_rcp.myOptExpectedStructures).Concat(_rcp.myCouchExpectedStructures).ToList();
 
             #region APPROVE ?  
             Item_Result approbationStatus = new Item_Result();
@@ -87,103 +87,98 @@ namespace PlanCheck
             #endregion
 
             #region COUCH STRUCTURES 
-            Item_Result couchStructExist = new Item_Result();
-            couchStructExist.Label = "Structures de table";
-            couchStructExist.ExpectedValue = "EN COURS";
-
-            List<string> missingCouchStructures = new List<string>();
-            List<string> wrongHUCouchStructures = new List<string>();
-            List<string> mandatoryMissingCouchStructures = new List<string>();
-            List<string> overlapStructList = new List<string>();
-           // double tolerancedOV = 4.0; // Tolerance for overlap couch vs. body
-            foreach (expectedStructure es in _rcp.myCouchExpectedStructures) // foreach couch element in the xls protocol file
+            if (!_pinfo.isTOMO)
             {
-                double mydouble = 0;
-                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
-                if (struct1 == null) // if structure doesnt exist in ss
-                {
-                    missingCouchStructures.Add(es.Name);
-                    if (es.isMandatory)
-                        mandatoryMissingCouchStructures.Add(es.Name);
-                }
-                else if (struct1.IsEmpty) // else if it exists but empty --> same
-                {
-                    missingCouchStructures.Add(es.Name);
-                    if (es.isMandatory)
-                        mandatoryMissingCouchStructures.Add(es.Name);
-                }
-                else // else struct is not empty
-                {
-                    struct1.GetAssignedHU(out mydouble);   // check assigned HU
-                    if (mydouble != es.HU)
-                        wrongHUCouchStructures.Add(es.Name);
+                Item_Result couchStructExist = new Item_Result();
+                couchStructExist.Label = "Structures de table";
+                couchStructExist.ExpectedValue = "EN COURS";
 
-
-                    try
-                    {
-                        Structure body = _ctx.StructureSet.Structures.FirstOrDefault(x => x.DicomType == "EXTERNAL"); // find a structure BODY
-
-                        double yBodyMax = body.MeshGeometry.Bounds.Y + body.MeshGeometry.Bounds.SizeY; // post limit of body
-                        double ySetUpMin = struct1.MeshGeometry.Bounds.Y;
-                        if ((yBodyMax - 4.0) > ySetUpMin) // overlap suspected 4 mm allowed
-                        {
-                            overlapStructList.Add(struct1.Id);
-                        }
-                        /*else // no overlap suspected
-                        {
-                            ;
-                        }*/
-                    }
-                    catch
-                    {
-                        MessageBox.Show("No Body found for check contours: couch structures item " + es.Name);
-                    }
-
-                    //MessageBox.Show(body.Id + " " + body.MeshGeometry.Bounds.Y + " " + body.MeshGeometry.Bounds.SizeY);
-                }
-            }
-
-
-            if ((wrongHUCouchStructures.Count == 0) && (missingCouchStructures.Count == 0))
-            {
-                couchStructExist.setToTRUE();
-                couchStructExist.MeasuredValue = "Présentes et UH corectes " + _rcp.myCouchExpectedStructures.Count.ToString() + "/" + _rcp.myCouchExpectedStructures.Count.ToString();
-                couchStructExist.Infobulle = "Structures de tables attendues pour le protocole " + _rcp.protocolName + " :\n";
+                List<string> missingCouchStructures = new List<string>();
+                List<string> wrongHUCouchStructures = new List<string>();
+                List<string> mandatoryMissingCouchStructures = new List<string>();
+                List<string> overlapStructList = new List<string>();
+                // double tolerancedOV = 4.0; // Tolerance for overlap couch vs. body
                 foreach (expectedStructure es in _rcp.myCouchExpectedStructures) // foreach couch element in the xls protocol file
                 {
-                    couchStructExist.Infobulle += " - " + es.Name + "\n";
-                }
-            }
-            else
-            {
-                couchStructExist.setToWARNING();
-                couchStructExist.MeasuredValue = "Absentes, vides ou UH incorrectes (voir infobulle)";
-                if (missingCouchStructures.Count > 0)
-                    couchStructExist.Infobulle = "Structures attendues pour le protocole " + _rcp.protocolName + " absentes ou vides dans le plan :\n";
-                foreach (string ms in missingCouchStructures)
-                    couchStructExist.Infobulle += " - " + ms + "\n";
-                if (wrongHUCouchStructures.Count > 0)
-                    couchStructExist.Infobulle += "Structures avec UH incorrectes :\n";
-                foreach (string ms in wrongHUCouchStructures)
-                    couchStructExist.Infobulle += " - " + ms + "\n";
+                    double mydouble = 0;
+                    Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
+                    if (struct1 == null) // if structure doesnt exist in ss
+                    {
+                        missingCouchStructures.Add(es.Name);
+                        if (es.isMandatory)
+                            mandatoryMissingCouchStructures.Add(es.Name);
+                    }
+                    else if (struct1.IsEmpty) // else if it exists but empty --> same
+                    {
+                        missingCouchStructures.Add(es.Name);
+                        if (es.isMandatory)
+                            mandatoryMissingCouchStructures.Add(es.Name);
+                    }
+                    else // else struct is not empty
+                    {
+                        struct1.GetAssignedHU(out mydouble);   // check assigned HU
+                        if (mydouble != es.HU)
+                            wrongHUCouchStructures.Add(es.Name);
 
-                if (mandatoryMissingCouchStructures.Count > 0)
+
+                        try
+                        {
+                            Structure body = _ctx.StructureSet.Structures.FirstOrDefault(x => x.DicomType == "EXTERNAL"); // find a structure BODY
+
+                            double yBodyMax = body.MeshGeometry.Bounds.Y + body.MeshGeometry.Bounds.SizeY; // post limit of body
+                            double ySetUpMin = struct1.MeshGeometry.Bounds.Y;
+                            if ((yBodyMax - 4.0) > ySetUpMin) // overlap suspected 4 mm allowed
+                            {
+                                overlapStructList.Add(struct1.Id);
+                            }
+                            /*else // no overlap suspected
+                            {
+                                ;
+                            }*/
+                        }
+                        catch
+                        {
+                            MessageBox.Show("No Body found for check contours: couch structures item " + es.Name);
+                        }
+                    }
+                }
+
+
+                if ((wrongHUCouchStructures.Count == 0) && (missingCouchStructures.Count == 0))
                 {
-                    couchStructExist.setToFALSE();
-                    couchStructExist.Infobulle += "\nAu moins une structure de table obligatoire est absente : \n";
-                    foreach (string ms in mandatoryMissingCouchStructures)
+                    couchStructExist.setToTRUE();
+                    couchStructExist.MeasuredValue = "Présentes et UH corectes " + _rcp.myCouchExpectedStructures.Count.ToString() + "/" + _rcp.myCouchExpectedStructures.Count.ToString();
+                    couchStructExist.Infobulle = "Structures de tables attendues pour le protocole " + _rcp.protocolName + " :\n";
+                    foreach (expectedStructure es in _rcp.myCouchExpectedStructures) // foreach couch element in the xls protocol file
+                    {
+                        couchStructExist.Infobulle += " - " + es.Name + "\n";
+                    }
+                }
+                else
+                {
+                    couchStructExist.setToWARNING();
+                    couchStructExist.MeasuredValue = "Absentes, vides ou UH incorrectes (voir infobulle)";
+                    if (missingCouchStructures.Count > 0)
+                        couchStructExist.Infobulle = "Structures attendues pour le protocole " + _rcp.protocolName + " absentes ou vides dans le plan :\n";
+                    foreach (string ms in missingCouchStructures)
+                        couchStructExist.Infobulle += " - " + ms + "\n";
+                    if (wrongHUCouchStructures.Count > 0)
+                        couchStructExist.Infobulle += "Structures avec UH incorrectes :\n";
+                    foreach (string ms in wrongHUCouchStructures)
                         couchStructExist.Infobulle += " - " + ms + "\n";
 
-
+                    if (mandatoryMissingCouchStructures.Count > 0)
+                    {
+                        couchStructExist.setToFALSE();
+                        couchStructExist.Infobulle += "\nAu moins une structure de table obligatoire est absente : \n";
+                        foreach (string ms in mandatoryMissingCouchStructures)
+                            couchStructExist.Infobulle += " - " + ms + "\n";
+                    }
                 }
 
+                this._result.Add(couchStructExist);
             }
-            if (machine.Contains("TOM"))
-            {
-                couchStructExist.setToINFO();
-                couchStructExist.Infobulle += "\n\n\nMachine TOMO (item INFO) : (vérifier la table)";
-            }
-            this._result.Add(couchStructExist);
+            
             #endregion
 
             #region overlap body vs couch structs. 
@@ -356,7 +351,7 @@ namespace PlanCheck
                 foreach (string ms in wrongHUOptStructures)
                     optStructuresItem.Infobulle += " - " + ms + "\n";
 
-                if(mandatoryMissingOptStructures.Count > 0)
+                if (mandatoryMissingOptStructures.Count > 0)
                 {
                     optStructuresItem.setToFALSE();
                     optStructuresItem.Infobulle += "Structures obligatoires manquantes : \n";
@@ -368,11 +363,7 @@ namespace PlanCheck
 
             this._result.Add(optStructuresItem);
             #endregion
-
-            #region Concatenate all structures in one list
-            var allStructures = _rcp.myClinicalExpectedStructures.Concat(_rcp.myOptExpectedStructures).Concat(_rcp.myCouchExpectedStructures).ToList();
-            #endregion
-
+           
             #region  Anormal Volume values (cc)
             // entre -3sigma et +3sigma >99.9% des cas
             List<string> anormalVolumeList = new List<string>();
@@ -536,7 +527,6 @@ namespace PlanCheck
             }
             this._result.Add(missingSlicesItem);
             #endregion
-
 
             #region Laterality
             Item_Result laterality = new Item_Result();

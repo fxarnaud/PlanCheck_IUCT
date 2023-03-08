@@ -34,7 +34,7 @@ namespace PlanCheck
 
         public void Check()
         {
-            string machineID = _ctx.PlanSetup.Beams.First().TreatmentUnit.Id;
+
 
             #region LISTE DES CIBLES DE LA PRESCRIPTION
             Item_Result prescriptionVolumes = new Item_Result();
@@ -66,7 +66,7 @@ namespace PlanCheck
 
             #endregion
 
-            
+
             #region FRACTIONNEMENT - CIBLE LA PLUS HAUTE
             Item_Result fractionation = new Item_Result();
             //fractionation.Label = "Fractionnement du PTV principal";
@@ -96,11 +96,11 @@ namespace PlanCheck
             fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction + " Gy";
             fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.Dose.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
 
-            
+
 
             if ((nPrescribedNFractions == nFraction) && (nPrescribedDosePerFraction == myDosePerFraction.Dose))
                 fractionation.setToTRUE();
-            else if (machineID == "TOM")
+            else if (_pinfo.isTOMO)
                 fractionation.setToINFO();
             else
                 fractionation.setToFALSE();
@@ -110,79 +110,81 @@ namespace PlanCheck
                 " : " + nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
             fractionation.Infobulle += "\nNe fonctionne pas pour la TOMO : l'item est mis en INFO";
 
-             this._result.Add(fractionation);
+            this._result.Add(fractionation);
             #endregion
 
 
             // pas réussi à attraper le % dans la prescription (que dans le plan)
             #region POURCENTAGE DE LA PRESCRIPTION
-
-            Item_Result percentage = new Item_Result();
-            double myTreatPercentage = _ctx.PlanSetup.TreatmentPercentage;
-            myTreatPercentage = 100 * myTreatPercentage;
-            percentage.Label = "Pourcentage de traitement";
-            percentage.ExpectedValue = _rcp.prescriptionPercentage;
-            percentage.MeasuredValue = myTreatPercentage.ToString() + "%";
-            if (percentage.ExpectedValue == percentage.MeasuredValue)
-                percentage.setToTRUE();
-            else
-                percentage.setToFALSE();
-            percentage.Infobulle = "Le pourcentage de traitement (onglet Dose) doit être en accord avec";
-            percentage.Infobulle += "\nla valeur de pourcentage du check-protocol " + _rcp.protocolName + " (" + _rcp.prescriptionPercentage + ")";
-            this._result.Add(percentage);
+            if (!_pinfo.isTOMO)
+            {
+                Item_Result percentage = new Item_Result();
+                double myTreatPercentage = _ctx.PlanSetup.TreatmentPercentage;
+                myTreatPercentage = 100 * myTreatPercentage;
+                percentage.Label = "Pourcentage de traitement";
+                percentage.ExpectedValue = _rcp.prescriptionPercentage;
+                percentage.MeasuredValue = myTreatPercentage.ToString() + "%";
+                if (percentage.ExpectedValue == percentage.MeasuredValue)
+                    percentage.setToTRUE();
+                else
+                    percentage.setToFALSE();
+                percentage.Infobulle = "Le pourcentage de traitement (onglet Dose) doit être en accord avec";
+                percentage.Infobulle += "\nla valeur de pourcentage du check-protocol " + _rcp.protocolName + " (" + _rcp.prescriptionPercentage + ")";
+                this._result.Add(percentage);
+            }
             #endregion
 
 
 
             #region NORMALISATION DU PLAN
-            Item_Result normalisation = new Item_Result();
-            //string normMethod = _ctx.PlanSetup.PlanNormalizationMethod;
-            normalisation.Label = "Mode de normalisation du plan";
-            normalisation.ExpectedValue = _rcp.normalisationMode;
-            normalisation.MeasuredValue = _ctx.PlanSetup.PlanNormalizationMethod;
-
-            if (normalisation.MeasuredValue.Contains("volume")) // si le mode de normalisation contient le mot volume
+            if (!_pinfo.isTOMO)
             {
-                if (normalisation.ExpectedValue == normalisation.MeasuredValue)
-                    normalisation.setToTRUE();
-                else
-                    normalisation.setToFALSE();
+                Item_Result normalisation = new Item_Result();
+                //string normMethod = _ctx.PlanSetup.PlanNormalizationMethod;
+                normalisation.Label = "Mode de normalisation du plan";
+                normalisation.ExpectedValue = _rcp.normalisationMode;
+                normalisation.MeasuredValue = _ctx.PlanSetup.PlanNormalizationMethod;
 
-                normalisation.MeasuredValue += ": " + _ctx.PlanSetup.TargetVolumeID; // afficher ce volume
-
-            }
-            if (normalisation.MeasuredValue.Contains("point"))
-            {
-                if (normalisation.MeasuredValue.Contains("100% au point de référence"))
+                if (normalisation.MeasuredValue.Contains("volume")) // si le mode de normalisation contient le mot volume
                 {
-                    if (normalisation.ExpectedValue.Contains("100% au point de référence"))
+                    if (normalisation.ExpectedValue == normalisation.MeasuredValue)
                         normalisation.setToTRUE();
                     else
                         normalisation.setToFALSE();
 
-                    if (normalisation.MeasuredValue.Contains("principal"))
-                        normalisation.MeasuredValue += " (" + _ctx.PlanSetup.PrimaryReferencePoint.Id + ")";
+                    normalisation.MeasuredValue += ": " + _ctx.PlanSetup.TargetVolumeID; // afficher ce volume
 
                 }
-                else
+                if (normalisation.MeasuredValue.Contains("point"))
                 {
-                    normalisation.setToFALSE();
-                }
-            }
+                    if (normalisation.MeasuredValue.Contains("100% au point de référence"))
+                    {
+                        if (normalisation.ExpectedValue.Contains("100% au point de référence"))
+                            normalisation.setToTRUE();
+                        else
+                            normalisation.setToFALSE();
 
-            if (normalisation.MeasuredValue == "Aucune normalisation de plan")
-                normalisation.setToWARNING();
-            if (machineID == "TOM")
-            {
-                normalisation.MeasuredValue = "TOMO (vérifier la normalisation)";
-                normalisation.setToINFO();
-            }
+                        if (normalisation.MeasuredValue.Contains("principal"))
+                            normalisation.MeasuredValue += " (" + _ctx.PlanSetup.PrimaryReferencePoint.Id + ")";
+
+                    }
+                    else
+                    {
+                        normalisation.setToFALSE();
+                    }
+                }
+
+                if (normalisation.MeasuredValue == "Aucune normalisation de plan")
+                    normalisation.setToWARNING();
+
+            
 
 
             normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le check-protocol. Cet item est en WARNING si Aucune normalisation";
-            normalisation.Infobulle += "\nPour la TOMO l'item est mis en INFO";
+            //normalisation.Infobulle += "\nPour la TOMO l'item est mis en INFO";
 
             this._result.Add(normalisation);
+            }
             #endregion
 
             #region NOM DE LA PRESCRIPTION
@@ -201,13 +203,13 @@ namespace PlanCheck
                 prescriptionName.MeasuredValue += " (différent du nom du plan)";
                 prescriptionName.setToWARNING();
             }
-            prescriptionName.Infobulle="La prescription et le plan doivent avoir le même nom";
+            prescriptionName.Infobulle = "La prescription et le plan doivent avoir le même nom";
             prescriptionName.Infobulle += "\nIl est recommandé de mettre ce nom en commentaire du course\n";
             if (_ctx.Course.Comment == _ctx.PlanSetup.RTPrescription.Id)
                 prescriptionName.Infobulle += "C'est le cas pour ce course";
             this._result.Add(prescriptionName);
             #endregion
-            
+
         }
         public string Title
         {

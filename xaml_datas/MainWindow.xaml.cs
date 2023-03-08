@@ -58,8 +58,6 @@ namespace PlanCheck
 
         #endregion
 
-
-
         public MainWindow(PreliminaryInformation pinfo, ScriptContext pcontext) //Constructeur
         {
 
@@ -103,7 +101,6 @@ namespace PlanCheck
              Verif_button.Foreground = new SolidColorBrush(Color.FromArgb(255, 0, 0, 0));//"#FFEF0E0E");// ;
              //OK_button.OverridesDefaultStyle;*/
         }
-
         public void FillHeaderInfos()
         {
             //Patient, plan and others infos to bind to xml
@@ -214,7 +211,7 @@ d3.ToString("0.##");   //24
             #endregion
 
             #region machine and fields
-            String machineName = null;
+            //String machineName = null;
             String treatmentType = null;
             int setupFieldNumber = 0;
             int TreatmentFieldNumber = 0;
@@ -229,7 +226,7 @@ d3.ToString("0.##");   //24
                 else
                 {
                     TreatmentFieldNumber++;
-                    machineName = b.TreatmentUnit.Id;
+                    //machineName = b.TreatmentUnit.Id;
 
 
                     if (b.MLCPlanType.ToString() == "VMAT")
@@ -247,7 +244,7 @@ d3.ToString("0.##");   //24
                     {
                         if (b.Technique.Id == "STATIC")  // can be TOMO, Electrons or 3DCRT without MLC
                         {
-                            if (machineName == "TOM")
+                            if (_pinfo.machine.Contains("TOM"))
                                 treatmentType = "Tomotherapy";
                             else if (b.EnergyModeDisplayName.Contains("E"))
                                 treatmentType = "Electrons";
@@ -261,59 +258,59 @@ d3.ToString("0.##");   //24
                 }
             }
 
-            theMachine = "    " + machineName;
+            theMachine = "    " + _pinfo.machine;// machineName;
 
             #region color the machines first theme
 
             // see palette at https://learn.microsoft.com/fr-fr/dotnet/api/system.windows.media.brushes?view=windowsdesktop-6.0
 
 
-            if (machineName == "V4")
+            if (_pinfo.machine == "V4")
             {
                 machineBackgroundColor = "PowderBlue";
                 machineForegroundColor = "Blue";
             }
-            else if (machineName == "TOM")
+            else if (_pinfo.machine == "TOM")
             {
                 machineBackgroundColor = "Orange";
                 machineForegroundColor = "White";
             }
-            else if (machineName == "TOMO2")
+            else if (_pinfo.machine == "TOMO2")
             {
                 machineBackgroundColor = "Orange";
                 machineForegroundColor = "White";
             }
-            else if (machineName == "NOVA3")
+            else if (_pinfo.machine == "NOVA3")
             {
                 machineBackgroundColor = "Green";
                 machineForegroundColor = "White";
             }
-            else if (machineName == "TOMO4")
+            else if (_pinfo.machine == "TOMO4")
             {
                 machineBackgroundColor = "Red";
                 machineForegroundColor = "White";
             }
-            else if (machineName == "NOVA5")
+            else if (_pinfo.machine == "NOVA5")
             {
                 machineBackgroundColor = "Yellow";
                 machineForegroundColor = "Black";
             }
-            else if (machineName == "NOVA SBRT")
+            else if (_pinfo.machine == "NOVA SBRT")
             {
                 machineBackgroundColor = "Gold";
                 machineForegroundColor = "Blue";
             }
-            else if (machineName == "HALCYON6")
+            else if (_pinfo.machine == "HALCYON6")
             {
                 machineBackgroundColor = "LightBlue";
                 machineForegroundColor = "White";
             }
-            else if (machineName == "TOMO7")
+            else if (_pinfo.machine == "TOMO7")
             {
                 machineBackgroundColor = "Brown";
                 machineForegroundColor = "White";
             }
-            else if (machineName == "HALCYON8")
+            else if (_pinfo.machine == "HALCYON8")
             {
                 machineBackgroundColor = "DeepSkyBlue";
                 machineForegroundColor = "White";
@@ -328,7 +325,7 @@ d3.ToString("0.##");   //24
 
 
 
-            if (machineName != "TOM")
+            if (!_pinfo.machine.Contains("TOM"))
             {
                 if (TreatmentFieldNumber == 1)
                     theFields = treatmentType + " : " + TreatmentFieldNumber + " champ + " + setupFieldNumber + " set-up";
@@ -481,7 +478,6 @@ d3.ToString("0.##");   //24
                 System.Diagnostics.Process.Start(@".\doc\plancheckhelp.pdf");
             }
         }
-
         private void exportPDF_button_Click(object sender, RoutedEventArgs e)
         {
 

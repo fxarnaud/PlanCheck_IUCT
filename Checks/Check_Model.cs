@@ -75,7 +75,7 @@ namespace PlanCheck
                     {
                         if ((-cp.JawPositions.X1 + cp.JawPositions.X2 < 31) || (-cp.JawPositions.Y1 + cp.JawPositions.Y2 < 31))
                         {
-                           // MessageBox.Show(cp.JawPositions.X1.ToString() + " " + cp.JawPositions.X2.ToString() + " " + cp.JawPositions.Y1 + " " + cp.JawPositions.Y2);
+                            // MessageBox.Show(cp.JawPositions.X1.ToString() + " " + cp.JawPositions.X2.ToString() + " " + cp.JawPositions.Y1 + " " + cp.JawPositions.Y2);
                             itis = true;
                             break;
                         }
@@ -86,7 +86,7 @@ namespace PlanCheck
                     break;
 
             }
-         
+
             return itis;
 
         }
@@ -95,24 +95,27 @@ namespace PlanCheck
         public void Check()
         {
 
-            String machin = _pcontext.PlanSetup.Beams.First().TreatmentUnit.Id;
-            bool isTomo = false;
-            if (machin.Contains("TOM"))
-                isTomo = true;
+
+
 
             Comparator testing = new Comparator();
 
 
             #region Nom de l'algo
             Item_Result algo_name = new Item_Result();
-            algo_name.Label = "Algorithme de calcul";
-            algo_name.ExpectedValue = _rcp.algoName;
-            algo_name.MeasuredValue = _pinfo.AlgoName;
-            algo_name.Comparator = "=";
-            algo_name.Infobulle = "Algorithme attendu pour le check-protocol " + _rcp.protocolName + " : " + algo_name.ExpectedValue;
-            algo_name.Infobulle += "\nLes options de calcul ne sont pas vérifiées si l'algorithme n'est pas celui attendu";
-            algo_name.ResultStatus = testing.CompareDatas(algo_name.ExpectedValue, algo_name.MeasuredValue, algo_name.Comparator);
-            this._result.Add(algo_name);
+            if (!_pinfo.isTOMO)
+            {
+
+                
+                algo_name.Label = "Algorithme de calcul";
+                algo_name.ExpectedValue = _rcp.algoName;
+                algo_name.MeasuredValue = _pinfo.AlgoName;
+                algo_name.Comparator = "=";
+                algo_name.Infobulle = "Algorithme attendu pour le check-protocol " + _rcp.protocolName + " : " + algo_name.ExpectedValue;
+                algo_name.Infobulle += "\nLes options de calcul ne sont pas vérifiées si l'algorithme n'est pas celui attendu";
+                algo_name.ResultStatus = testing.CompareDatas(algo_name.ExpectedValue, algo_name.MeasuredValue, algo_name.Comparator);
+                this._result.Add(algo_name);
+            }
             #endregion
 
             #region Grille de resolution
@@ -132,7 +135,7 @@ namespace PlanCheck
             {
                 algo_grid.setToFALSE();
             }
-            if (isTomo)
+            if (_pinfo.isTOMO)
             {
                 if (_pcontext.PlanSetup.Dose.XRes - 1.2695 < 0.01)
                 {
@@ -147,114 +150,117 @@ namespace PlanCheck
             }
 
             this._result.Add(algo_grid);
+
+
             #endregion
 
 
 
             #region LES OPTIONS DE CALCUL
-            if (algo_name.ResultStatus.Item1 != "X")// options are not checked if the algo is not the same
+            if (!_pinfo.isTOMO)
             {
-                Item_Result options = new Item_Result();
-                options.Label = "Autres options du modèle de calcul";
-
-                options.ExpectedValue = "N/A";// TO GET IN PRTOCOLE
-
-                options.Comparator = "=";
-
-                int optionsAreOK = 1;
-                int myOpt = 0;
-
-                foreach (string s in _pinfo.Calculoptions)
+                if (algo_name.ResultStatus.Item1 != "X")// options are not checked if the algo is not the same
                 {
-                    if (s != _rcp.optionComp[myOpt]) // if one computation option is different test is error
+                    Item_Result options = new Item_Result();
+                    options.Label = "Autres options du modèle de calcul";
+
+                    int optionsAreOK = 1;
+                    int myOpt = 0;
+
+                    foreach (string s in _pinfo.Calculoptions)
                     {
-                        options.Infobulle = "Une option de calcul est différente du check-protocol " + _rcp.protocolName;
-                        options.MeasuredValue = s + " (options de calcul du plan) vs. " + _rcp.optionComp[myOpt] + " (attendu pour ce check-protocol) ";
-                        optionsAreOK = 0;
+                        if (s != _rcp.optionComp[myOpt]) // if one computation option is different test is error
+                        {
+                            options.Infobulle = "Une option de calcul est différente du check-protocol " + _rcp.protocolName;
+                            options.MeasuredValue = s + " (options de calcul du plan) vs. " + _rcp.optionComp[myOpt] + " (attendu pour ce check-protocol) ";
+                            optionsAreOK = 0;
+                        }
+                        myOpt++;
                     }
-                    myOpt++;
-                }
 
-                if (optionsAreOK == 0)
-                {
-                    options.setToFALSE();
-                }
-                else
-                {
-                    options.setToTRUE();
-                    options.Infobulle = "Les " + myOpt + " options du modèle calcul sont en accord avec le check-protocol: " + _rcp.protocolName;
-                    options.MeasuredValue = "OK";
+                    if (optionsAreOK == 0)
+                    {
+                        options.setToFALSE();
+                    }
+                    else
+                    {
+                        options.setToTRUE();
+                        options.Infobulle = "Les " + myOpt + " options du modèle calcul sont en accord avec le check-protocol: " + _rcp.protocolName;
+                        options.MeasuredValue = "OK";
 
-                }
+                    }
 
-                this._result.Add(options);
+                    this._result.Add(options);
+                }
             }
             #endregion
 
             #region NTO
 
 
-
-            if (_pcontext.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
+            if (!_pinfo.isTOMO)
             {
-                //foreach (OptimizationObjective oo in _ctx.PlanSetup.OptimizationSetup.Objectives)
-                // foreach (OptimizationParameter op in _ctx.PlanSetup.OptimizationSetup.Parameters)
-
-
-
-
-                OptimizationNormalTissueParameter ontp = _pcontext.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationNormalTissueParameter") as OptimizationNormalTissueParameter;
-
-                // OptimizationNormalTissueParameter ontp = op as OptimizationNormalTissueParameter;
-                bool NTOparamsOk = CompareNTO(ontp, _rcp.NTOparams);
-
-                Item_Result NTO = new Item_Result();
-                NTO.Label = "NTO";
-                if (NTOparamsOk)
+                if (_pcontext.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
                 {
-                    NTO.MeasuredValue = "Paramètres NTO conformes au protocole";
-                    NTO.Infobulle = "Paramètres NTO conformes au protocole " + _rcp.protocolName;
-                    NTO.setToTRUE();
+                    //foreach (OptimizationObjective oo in _ctx.PlanSetup.OptimizationSetup.Objectives)
+                    // foreach (OptimizationParameter op in _ctx.PlanSetup.OptimizationSetup.Parameters)
+
+
+
+
+                    OptimizationNormalTissueParameter ontp = _pcontext.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationNormalTissueParameter") as OptimizationNormalTissueParameter;
+
+                    // OptimizationNormalTissueParameter ontp = op as OptimizationNormalTissueParameter;
+                    bool NTOparamsOk = CompareNTO(ontp, _rcp.NTOparams);
+
+                    Item_Result NTO = new Item_Result();
+                    NTO.Label = "NTO";
+                    if (NTOparamsOk)
+                    {
+                        NTO.MeasuredValue = "Paramètres NTO conformes au protocole";
+                        NTO.Infobulle = "Paramètres NTO conformes au protocole " + _rcp.protocolName;
+                        NTO.setToTRUE();
+                    }
+                    else
+                    {
+                        NTO.MeasuredValue = "Paramètres NTO non conformes au protocole";
+                        NTO.Infobulle = "Paramètres NTO non conformes au protocole " + _rcp.protocolName;
+
+
+
+                        NTO.setToFALSE();
+                    }
+                    NTO.Infobulle += "\n Paramètres NTO du plan :";
+                    NTO.Infobulle += "\n Distance : " + ontp.DistanceFromTargetBorderInMM;
+                    NTO.Infobulle += "\n Fall off : " + ontp.FallOff;
+                    NTO.Infobulle += "\n Start Dose : " + ontp.StartDosePercentage;
+                    NTO.Infobulle += "\n End Dose : " + ontp.EndDosePercentage;
+                    NTO.Infobulle += "\n Priority : " + ontp.Priority;
+                    NTO.Infobulle += "\n Auto Mode : " + ontp.IsAutomatic;
+                    if (ontp.IsAutomatic)
+                        NTO.Infobulle += " (Auto)";
+                    else
+                        NTO.Infobulle += " (Manual)";
+
+                    NTO.Infobulle += "\n Paramètres NTO du protocole :";
+                    NTO.Infobulle += "\n Distance : " + _rcp.NTOparams.distanceTotTarget;
+                    NTO.Infobulle += "\n Fall off : " + _rcp.NTOparams.theFalloff;
+                    NTO.Infobulle += "\n Start Dose : " + _rcp.NTOparams.startPercentageDose;
+                    NTO.Infobulle += "\n End Dose : " + _rcp.NTOparams.stopPercentageDose;
+                    NTO.Infobulle += "\n Priority : " + _rcp.NTOparams.priority;
+                    NTO.Infobulle += "\n Auto Mode : " + _rcp.NTOparams.mode;
+                    this._result.Add(NTO);
+
+                    //OptimizationIMRTBeamParameter oibp = _pcontext.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationIMRTBeamParameter") as OptimizationIMRTBeamParameter;
+                    /*
+                    OptimizationExcludeStructureParameter oesp = op as OptimizationExcludeStructureParameter;
+                    OptimizationIMRTBeamParameter oibp = op as OptimizationIMRTBeamParameter;                
+                    OptimizationPointCloudParameter opcp = op as OptimizationPointCloudParameter;
+
+                    */
+
+
                 }
-                else
-                {
-                    NTO.MeasuredValue = "Paramètres NTO non conformes au protocole";
-                    NTO.Infobulle = "Paramètres NTO non conformes au protocole " + _rcp.protocolName;
-
-
-
-                    NTO.setToFALSE();
-                }
-                NTO.Infobulle += "\n Paramètres NTO du plan :";
-                NTO.Infobulle += "\n Distance : " + ontp.DistanceFromTargetBorderInMM;
-                NTO.Infobulle += "\n Fall off : " + ontp.FallOff;
-                NTO.Infobulle += "\n Start Dose : " + ontp.StartDosePercentage;
-                NTO.Infobulle += "\n End Dose : " + ontp.EndDosePercentage;
-                NTO.Infobulle += "\n Priority : " + ontp.Priority;
-                NTO.Infobulle += "\n Auto Mode : " + ontp.IsAutomatic;
-                if (ontp.IsAutomatic)
-                    NTO.Infobulle += " (Auto)";
-                else
-                    NTO.Infobulle += " (Manual)";
-
-                NTO.Infobulle += "\n Paramètres NTO du protocole :";
-                NTO.Infobulle += "\n Distance : " + _rcp.NTOparams.distanceTotTarget;
-                NTO.Infobulle += "\n Fall off : " + _rcp.NTOparams.theFalloff;
-                NTO.Infobulle += "\n Start Dose : " + _rcp.NTOparams.startPercentageDose;
-                NTO.Infobulle += "\n End Dose : " + _rcp.NTOparams.stopPercentageDose;
-                NTO.Infobulle += "\n Priority : " + _rcp.NTOparams.priority;
-                NTO.Infobulle += "\n Auto Mode : " + _rcp.NTOparams.mode;
-                this._result.Add(NTO);
-
-                //OptimizationIMRTBeamParameter oibp = _pcontext.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationIMRTBeamParameter") as OptimizationIMRTBeamParameter;
-                /*
-                OptimizationExcludeStructureParameter oesp = op as OptimizationExcludeStructureParameter;
-                OptimizationIMRTBeamParameter oibp = op as OptimizationIMRTBeamParameter;                
-                OptimizationPointCloudParameter opcp = op as OptimizationPointCloudParameter;
-
-                */
-
-
             }
 
 
@@ -269,7 +275,8 @@ namespace PlanCheck
             // en fait c'est actif systemetiquement au nova. pas fait a l'halcyon 
             // sauf toute petite lésion : 3x3
 
-            if (machin.Contains("NOVA"))
+            if (_pinfo.isNOVA)
+            {
                 if (_pcontext.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
                 {
                     Item_Result jawTrack = new Item_Result();
@@ -304,61 +311,57 @@ namespace PlanCheck
                     }
                     this._result.Add(jawTrack);
                 }
-            #endregion
-
-
-            #region LES OPTIONS DU PO
-            if (algo_name.ResultStatus.Item1 != "X")// options are not checked if the algo is not the same
-            {
-                Item_Result POoptions = new Item_Result();
-                POoptions.Label = "Options du PO";
-
-                POoptions.ExpectedValue = "N/A";// TO GET IN PRTOCOLE
-
-
-
-
-                int myOpt = 0;
-
-                bool optionsPOareOK = true;
-                foreach (string s in _rcp.POoptions)
-                {
-                    //                    MessageBox.Show("Comp " + s + " vs. " + _pinfo.POoptions[myOpt]);
-                    if (s != _pinfo.POoptions[myOpt])
-                        optionsPOareOK = false;
-                    myOpt++;
-                }
-
-                if (!optionsPOareOK)
-                {
-                    POoptions.setToFALSE();
-                    POoptions.MeasuredValue = "Option(s) du PO non conforme au protocole (voir détail)";
-                    POoptions.Infobulle = "Une option du PO est différente du check-protocol " + _rcp.protocolName;
-                    myOpt = 0;
-                    foreach (string s in _rcp.POoptions)
-                    {
-                        POoptions.Infobulle += s + " vs. " + _pinfo.POoptions[myOpt] + "\n";
-                        myOpt++;
-                    }
-                }
-                else
-                {
-                    POoptions.setToTRUE();
-                    POoptions.Infobulle = "Les " + myOpt + " options du modèle PO sont en accord avec le check-protocol: " + _rcp.protocolName;
-                    POoptions.MeasuredValue = "OK";
-
-                }
-
-                this._result.Add(POoptions);
             }
             #endregion
 
+            #region LES OPTIONS DU PO
+            if (!_pinfo.isTOMO)
+            {
+                if (algo_name.ResultStatus.Item1 != "X")// options are not checked if the algo is not the same
+                {
+                    Item_Result POoptions = new Item_Result();
+                    POoptions.Label = "Options du PO";
+
+                    POoptions.ExpectedValue = "N/A";// TO GET IN PRTOCOLE
 
 
 
 
+                    int myOpt = 0;
 
+                    bool optionsPOareOK = true;
+                    foreach (string s in _rcp.POoptions)
+                    {
+                        //                    MessageBox.Show("Comp " + s + " vs. " + _pinfo.POoptions[myOpt]);
+                        if (s != _pinfo.POoptions[myOpt])
+                            optionsPOareOK = false;
+                        myOpt++;
+                    }
 
+                    if (!optionsPOareOK)
+                    {
+                        POoptions.setToFALSE();
+                        POoptions.MeasuredValue = "Option(s) du PO non conforme au protocole (voir détail)";
+                        POoptions.Infobulle = "Une option du PO est différente du check-protocol " + _rcp.protocolName;
+                        myOpt = 0;
+                        foreach (string s in _rcp.POoptions)
+                        {
+                            POoptions.Infobulle += s + " vs. " + _pinfo.POoptions[myOpt] + "\n";
+                            myOpt++;
+                        }
+                    }
+                    else
+                    {
+                        POoptions.setToTRUE();
+                        POoptions.Infobulle = "Les " + myOpt + " options du modèle PO sont en accord avec le check-protocol: " + _rcp.protocolName;
+                        POoptions.MeasuredValue = "OK";
+
+                    }
+
+                    this._result.Add(POoptions);
+                }
+            }
+            #endregion
 
         }
 

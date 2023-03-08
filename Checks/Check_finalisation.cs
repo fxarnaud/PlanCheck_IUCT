@@ -55,191 +55,184 @@ namespace PlanCheck
         {
 
 
-            String machin = _ctx.PlanSetup.Beams.First().TreatmentUnit.Id.ToUpper();
-            bool isTomo = false;
-            bool isHalcyon = false;
-            if (machin.Contains("TOM"))
-                isTomo = true;
-            if (machin.Contains("HALCYON"))
-                isHalcyon = true;
+
 
 
 
             #region QA plans
-            Item_Result preparedQA = new Item_Result();
-            preparedQA.Label = "CQ";
-            preparedQA.ExpectedValue = "EN COURS";
-            String nameOfMatch = null;
-            List<PlanSetup> qaPlans = new List<PlanSetup>();
-            List<String> qaPlansPresent = new List<String>();
-            List<String> qaPlansMissing = new List<String>();
-            List<String> unapprovedQAplans = new List<String>();
-            List<String> wrongAlgoQAplans = new List<String>();
-            foreach (Course c in _ctx.Patient.Courses) // list QA plans of the patient
-            {
-                foreach (PlanSetup p in c.PlanSetups)
-                {
-                    try
-                    {
-                        if (p.PlanIntent.ToString() == "VERIFICATION") // QA plan                        
-                            qaPlans.Add(p);
 
-                        // MessageBox.Show("making the list " + p.PlanIntent.ToString());
-                    }
-                    catch
+            if (!_pinfo.isTOMO) // no check for tomo
+            {
+                Item_Result preparedQA = new Item_Result();
+                preparedQA.Label = "CQ";
+                preparedQA.ExpectedValue = "EN COURS";
+                String nameOfMatch = null;
+                List<PlanSetup> qaPlans = new List<PlanSetup>();
+                List<String> qaPlansPresent = new List<String>();
+                List<String> qaPlansMissing = new List<String>();
+                List<String> unapprovedQAplans = new List<String>();
+                List<String> wrongAlgoQAplans = new List<String>();
+                foreach (Course c in _ctx.Patient.Courses) // list QA plans of the patient
+                {
+                    foreach (PlanSetup p in c.PlanSetups)
                     {
-                        ; // do nothing
+                        try
+                        {
+                            if (p.PlanIntent.ToString() == "VERIFICATION") // QA plan                        
+                                qaPlans.Add(p);
+
+                            // MessageBox.Show("making the list " + p.PlanIntent.ToString());
+                        }
+                        catch
+                        {
+                            ; // do nothing
+                        }
                     }
                 }
-            }
 
-            if (_rcp.listQAplans.Count > 0) // list needed QA plans in protocol
-            {
-                foreach (String qa in _rcp.listQAplans) // loop on required QAplans
+                if (_rcp.listQAplans.Count > 0) // list needed QA plans in protocol
                 {
-                    bool found = false;
-                    if (qa == "PDIP") // protocol wants a pdip qa
+                    foreach (String qa in _rcp.listQAplans) // loop on required QAplans
                     {
-
-
-                        foreach (PlanSetup p in qaPlans) // loop on present QA plans
+                        bool found = false;
+                        if (qa == "PDIP") // protocol wants a pdip qa
                         {
 
-                            if (p.Id.ToUpper().Contains("PDIP") || (p.Course.Id.ToUpper().Contains("PDIP")))
+
+                            foreach (PlanSetup p in qaPlans) // loop on present QA plans
                             {
 
-
-                                if (haveTheSameMU(p, _ctx.PlanSetup))
+                                if (p.Id.ToUpper().Contains("PDIP") || (p.Course.Id.ToUpper().Contains("PDIP")))
                                 {
 
 
-                                    nameOfMatch = p.Id + " (Course:" + p.Course.Id + ")";
-                                    found = true;
-                                    if (p.ApprovalStatus.ToString() != "PlanningApproved")
-                                        unapprovedQAplans.Add(p.Id);
-
-                                    //String machine = _ctx.PlanSetup.Beams.FirstOrDefault().Id.ToUpper();
-                                    if (!isHalcyon) // if not HALCYON 
+                                    if (haveTheSameMU(p, _ctx.PlanSetup))
                                     {
-                                        if (p.PhotonCalculationModel != _ctx.PlanSetup.PhotonCalculationModel)
-                                            wrongAlgoQAplans.Add(p.Id + " " + p.PhotonCalculationModel);
+
+
+                                        nameOfMatch = p.Id + " (Course:" + p.Course.Id + ")";
+                                        found = true;
+                                        if (p.ApprovalStatus.ToString() != "PlanningApproved")
+                                            unapprovedQAplans.Add(p.Id);
+
+                                        //String machine = _ctx.PlanSetup.Beams.FirstOrDefault().Id.ToUpper();
+                                        if (!_pinfo.isHALCYON) // if not HALCYON 
+                                        {
+                                            if (p.PhotonCalculationModel != _ctx.PlanSetup.PhotonCalculationModel)
+                                                wrongAlgoQAplans.Add(p.Id + " " + p.PhotonCalculationModel);
+                                        }
+                                        else // if HALCYON PDIP must be in AAA
+                                        {
+                                            if (p.PhotonCalculationModel != "AAA_15605New")
+                                                wrongAlgoQAplans.Add(p.Id + " " + p.PhotonCalculationModel);
+                                        }
+                                        break;
                                     }
-                                    else // if HALCYON PDIP must be in AAA
+                                }
+                            }
+
+                        }
+                        else if (qa == "RUBY")
+                        {
+                            foreach (PlanSetup p in qaPlans) // loop on present QA plans
+                            {
+                                if (p.Id.ToUpper().Contains("RUBY") || (p.Course.Id.ToUpper().Contains("RUBY")))
+                                {
+                                    if (haveTheSameMU(p, _ctx.PlanSetup))
                                     {
-                                        if (p.PhotonCalculationModel != "AAA_15605New")
-                                            wrongAlgoQAplans.Add(p.Id + " " + p.PhotonCalculationModel);
+                                        nameOfMatch = p.Id + " (Course:" + p.Course.Id + ")";
+                                        found = true;
+                                        if (p.ApprovalStatus.ToString() != "PlanningApproved")
+                                            unapprovedQAplans.Add(p.Id);
+                                        break;
                                     }
-                                    break;
+                                }
+                            }
+                        }
+                        else if (qa == "Octa4D")
+                        {
+                            foreach (PlanSetup p in qaPlans) // loop on present QA plans
+                            {
+                                if (p.Id.ToUpper().Contains("OCTA4D") || (p.Course.Id.ToUpper().Contains("OCTA4D")))
+                                {
+                                    if (haveTheSameMU(p, _ctx.PlanSetup))
+                                    {
+                                        nameOfMatch = p.Id + " (Course:" + p.Course.Id + ")";
+                                        found = true;
+                                        if (p.ApprovalStatus.ToString() != "PlanningApproved")
+                                            unapprovedQAplans.Add(p.Id);
+                                        break;
+                                    }
                                 }
                             }
                         }
 
-                    }
-                    else if (qa == "RUBY")
-                    {
-                        foreach (PlanSetup p in qaPlans) // loop on present QA plans
+                        if (found == true)
                         {
-                            if (p.Id.ToUpper().Contains("RUBY") || (p.Course.Id.ToUpper().Contains("RUBY")))
-                            {
-                                if (haveTheSameMU(p, _ctx.PlanSetup))
-                                {
-                                    nameOfMatch = p.Id + " (Course:" + p.Course.Id + ")";
-                                    found = true;
-                                    if (p.ApprovalStatus.ToString() != "PlanningApproved")
-                                        unapprovedQAplans.Add(p.Id);
-                                    break;
-                                }
-                            }
+                            qaPlansPresent.Add(qa + " --> " + nameOfMatch);
                         }
-                    }
-                    else if (qa == "Octa4D")
-                    {
-                        foreach (PlanSetup p in qaPlans) // loop on present QA plans
+                        else
                         {
-                            if (p.Id.ToUpper().Contains("OCTA4D") || (p.Course.Id.ToUpper().Contains("OCTA4D")))
-                            {
-                                if (haveTheSameMU(p, _ctx.PlanSetup))
-                                {
-                                    nameOfMatch = p.Id + " (Course:" + p.Course.Id + ")";
-                                    found = true;
-                                    if (p.ApprovalStatus.ToString() != "PlanningApproved")
-                                        unapprovedQAplans.Add(p.Id);
-                                    break;
-                                }
-                            }
+                            qaPlansMissing.Add(qa);
                         }
+
                     }
 
-                    if (found == true)
+                    if ((qaPlansMissing.Count > 0) || (wrongAlgoQAplans.Count() > 0))
                     {
-                        qaPlansPresent.Add(qa + " --> " + nameOfMatch);
+                        preparedQA.setToFALSE();
+                        preparedQA.MeasuredValue = "Au moins un CQ absent ou mauvais algorithme";// "Différent de Planning Approved";
+                        if (qaPlansMissing.Count > 0)
+                            preparedQA.Infobulle = "Au moins un plan CQ absent alors qu'il est requis selon le check-protocole " + _rcp.protocolName;
+                        if (wrongAlgoQAplans.Count() > 0)
+                        {
+                            preparedQA.Infobulle += "\n\nMauvais algorithme pour les plans QA suivants";
+                            foreach (String s in wrongAlgoQAplans)
+                                preparedQA.Infobulle += "\n - " + s;
+                        }
+
+                    }
+                    else if (unapprovedQAplans.Count > 0)
+                    {
+                        preparedQA.MeasuredValue = "Plan CQ présents mais non approuvé";
+                        preparedQA.Infobulle = "Tous les plans CQ requis sont présents mais au moins un n'est pas approuvé :\n";
+                        foreach (String s in unapprovedQAplans)
+                            preparedQA.Infobulle += "\n - " + s;
+                        preparedQA.setToWARNING();
                     }
                     else
                     {
-                        qaPlansMissing.Add(qa);
+                        preparedQA.setToTRUE();
+                        preparedQA.MeasuredValue = "Tous les CQ sont présents";// "Différent de Planning Approved";
+                        preparedQA.Infobulle = "Les plans CQ requis selon le check-protocole " + _rcp.protocolName + " sont présents, Planning Approved et calculés avec le bon algorithme";
                     }
-
-                }
-
-                if ((qaPlansMissing.Count > 0) || (wrongAlgoQAplans.Count() > 0))
-                {
-                    preparedQA.setToFALSE();
-                    preparedQA.MeasuredValue = "Au moins un CQ absent ou mauvais algorithme";// "Différent de Planning Approved";
-                    if (qaPlansMissing.Count > 0)
-                        preparedQA.Infobulle = "Au moins un plan CQ absent alors qu'il est requis selon le check-protocole " + _rcp.protocolName;
-                    if (wrongAlgoQAplans.Count() > 0)
+                    if (qaPlansPresent.Count() > 0)
                     {
-                        preparedQA.Infobulle += "\n\nMauvais algorithme pour les plans QA suivants";
-                        foreach (String s in wrongAlgoQAplans)
+                        preparedQA.Infobulle += "\n\nListe des plans CQ requis et présents :";
+                        foreach (String s in qaPlansPresent)
                             preparedQA.Infobulle += "\n - " + s;
                     }
 
-                }
-                else if (unapprovedQAplans.Count > 0)
-                {
-                    preparedQA.MeasuredValue = "Plan CQ présents mais non approuvé";
-                    preparedQA.Infobulle = "Tous les plans CQ requis sont présents mais au moins un n'est pas approuvé :\n";
-                    foreach (String s in unapprovedQAplans)
-                        preparedQA.Infobulle += "\n - " + s;
-                    preparedQA.setToWARNING();
-                }
-                else
-                {
-                    preparedQA.setToTRUE();
-                    preparedQA.MeasuredValue = "Tous les CQ sont présents";// "Différent de Planning Approved";
-                    preparedQA.Infobulle = "Les plans CQ requis selon le check-protocole " + _rcp.protocolName + " sont présents, Planning Approved et calculés avec le bon algorithme";
-                }
-                if (qaPlansPresent.Count() > 0)
-                {
-                    preparedQA.Infobulle += "\n\nListe des plans CQ requis et présents :";
-                    foreach (String s in qaPlansPresent)
-                        preparedQA.Infobulle += "\n - " + s;
-                }
-
-                if (qaPlansMissing.Count() > 0)
-                {
-                    preparedQA.Infobulle += "\n\nListe des plans CQ requis mais absents  :";
-                    foreach (String s in qaPlansMissing)
-                        preparedQA.Infobulle += "\n - " + s;
-                }
+                    if (qaPlansMissing.Count() > 0)
+                    {
+                        preparedQA.Infobulle += "\n\nListe des plans CQ requis mais absents  :";
+                        foreach (String s in qaPlansMissing)
+                            preparedQA.Infobulle += "\n - " + s;
+                    }
 
 
+                }
+                else // no QA in protocol
+                {
+                    preparedQA.setToINFO();
+                    preparedQA.MeasuredValue = "Aucun CQ attendu selon le protocole";// "Différent de Planning Approved";
+                    preparedQA.Infobulle = "Aucun CQ attendu selon le protocole: " + _rcp.protocolName;
+                }
+
+                
+
+                this._result.Add(preparedQA);
             }
-            else // no QA in protocol
-            {
-                preparedQA.setToINFO();
-                preparedQA.MeasuredValue = "Aucun CQ attendu selon le protocole";// "Différent de Planning Approved";
-                preparedQA.Infobulle = "Aucun CQ attendu selon le protocole: " + _rcp.protocolName;
-            }
-
-            if(isTomo)
-            {
-                preparedQA.setToINFO();
-                preparedQA.MeasuredValue = "TOMO (vérifier QA plan)";// "Différent de Planning Approved";
-                preparedQA.Infobulle = "Machine Tomo, le check protocole " + _rcp.protocolName + " est ignoré. Vérifier QA plans";
-            }
-
-            this._result.Add(preparedQA);
             #endregion
 
 

@@ -26,10 +26,14 @@ namespace PlanCheck
         private string _treatmentType;
         private string[] _calculoptions;
         private string[] _POoptions;
+        private bool _TOMO;
+        private bool _NOVA;
+        private bool _HALCYON;
+        private string _machine;
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
             _ctx = ctx;
-           
+
             if (_ctx.Patient.Name != null)
                 _patientname = _ctx.Patient.Name;
             else
@@ -48,12 +52,12 @@ namespace PlanCheck
 
             _coursename = ctx.Course.Id;
             _planname = ctx.PlanSetup.Id;
-            _plancreator = GetUser("creator",iuct_users);
-            _currentuser = GetUser("currentuser",iuct_users);
+            _plancreator = GetUser("creator", iuct_users);
+            _currentuser = GetUser("currentuser", iuct_users);
 
             if (ctx.PlanSetup.RTPrescription != null)
-                _doctor = GetUser("doctor",iuct_users);
-            
+                _doctor = GetUser("doctor", iuct_users);
+
             if (_ctx.PlanSetup.PhotonCalculationModel != null)
                 _algoname = ctx.PlanSetup.PhotonCalculationModel;
             else
@@ -64,18 +68,35 @@ namespace PlanCheck
             _calculoptions = new string[ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.Count];
             _calculoptions = ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.ToArray();
 
-            
+
             int n = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Values.Count;
             _POoptions = new string[n];
             _POoptions = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Values.ToArray();
-//            _POoptions = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Keys.ToArray(); // if option name are needed
 
-            //MessageBox.Show(string.Format("test = {0}", calculoptions[0]));
-            //MessageBox.Show(string.Format("test = {0}", calculoptions[1]));
-            //_calculationgridsize = calculoptions[0];
-            //SELON L'ALGO ON A DES OPTIONS ET UN NOMBRE D'OPTIONS DIFFERENT. METTRE DES IF !
+            _machine = ctx.PlanSetup.Beams.First().TreatmentUnit.Id.ToUpper();
+            _NOVA = false;
+            _TOMO = false;
+            _HALCYON = false;
 
-            //MessageBox.Show(string.Format("Date image = {0}", ctx.Image.CreationDateTime));         
+            if (_machine.Contains("NOVA"))
+                _NOVA = true;
+            else if (_machine.Contains("HALCYON"))
+                _HALCYON = true;
+            else if (_machine.Contains("TOM"))
+            {
+                _TOMO = true;
+                foreach (PlanSetup p in ctx.Course.PlanSetups)
+                {
+                    if (p.Id.Contains("SEA"))
+                    {
+                        _machine = p.Beams.First().TreatmentUnit.Id;
+                        _machine = _machine.Replace(" SEANCE", "");
+                    }
+                }
+
+            }
+
+
 
 
         }
@@ -106,7 +127,7 @@ namespace PlanCheck
             foreach (IUCT_User user_tmp in iuct_users.UsersList)
             {
 
-                
+
                 if (tocheck.ToLower().Contains(user_tmp.UserFamilyName.ToLower()))
                 {
                     user = user_tmp;
@@ -114,7 +135,7 @@ namespace PlanCheck
                 }
             }
 
-           
+
 
             return user;
         }
@@ -144,7 +165,6 @@ namespace PlanCheck
         {
             get { return _patientname; }
         }
-
         public string[] Calculoptions
         {
             get { return _calculoptions; }
@@ -153,7 +173,6 @@ namespace PlanCheck
         {
             get { return _POoptions; }
         }
-
         public string PatientDOB
         {
             get { return _patientdob; }
@@ -166,12 +185,10 @@ namespace PlanCheck
         {
             get { return _coursename; }
         }
-
         public string PlanName
         {
             get { return _planname; }
         }
-
         public IUCT_User PlanCreator
         {
             get { return _plancreator; }
@@ -180,12 +197,10 @@ namespace PlanCheck
         {
             get { return _doctor; }
         }
-
         public IUCT_User CurrentUser
         {
             get { return _currentuser; }
         }
-
         public string AlgoName
         {
             get { return _algoname; }
@@ -200,12 +215,25 @@ namespace PlanCheck
         }
         public void setTreatmentType(string type)
         {
-            _treatmentType = type; 
+            _treatmentType = type;
         }
-        //public string CalculationGridSize
-        //{
-        //    get { return _calculationgridsize; }
-        //}
+        public bool isTOMO
+        {
+            get { return _TOMO; }
+        }
+        public bool isNOVA
+        {
+            get { return _NOVA; }
+        }
+        public bool isHALCYON
+        {
+            get { return _HALCYON; }
+        }
+        public string machine
+        {
+            get { return _machine; }
+        }
+
         #endregion
 
     }
