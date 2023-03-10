@@ -30,6 +30,7 @@ namespace PlanCheck
         private List<string> _optionComp = new List<string>();
         private List<string> _POoptions = new List<string>();
         private String _prescriptionPercentage;
+        private double _prescriptionPercentageDouble;
         private String _normalisationMode;
         private String _enableGating;
         private String _energy;
@@ -97,7 +98,7 @@ namespace PlanCheck
         {
             expectedStructure es = new expectedStructure();
             var temp1 = r.Cells[row, 1].Value2;
-            if (temp1 != null)
+            if ((temp1 != null)&&(temp1 != ""))
             {
                 string temp2 = r.Cells[row, 2].Text; // column 2
                 string temp3 = r.Cells[row, 3].Text; // column 3
@@ -107,20 +108,23 @@ namespace PlanCheck
                 string temp7 = r.Cells[row, 7].Text; // column 7
 
                 es.Name = (r.Cells[row, 1].Value2).ToString();
+                //es.Name = es.Name.ToUpper();
                 es.HU = giveMeTheDouble(temp2, row, 2, r.Worksheet.Name);
                 es.volMin = giveMeTheDouble(temp3, row, 3, r.Worksheet.Name);
                 es.volMax = giveMeTheDouble(temp4, row, 4, r.Worksheet.Name);
                 es.expectedNumberOfPart = giveMeTheInt(temp5, row, 5, r.Worksheet.Name);
-                if ((temp6 == "R") || (temp6 == "L"))
-                    es.laterality = temp6;
+                if ((temp6 == "R") || (temp6 == "D"))
+                    es.laterality = "R";
+                else if ((temp6 == "L") || (temp6 == "G"))
+                    es.laterality = "L";
                 else
                     es.laterality = "NONE"; // laterality cell is simply ignored if it is not L or R
 
                 es.isMandatory = false;
-                if (temp7.ToUpper() == "OUI") es.isMandatory = true;
+                if ((temp7.ToUpper() == "OUI") || (temp7.ToUpper() == "Y") || (temp7.ToUpper() == "YES") || (temp7.ToUpper() == "1")) es.isMandatory = true;
 
             }
-            if (temp1 != null)
+            if ((temp1 != null) && (temp1 != ""))
                 return es;
             else
                 return null;
@@ -226,25 +230,17 @@ namespace PlanCheck
             // line 2
             _CTslicewidth = xlRange1.Cells[2, 2].Value2;
 
-            // line 3
-            _algoName = xlRange1.Cells[3, 2].Value2;
-            int optnumber = 3;
-            String tempo1;
-            String tempo2;
-            while (xlRange1.Cells[3, optnumber].Text != "") // parse the excel line from col 3 to first empty cell
-            {
-                tempo1 = xlRange1.Cells[3, optnumber].Text;
-                tempo2 = tempo1.Replace(',', '.');// replace , by .
-                _optionComp.Add(tempo2);
-                optnumber++;
-            }
+
 
             // line 4
             _gridsize = xlRange1.Cells[4, 2].Value2;
 
-            // line 5
+            // line 5  : need this in string and double format
             _prescriptionPercentage = xlRange1.Cells[5, 2].Text;
-
+            String tempString = _prescriptionPercentage.Replace("%", "");
+            tempString = tempString.Replace(",", ".");
+            _prescriptionPercentageDouble = Convert.ToDouble(tempString);
+            _prescriptionPercentageDouble = _prescriptionPercentageDouble / 100.0;
             // line 6
             _normalisationMode = xlRange1.Cells[6, 2].Text;
 
@@ -258,7 +254,7 @@ namespace PlanCheck
             int nQA = 2;
             while (xlRange1.Cells[9, nQA].Text != "") // parse the excel line from col 2 to first empty cell
             {
-                String oneQA = xlRange1.Cells[9, nQA].Text;                
+                String oneQA = xlRange1.Cells[9, nQA].Text;
                 _listQAplans.Add(oneQA);
                 nQA++;
             }
@@ -266,7 +262,7 @@ namespace PlanCheck
             _tolTable = xlRange1.Cells[10, 2].Text;
 
             // line 12
-            if(xlRange1.Cells[12, 2].Text != "")
+            if (xlRange1.Cells[12, 2].Text != "")
             {
                 myNTO = new NTO(xlRange1.Cells[12, 2].Text,
                     xlRange1.Cells[12, 3].Value2,
@@ -277,15 +273,27 @@ namespace PlanCheck
             }
             // line 14
             _jawTracking = false;
-            if(xlRange1.Cells[14, 2].Text == "true")
-                _jawTracking=true;
+            if (xlRange1.Cells[14, 2].Text == "true")
+                _jawTracking = true;
 
             // line 16
             int k = 0;
             for (k = 17; k < 29; k++)
                 _POoptions.Add(xlRange1.Cells[k, 2].Text);
 
-                
+
+            // line 31
+            _algoName = xlRange1.Cells[31, 2].Value2;
+            int optnumber = 32;
+            String tempo1;
+            String tempo2;
+            while (xlRange1.Cells[optnumber, 2].Text != "") // parse the excel line from col 3 to first empty cell
+            {
+                tempo1 = xlRange1.Cells[optnumber, 2].Text;
+                tempo2 = tempo1.Replace(',', '.');// replace , by .
+                _optionComp.Add(tempo2);
+                optnumber++;
+            }
             #endregion
 
             #region sheet 2 clinical structures
@@ -399,6 +407,10 @@ namespace PlanCheck
         public string prescriptionPercentage
         {
             get { return _prescriptionPercentage; }
+        }
+        public double  prescriptionPercentageDouble
+        {
+            get { return _prescriptionPercentageDouble; }
         }
         public string normalisationMode
         {

@@ -24,6 +24,7 @@ Plan replanif ???
 	- existe t il un volume chauffe ? ((il faut l'ajouter systemeatiquement pour les prostates)
 
 Faiscaux
+	Technique et Energie check (STEC RA = 6x dca 10fff)
 	Blocage ? 
 	Mode SRS
 	Nova SBRT/NOVA
@@ -104,6 +105,8 @@ tests prostate
 202207818
 202208672
 202212024
+201319168
+Jawtrack ??? 
 
 
 

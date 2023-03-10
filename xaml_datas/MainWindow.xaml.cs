@@ -56,6 +56,89 @@ namespace PlanCheck
         public string OptimizationModel { get; set; }
         public List<UserControl> ListChecks { get; set; }
 
+        private String setProtocolDisplay(String filename)
+        {
+            String protocol = "Check-protocol: ";  // theProtocol is not a file name. It s a string that display the file name with no extension
+            protocol += Path.GetFileNameWithoutExtension(filename);
+
+            return protocol;
+        }
+        private String getIntelligentDefaultProtocol()
+        {
+
+            String fileName = @"\check_protocol\prostate.xlsx";
+            String planName = _pcontext.PlanSetup.Id.ToUpper();
+            String nFractions = _pcontext.PlanSetup.NumberOfFractions.ToString();
+            if (planName.Contains("SEIN"))
+            {
+                bool gg = false;
+                bool hypo = false;
+                if (planName.Contains("GG"))
+                    gg = true;
+                if (_pcontext.PlanSetup.NumberOfFractions == 15)
+                    hypo = true;
+
+                if (gg)
+                {
+                    if (hypo)
+                        fileName = @"\check_protocol\sein ganglions hypo.xlsx";
+                    else
+                        fileName = @"\check_protocol\sein ganglions.xlsx";
+                }
+                else
+                {
+                    if (hypo)
+                        fileName = @"\check_protocol\sein hypo.xlsx";
+                    else
+                        fileName = @"\check_protocol\sein.xlsx";
+                }
+
+
+            }
+            if (planName.Contains("PAROI"))
+            {
+
+                fileName = @"\check_protocol\paroi ganglions.xlsx";
+            }
+
+            if (planName.Contains("LOGE") || planName.Contains("PROST"))
+                fileName = @"\check_protocol\prostate.xlsx";
+
+          //  String FirstFieldName = _pcontext.PlanSetup.Beams.FirstOrDefault(x => x.IsSetupField == false).Id;
+            //if (FirstFieldName.Contains("HA"))
+            if(_pinfo.isHyperArc)
+            {
+                
+                fileName = @"\check_protocol\hyperarc" + nFractions + "F.xlsx";
+            }
+
+            if (planName.ToUpper().Contains("STEC"))
+            {
+                if (planName.ToUpper().Contains("FOIE"))
+                {
+                    //fileName = @"\check_protocol\STEC foie" + nFractions + "F.xlsx";
+                    fileName = @"\check_protocol\STEC foie3F.xlsx";
+                }
+                if (planName.ToUpper().Contains("POUM"))
+                {
+                    //fileName = @"\check_protocol\STEC poumon" + nFractions + "F.xlsx";
+                    fileName = @"\check_protocol\STEC poumon3F.xlsx";
+                }
+
+            }
+
+
+            String fullname = Directory.GetCurrentDirectory() + fileName;
+            if (!File.Exists(fullname))
+            {
+                MessageBox.Show("Le check-protcol est introuvable :\n" + fullname + "\nUtilisation du fichier par défaut : prostate");
+                fullname = Directory.GetCurrentDirectory() + @"\check_protocol\prostate.xlsx"; 
+            }
+            if (!File.Exists(fullname))
+                MessageBox.Show(fullname + "\nFichier introuvable");
+
+            return fullname;
+        }
         #endregion
 
         public MainWindow(PreliminaryInformation pinfo, ScriptContext pcontext) //Constructeur
@@ -67,11 +150,12 @@ namespace PlanCheck
             _pcontext = pcontext;
 
 
-            // an intelligent default protocol must be chosen. Still to code
-            // myFullFilename = getIntelligentDefaultValue(_pcontext);
+            // an intelligent default protocol is chosen
+            myFullFilename = getIntelligentDefaultProtocol();
 
-            myFullFilename = Directory.GetCurrentDirectory() + @"\check_protocol\prostate.xlsx";
-            theProtocol = "Check-protocol: prostate"; // theProtocol is not a file name. It s a string that display the file name with no extension
+            //old : 
+            // myFullFilename = Directory.GetCurrentDirectory() + @"\check_protocol\prostate.xlsx";
+            theProtocol = setProtocolDisplay(myFullFilename);//
             FillHeaderInfos(); //Filling datas binded to xaml
 
             InitializeComponent(); // read the xaml
@@ -211,54 +295,21 @@ d3.ToString("0.##");   //24
             #endregion
 
             #region machine and fields
-            //String machineName = null;
-            String treatmentType = null;
-            int setupFieldNumber = 0;
-            int TreatmentFieldNumber = 0;
-            //String monTypeMLC = null;
-            foreach (Beam b in _pcontext.PlanSetup.Beams)
-            {
-
-                if (b.IsSetupField)  // count set up
-                {
-                    setupFieldNumber++;
-                }
-                else
-                {
-                    TreatmentFieldNumber++;
-                    //machineName = b.TreatmentUnit.Id;
 
 
-                    if (b.MLCPlanType.ToString() == "VMAT")
-                    {
-                        treatmentType = "VMAT";
+           // int setupFieldNumber = 0;
+            //int TreatmentFieldNumber = 0;
 
-                    }
-                    else if (b.MLCPlanType.ToString() == "ArcDynamic")
-                        treatmentType = "DCA";
-                    else if (b.MLCPlanType.ToString() == "DoseDynamic")
-                        treatmentType = "IMRT";
-                    else if (b.MLCPlanType.ToString() == "Static")
-                        treatmentType = "RTC (MLC)";
-                    else if (b.MLCPlanType.ToString() == "NotDefined")
-                    {
-                        if (b.Technique.Id == "STATIC")  // can be TOMO, Electrons or 3DCRT without MLC
-                        {
-                            if (_pinfo.machine.Contains("TOM"))
-                                treatmentType = "Tomotherapy";
-                            else if (b.EnergyModeDisplayName.Contains("E"))
-                                treatmentType = "Electrons";
-                            else
-                                treatmentType = "RTC (sans MLC)";
-                        }
-                        else
-                            treatmentType = "Technique non statique inconnue : pas de MLC !";
-                    }
-                    _pinfo.setTreatmentType(treatmentType);
-                }
-            }
 
             theMachine = "    " + _pinfo.machine;// machineName;
+
+
+            if (!_pinfo.machine.Contains("TOM"))
+            {
+                theFields = _pinfo.treatmentType + " : " + _pinfo.treatmentFieldNumber + " champ(s) + " + _pinfo.setupFieldNumber + " set-up";
+            }
+            else
+                theFields = "Tomotherapy";
 
             #region color the machines first theme
 
@@ -325,16 +376,7 @@ d3.ToString("0.##");   //24
 
 
 
-            if (!_pinfo.machine.Contains("TOM"))
-            {
-                if (TreatmentFieldNumber == 1)
-                    theFields = treatmentType + " : " + TreatmentFieldNumber + " champ + " + setupFieldNumber + " set-up";
-                else
-                    theFields = treatmentType + " : " + TreatmentFieldNumber + " champs + " + setupFieldNumber + " set-up";
-                // theFields = TreatmentFieldNumber + " champs " + treatmentType + " et " + setupFieldNumber + " champs de set-up" ;
-            }
-            else
-                theFields = "Tomotherapy";
+
 
             #endregion
 
@@ -388,8 +430,8 @@ d3.ToString("0.##");   //24
                 MessageBox.Show(string.Format("Le check-protocol '{0}'  n'existe pas ", theProtocol));
                 return;
             }
-
-            theProtocol = "Check-protocol: " + Path.GetFileNameWithoutExtension(myFullFilename);// a method to get the file name only (no extension)
+            theProtocol = setProtocolDisplay(myFullFilename);
+            //theProtocol = "Check-protocol: " + Path.GetFileNameWithoutExtension(myFullFilename);// a method to get the file name only (no extension)
             defaultProtocol.Text = theProtocol; // refresh display of default value
         }
         private void OK_button_click(object sender, RoutedEventArgs e)

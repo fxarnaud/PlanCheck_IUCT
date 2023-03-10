@@ -214,7 +214,7 @@ namespace PlanCheck
                         if (outputUnit == "%")
                         {
                             myDrel_something = _ctx.PlanSetup.GetDoseAtVolume(s, myD, VolumePresentation.Relative, DoseValuePresentation.Relative);
-                            result = myDrel_something.Dose;
+                            result = myDrel_something.Dose / _rcp.prescriptionPercentageDouble;
                         }
                         else if (outputUnit == "Gy")
                         {
@@ -230,7 +230,7 @@ namespace PlanCheck
                         if (outputUnit == "%")
                         {
                             myDrel_something = _ctx.PlanSetup.GetDoseAtVolume(s, myD, VolumePresentation.AbsoluteCm3, DoseValuePresentation.Relative);
-                            result = myDrel_something.Dose;
+                            result = myDrel_something.Dose / _rcp.prescriptionPercentageDouble; 
                         }
                         else if (outputUnit == "Gy")
                         {

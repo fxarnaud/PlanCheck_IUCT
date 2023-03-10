@@ -29,6 +29,36 @@ namespace PlanCheck
             return Convert.ToInt32((z - SS.Image.Origin.z) / imageRes);
         }
 
+        public double getXcenter()
+        {
+            double xCenter = 0.0;
+
+            Structure centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CHIASMA"); // find body;
+            if (centralStruct == null)
+                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CANAL MED");
+            if (centralStruct == null)
+                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "RECTUM");
+            if (centralStruct == null)
+                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "VESSIE");
+            if (centralStruct == null)
+                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CERVEAU");
+            if (centralStruct == null)
+                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "TRONC CEREBRAL");
+            if (centralStruct == null)
+                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "PROSTATE");
+            if (centralStruct == null)
+                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "HYPOPHYSE");
+            if (centralStruct == null)
+                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "BODY");
+            if (centralStruct == null)
+                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CONTOUR EXTERNE");
+
+            if (centralStruct != null)
+                xCenter = centralStruct.MeshGeometry.Bounds.X + (centralStruct.MeshGeometry.Bounds.SizeX / 2.0);
+
+
+            return xCenter;
+        }
         public static int getNumberOfMissingSlices(Structure S, StructureSet SS)
         {
 
@@ -101,7 +131,7 @@ namespace PlanCheck
                 foreach (expectedStructure es in _rcp.myCouchExpectedStructures) // foreach couch element in the xls protocol file
                 {
                     double mydouble = 0;
-                    Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
+                    Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == es.Name.ToUpper()); // find a structure in ss with the same name
                     if (struct1 == null) // if structure doesnt exist in ss
                     {
                         missingCouchStructures.Add(es.Name);
@@ -116,10 +146,14 @@ namespace PlanCheck
                     }
                     else // else struct is not empty
                     {
-                        struct1.GetAssignedHU(out mydouble);   // check assigned HU
-                        if (mydouble != es.HU)
-                            wrongHUCouchStructures.Add(es.Name);
+                        if (es.HU != 9999)
+                        {
+                            struct1.GetAssignedHU(out mydouble);   // check assigned HU
 
+
+                            if (mydouble != es.HU)
+                                wrongHUCouchStructures.Add(es.Name);
+                        }
 
                         try
                         {
@@ -178,7 +212,7 @@ namespace PlanCheck
 
                 this._result.Add(couchStructExist);
             }
-            
+
             #endregion
 
             #region overlap body vs couch structs. 
@@ -223,7 +257,7 @@ namespace PlanCheck
             {
                 //MessageBox.Show("here is " + es.Name);
                 double mydouble = 0;
-                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
+                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == es.Name.ToUpper()); // find a structure in ss with the same name
                 if (struct1 == null) // if structure doesnt exist in ss
                 {
                     missingClinicalStructures.Add(es.Name);
@@ -300,7 +334,8 @@ namespace PlanCheck
             foreach (expectedStructure es in _rcp.myOptExpectedStructures)
             {
                 double mydouble = 0;
-                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == es.Name); // find a structure in ss with the same name
+                Structure struct1 = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == es.Name.ToUpper()); // find a structure in ss with the same name
+                
                 if (struct1 == null) // if structure doesnt exist in ss
                 {
                     missingOptStructures.Add(es.Name);
@@ -363,7 +398,7 @@ namespace PlanCheck
 
             this._result.Add(optStructuresItem);
             #endregion
-           
+
             #region  Anormal Volume values (cc)
             // entre -3sigma et +3sigma >99.9% des cas
             List<string> anormalVolumeList = new List<string>();
@@ -535,15 +570,20 @@ namespace PlanCheck
 
             List<string> goodLaterality = new List<string>();
             List<string> badLaterality = new List<string>();
+
+
             Structure sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "BODY"); // find body
 
-            if (sbody == null)
-                sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CONTOUR EXTERNE"); // find body
+            /*            if (sbody == null)
+                            sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CONTOUR EXTERNE"); // find body
 
-            if (sbody == null)
-                MessageBox.Show("BODY NOT FOUND");
+                        if (sbody == null)
+                            MessageBox.Show("BODY NOT FOUND");
 
-            double bodyXcenter = sbody.MeshGeometry.Bounds.X + (sbody.MeshGeometry.Bounds.SizeX / 2.0);
+                        double bodyXcenter = sbody.MeshGeometry.Bounds.X + (sbody.MeshGeometry.Bounds.SizeX / 2.0);
+            */
+            double bodyXcenter = getXcenter();
+
 
             foreach (expectedStructure es in allStructures)
             {
@@ -558,7 +598,7 @@ namespace PlanCheck
 
                             //MessageBox.Show("orientation : " + _ctx.Image.ImagingOrientation.ToString());
                             //if(_ctx.Image.ImagingOrientation) //
-
+                            //MessageBox.Show("body " + bodyXcenter + " x " + xpos + " " + es.Name);
                             if (xpos > bodyXcenter) // THIS IS LEFT,  if Supine HF but also Prone HF, Supine FF...
                             {
                                 if (es.laterality == "L")
@@ -609,7 +649,7 @@ namespace PlanCheck
 
             #region A PTV for EACH CTV/GTV
             Item_Result aPTVforEveryone = new Item_Result();
-            aPTVforEveryone.Label = "GTV/CTV sans PTV";
+            aPTVforEveryone.Label = "GTV/CTV/ITV sans PTV";
             aPTVforEveryone.ExpectedValue = "wip...";
 
             List<string> CTVandGTVs = new List<string>();
@@ -618,9 +658,9 @@ namespace PlanCheck
             List<string> CTVwithPTV = new List<string>();
             foreach (Structure s in _ctx.StructureSet.Structures) // list all GTV/CTVs and PTVs
             {
-                if ((s.Id.ToUpper().Contains("CTV")) || (s.Id.ToUpper().Contains("GTV"))) // look for ctv or Gtv in name, case insensitive thanks to ToUpper
+                if ((s.Id.ToUpper().Contains("CTV")) || (s.Id.ToUpper().Contains("GTV")) || (s.Id.ToUpper().Contains("ITV"))) // look for ctv or Gtv or itv in name, case insensitive thanks to ToUpper
                 {
-                    if ((!s.Id.ToUpper().Contains("-CTV")) && (!s.Id.ToUpper().Contains("-GTV"))) // excludes lung-CTV
+                    if ((!s.Id.ToUpper().Contains("-CTV")) && (!s.Id.ToUpper().Contains("-GTV")) && (!s.Id.ToUpper().Contains("-ITV"))) // excludes lung-CTV
                         if ((!s.Id.ToUpper().Contains("RING"))) // exlude rings
                             if (!s.IsEmpty)
                                 CTVandGTVs.Add(s.Id);
@@ -634,6 +674,7 @@ namespace PlanCheck
                 }
             }
 
+            
             foreach (string CTV_ID in CTVandGTVs)
             {
                 Structure myCTV = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id == CTV_ID); // get the CTV
@@ -658,7 +699,7 @@ namespace PlanCheck
                         if ((PTV_ymin < CTV_ymin) && ((PTV_ymax > CTV_ymax)))
                             if ((PTV_zmin < CTV_zmin) && ((PTV_zmax > CTV_zmax)))
                             {
-                                CTVwithPTV.Add(CTV_ID);
+                              
                                 found = true;
                                 break; // exit as soon as a PTV is found
                             }
@@ -672,10 +713,18 @@ namespace PlanCheck
                     CTVwithPTV.Add(CTV_ID);
 
             }
+            
+            /*String infoMsg = null;
+            foreach (string tttt in CTVwithPTV)
+            {
+                infoMsg += "\n" + tttt;
+            }
+            MessageBox.Show(infoMsg);*/
+
             if (CTVwithoutAnyPTV.Count() > 0) // at least one GTV/CTV has no PTV
             {
                 aPTVforEveryone.setToFALSE();
-                aPTVforEveryone.MeasuredValue = "Au moins un GTV/CTV n'a pas de PTV (ou un PTV trop petit)";
+                aPTVforEveryone.MeasuredValue = CTVwithoutAnyPTV.Count.ToString() + " GTV/CTV/ITV(s) n'ont pas de PTV (ou un PTV trop petit)";
                 aPTVforEveryone.Infobulle = "Ces GTV/CTV n'ont pas de PTV : \n";
                 foreach (string s in CTVwithoutAnyPTV)
                     aPTVforEveryone.Infobulle += " - " + s + "\n";
@@ -683,13 +732,13 @@ namespace PlanCheck
             else
             {
                 aPTVforEveryone.setToTRUE();
-                aPTVforEveryone.MeasuredValue = "Aucun GTV/CTV n'a pas de PTV";
-                aPTVforEveryone.Infobulle = "Ces GTV/CTV ont tous un PTV : \n";
+                aPTVforEveryone.MeasuredValue = CTVwithPTV.Count.ToString() +" GTV/CTV/ITV(s) détectés avec PTV";
+                aPTVforEveryone.Infobulle = "Ces GTV/CTV/ITV(s) ont tous un PTV : \n";
                 foreach (string s in CTVwithPTV)
                     aPTVforEveryone.Infobulle += " - " + s + "\n";
             }
 
-            aPTVforEveryone.Infobulle += "\n\nUn CTV/GTV doit avoir une structure dont le nom contient 'PTV' et donc chacune des  6 dimensions (X+, X-, ...) est supérieure à celle du GTV/CTV \n";
+            aPTVforEveryone.Infobulle += "\n\nUn GTV/CTV/ITV doit avoir une structure dont le nom contient 'PTV' et donc chacune des  6 dimensions (X+, X-, ...) est supérieure à celle du GTV/CTV \n";
 
 
 

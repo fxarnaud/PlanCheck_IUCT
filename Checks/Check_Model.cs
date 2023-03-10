@@ -44,6 +44,8 @@ namespace PlanCheck
         {
             bool result = true;
 
+
+
             if (planNTO.DistanceFromTargetBorderInMM != protocolNTO.distanceTotTarget) result = false;
             if (planNTO.StartDosePercentage != protocolNTO.startPercentageDose) result = false;
             if (planNTO.EndDosePercentage != protocolNTO.stopPercentageDose) result = false;
@@ -54,6 +56,7 @@ namespace PlanCheck
             if (protocolNTO.mode == "Manual") autoMode = false;
             else if (protocolNTO.mode == "Auto") autoMode = true;
 
+            //MessageBox.Show("automode:     " + planNTO.IsAutomatic.ToString());
             if (planNTO.IsAutomatic != autoMode) result = false;
 
             return result;
@@ -106,7 +109,7 @@ namespace PlanCheck
             if (!_pinfo.isTOMO)
             {
 
-                
+
                 algo_name.Label = "Algorithme de calcul";
                 algo_name.ExpectedValue = _rcp.algoName;
                 algo_name.MeasuredValue = _pinfo.AlgoName;
@@ -159,6 +162,23 @@ namespace PlanCheck
             #region LES OPTIONS DE CALCUL
             if (!_pinfo.isTOMO)
             {
+
+
+                // ------------------
+                // uncomment to display options !
+                /*
+                 * String msg = null;
+                                Dictionary<String, String> map = new Dictionary<String, String>();
+                                map = _pcontext.PlanSetup.PhotonCalculationOptions;
+                                foreach (String s in map.Keys)
+                                    msg += s + "\n";
+                                msg += "\n";
+                                foreach (String s in map.Values)
+                                    msg += s + "\n";
+                                MessageBox.Show(msg);
+                */
+                // ----------------------
+
                 if (algo_name.ResultStatus.Item1 != "X")// options are not checked if the algo is not the same
                 {
                     Item_Result options = new Item_Result();
@@ -167,16 +187,23 @@ namespace PlanCheck
                     int optionsAreOK = 1;
                     int myOpt = 0;
 
-                    foreach (string s in _pinfo.Calculoptions)
+
+
+                    Dictionary<String, String> map = new Dictionary<String, String>();
+                    map = _pcontext.PlanSetup.PhotonCalculationOptions;
+
+                    foreach (KeyValuePair<String, String> kvp in map)
                     {
-                        if (s != _rcp.optionComp[myOpt]) // if one computation option is different test is error
+
+                        if (kvp.Value != _rcp.optionComp[myOpt]) // if one computation option is different test is error
                         {
-                            options.Infobulle = "Une option de calcul est différente du check-protocol " + _rcp.protocolName;
-                            options.MeasuredValue = s + " (options de calcul du plan) vs. " + _rcp.optionComp[myOpt] + " (attendu pour ce check-protocol) ";
+                            options.Infobulle += "\nOption de calcul est différente du check-protocol: " + kvp.Key + "\n Protocole: " + _rcp.optionComp[myOpt] + "\n Plan: " + kvp.Value;
+                            options.MeasuredValue = "Options de calcul erronées (voir détail)";
                             optionsAreOK = 0;
                         }
                         myOpt++;
                     }
+
 
                     if (optionsAreOK == 0)
                     {
@@ -185,8 +212,10 @@ namespace PlanCheck
                     else
                     {
                         options.setToTRUE();
-                        options.Infobulle = "Les " + myOpt + " options du modèle calcul sont en accord avec le check-protocol: " + _rcp.protocolName;
                         options.MeasuredValue = "OK";
+                        options.Infobulle = "Les " + myOpt + " options du modèle calcul sont en accord avec le check-protocol: " + _rcp.protocolName + "\n";
+                        foreach (KeyValuePair<String, String> kvp in map)
+                            options.Infobulle += " - " + kvp.Key + " : " + kvp.Value + "\n";
 
                     }
 
@@ -198,7 +227,7 @@ namespace PlanCheck
             #region NTO
 
 
-            if (!_pinfo.isTOMO)
+            if ((!_pinfo.isTOMO) && (!_pinfo.isHyperArc))
             {
                 if (_pcontext.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
                 {
@@ -275,7 +304,7 @@ namespace PlanCheck
             // en fait c'est actif systemetiquement au nova. pas fait a l'halcyon 
             // sauf toute petite lésion : 3x3
 
-            if (_pinfo.isNOVA)
+            if ((_pinfo.isNOVA)&&(!_pinfo.isHyperArc))
             {
                 if (_pcontext.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
                 {

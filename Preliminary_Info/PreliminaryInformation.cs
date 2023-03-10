@@ -24,11 +24,15 @@ namespace PlanCheck
         private string _algoname;
         private string _mlctype;
         private string _treatmentType;
-        private string[] _calculoptions;
+        private int _treatmentFieldNumber;
+        private int _setupFieldNumber;
+        //  private string[] _calculoptions;
         private string[] _POoptions;
         private bool _TOMO;
         private bool _NOVA;
         private bool _HALCYON;
+        private bool _HYPERARC;
+        private bool _isModulated;
         private string _machine;
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
@@ -64,10 +68,10 @@ namespace PlanCheck
                 _algoname = "no photon calculation model";
 
             _mlctype = Check_mlc_type(ctx.PlanSetup);
-
+            /*
             _calculoptions = new string[ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.Count];
             _calculoptions = ctx.PlanSetup.GetCalculationOptions(ctx.PlanSetup.PhotonCalculationModel).Values.ToArray();
-
+            */
 
             int n = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Values.Count;
             _POoptions = new string[n];
@@ -77,9 +81,15 @@ namespace PlanCheck
             _NOVA = false;
             _TOMO = false;
             _HALCYON = false;
-
+            _HYPERARC = false;
             if (_machine.Contains("NOVA"))
+            {
                 _NOVA = true;
+                String fieldname = ctx.PlanSetup.Beams.FirstOrDefault(x => x.IsSetupField == false).Id;
+                if (fieldname.Contains("HA"))
+                    _HYPERARC = true;
+
+            }
             else if (_machine.Contains("HALCYON"))
                 _HALCYON = true;
             else if (_machine.Contains("TOM"))
@@ -93,11 +103,57 @@ namespace PlanCheck
                         _machine = _machine.Replace(" SEANCE", "");
                     }
                 }
-
             }
 
+           
+            foreach (Beam bn in ctx.PlanSetup.Beams)
+            {
 
+                if (bn.IsSetupField)  // count set up
+                {
+                    _setupFieldNumber++;
+                }
+                else
+                {
+                    _treatmentFieldNumber++;
+                    //machineName = b.TreatmentUnit.Id;
+                }
+            }
 
+            _isModulated = false;
+            Beam b = ctx.PlanSetup.Beams.First(x => x.IsSetupField == false);
+
+            if (b.MLCPlanType.ToString() == "VMAT")
+            {
+                _treatmentType = "VMAT";
+                _isModulated = true;
+            }
+            else if (b.MLCPlanType.ToString() == "ArcDynamic")
+                _treatmentType = "DCA";
+            else if (b.MLCPlanType.ToString() == "DoseDynamic")
+            {
+                _treatmentType = "IMRT";
+                _isModulated = true;
+            }
+            else if (b.MLCPlanType.ToString() == "Static")
+                _treatmentType = "RTC (MLC)";
+            else if (b.MLCPlanType.ToString() == "NotDefined")
+            {
+                if (b.Technique.Id == "STATIC")  // can be TOMO, Electrons or 3DCRT without MLC
+                {
+                    if (_machine.Contains("TOM"))
+                    {
+                        _treatmentType = "Tomotherapy";
+                        _isModulated = true;
+                    }
+                    else if (b.EnergyModeDisplayName.Contains("E"))
+                        _treatmentType = "Electrons";
+                    else
+                        _treatmentType = "RTC (sans MLC)";
+                }
+                else
+                    _treatmentType = "Technique non statique inconnue : pas de MLC !";
+            }
 
         }
 
@@ -165,10 +221,12 @@ namespace PlanCheck
         {
             get { return _patientname; }
         }
-        public string[] Calculoptions
-        {
-            get { return _calculoptions; }
-        }
+        /*
+         public string[] Calculoptions
+         {
+             get { return _calculoptions; }
+         }
+        */
         public string[] POoptions
         {
             get { return _POoptions; }
@@ -193,6 +251,10 @@ namespace PlanCheck
         {
             get { return _plancreator; }
         }
+        public bool isModulated
+        {
+            get { return _isModulated; }
+        }
         public IUCT_User Doctor
         {
             get { return _doctor; }
@@ -213,6 +275,15 @@ namespace PlanCheck
         {
             get { return _treatmentType; }
         }
+        public int treatmentFieldNumber
+        {
+            get { return _treatmentFieldNumber; }
+        }
+        public int setupFieldNumber
+        {
+            get { return _setupFieldNumber; }
+        }
+
         public void setTreatmentType(string type)
         {
             _treatmentType = type;
@@ -228,6 +299,10 @@ namespace PlanCheck
         public bool isHALCYON
         {
             get { return _HALCYON; }
+        }
+        public bool isHyperArc
+        {
+            get { return _HYPERARC; }
         }
         public string machine
         {
