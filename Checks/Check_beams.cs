@@ -315,6 +315,51 @@ namespace PlanCheck
 
             #endregion
 
+            #region NOVA SBRT 
+            if((_pinfo.isNOVA)&&(_pinfo.isModulated))
+            {
+
+                Item_Result novaSBRT = new Item_Result();
+                novaSBRT.Label = "NOVA SBRT ou NOVA";
+                novaSBRT.MeasuredValue = _pinfo.machine;
+                novaSBRT.Infobulle = "Pour les Nova, la machine NOVA SBRT doit être utilisée pour les champs < 7x7 cm2";
+                Beam b = _ctx.PlanSetup.Beams.FirstOrDefault(x => x.IsSetupField == false);
+                ControlPoint cp = b.ControlPoints.First();
+                double meanJawsXY = 0.5*(Math.Abs(cp.JawPositions.X1) + Math.Abs(cp.JawPositions.X2)) + (Math.Abs(cp.JawPositions.Y1) + Math.Abs(cp.JawPositions.Y2));
+                double limit = 70.0;
+
+                if(_pinfo.machine == "NOVA SBRT")
+                {
+                    novaSBRT.MeasuredValue = "NOVA SBRT (jaws moy. = "+meanJawsXY+")";
+                    if (meanJawsXY < limit)
+                    {
+                        novaSBRT.setToTRUE();
+                    }
+                    else
+                    {
+                        novaSBRT.setToFALSE();
+                    }
+
+                }
+                else
+                {
+                    novaSBRT.MeasuredValue = "NOVA (jaws moy. = " + meanJawsXY + ")";
+                    if (meanJawsXY < limit)
+                    {
+                        novaSBRT.setToFALSE();
+                    }
+                    else
+                    {
+                        novaSBRT.setToTRUE();
+                    }
+
+                }
+
+                this._result.Add(novaSBRT);
+            }
+
+            #endregion
+
         }
         public string Title
         {
