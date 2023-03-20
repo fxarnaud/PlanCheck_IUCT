@@ -10,6 +10,7 @@ using System.IO;
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;
 using MigraDoc.Rendering;
+
 using PdfSharp.Pdf;
 //using System.Windows.Forms;
 
@@ -104,11 +105,11 @@ namespace PlanCheck
             if (planName.Contains("LOGE") || planName.Contains("PROST"))
                 fileName = @"\check_protocol\prostate.xlsx";
 
-          //  String FirstFieldName = _pcontext.PlanSetup.Beams.FirstOrDefault(x => x.IsSetupField == false).Id;
+            //  String FirstFieldName = _pcontext.PlanSetup.Beams.FirstOrDefault(x => x.IsSetupField == false).Id;
             //if (FirstFieldName.Contains("HA"))
-            if(_pinfo.isHyperArc)
+            if (_pinfo.isHyperArc)
             {
-                
+
                 fileName = @"\check_protocol\hyperarc" + nFractions + "F.xlsx";
             }
 
@@ -132,7 +133,7 @@ namespace PlanCheck
             if (!File.Exists(fullname))
             {
                 MessageBox.Show("Le check-protcol est introuvable :\n" + fullname + "\nUtilisation du fichier par défaut : prostate");
-                fullname = Directory.GetCurrentDirectory() + @"\check_protocol\prostate.xlsx"; 
+                fullname = Directory.GetCurrentDirectory() + @"\check_protocol\prostate.xlsx";
             }
             if (!File.Exists(fullname))
                 MessageBox.Show(fullname + "\nFichier introuvable");
@@ -297,7 +298,7 @@ d3.ToString("0.##");   //24
             #region machine and fields
 
 
-           // int setupFieldNumber = 0;
+            // int setupFieldNumber = 0;
             //int TreatmentFieldNumber = 0;
 
 
@@ -508,9 +509,13 @@ d3.ToString("0.##");   //24
         }
         private void Button_Click_help(object sender, RoutedEventArgs e)
         {
+
+            #region old online user guide
             // Chrome is not installed on citrix and if hte navigator is not specified IE is launched and can't read google doc.. So,...pdf
             //System.Diagnostics.Process.Start("Chrome.exe", "https://docs.google.com/document/d/1SKk-R7JMUk4_7oHblT3idBDCOFeZwGlmQ-nVpAzsgLo");
             // System.Diagnostics.Process.Start("https://docs.google.com/document/d/1SKk-R7JMUk4_7oHblT3idBDCOFeZwGlmQ-nVpAzsgLo");
+
+
             try
             {
                 System.Diagnostics.Process.Start("Chrome.exe", "https://docs.google.com/document/d/1SKk-R7JMUk4_7oHblT3idBDCOFeZwGlmQ-nVpAzsgLo");
@@ -519,6 +524,100 @@ d3.ToString("0.##");   //24
             {
                 System.Diagnostics.Process.Start(@".\doc\plancheckhelp.pdf");
             }
+            #endregion
+            #region dynamic documentation (deprecated)
+            /*
+            #region copy intro pdf to user guide
+
+            Document migraDoc2 = new Document();
+            Section section0 = migraDoc2.AddSection();
+            String fileNameInro = @".\doc\intro-user-guide.pdf#1"; // page 1
+            MigraDoc.DocumentObjectModel.Shapes.Image ima1 = section0.AddImage(fileNameInro);
+            fileNameInro = @".\doc\intro-user-guide.pdf#2"; // page2 
+            section0.AddImage(fileNameInro);
+            fileNameInro = @".\doc\intro-user-guide.pdf#3"; //Page 3
+            section0.AddImage(fileNameInro);
+            fileNameInro = @".\doc\intro-user-guide.pdf#4"; //Page 4
+            section0.AddImage(fileNameInro);
+            #endregion
+
+            #region pdf body
+            Section section = migraDoc2.AddSection();
+            section.PageSetup.Orientation = MigraDoc.DocumentObjectModel.Orientation.Portrait;
+
+
+            // Header of the table
+            Table table = new Table();
+            table.Borders.Width = 1;
+            table.Borders.Color = MigraDoc.DocumentObjectModel.Colors.White;
+            table.AddColumn(Unit.FromCentimeter(6));
+            table.AddColumn(Unit.FromCentimeter(10));
+            Row row = table.AddRow();
+            Cell cell = row.Cells[0];
+            cell.AddParagraph("Explications des checks");
+            section.Add(table);
+
+            Paragraph paragraph2 = section.AddParagraph("\n\n");
+            paragraph2.AddFormattedText("\n", TextFormat.Bold);
+            foreach (CheckScreen_Global csg in ListChecks)
+            {
+
+
+                Paragraph paragraph1 = section.AddParagraph("\n\n" + csg._title + "\n\n");
+                paragraph1.Format.Font.Bold = true;
+                paragraph1.Format.Font.Size = 14;
+
+                Table table1 = new Table();
+                table1.Borders.Width = 1;
+                table1.Borders.Color = MigraDoc.DocumentObjectModel.Colors.Olive;
+
+                table1.AddColumn(Unit.FromCentimeter(4.0));
+                table1.AddColumn(Unit.FromCentimeter(14.0));
+                // table1.AddColumn(Unit.FromCentimeter(10.0));
+                row = table1.AddRow();
+                row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.PaleGoldenrod;
+                row.Format.Font.Size = 8;
+                row.Format.Font.Bold = true;
+
+                cell = row.Cells[0];
+                cell.AddParagraph("Item");
+                cell = row.Cells[1];
+                cell.AddParagraph("Explication détaillée");
+
+
+                foreach (Item_Result ir in csg.Items)
+                {
+                    row = table1.AddRow();
+                    row.Format.Font.Size = 6;
+
+                    row.Shading.Color = MigraDoc.DocumentObjectModel.Colors.AntiqueWhite;
+                    row.Format.Font.Color = MigraDoc.DocumentObjectModel.Colors.Black;
+
+
+
+                    row.Cells[0].AddParagraph("\n\n" + ir.Label + "\n\n");
+                    row.Cells[1].AddParagraph("\n\n" + ir.Infobulle + "\n\n");
+//                    row.Cells[1].AddParagraph("\n\n" + ir.detailedExplanation + "\n\n");
+
+                }
+                section.Add(table1);
+                section.AddPageBreak();
+
+            }
+            #endregion
+
+            #region PDF SAVING
+
+            PdfDocumentRenderer pdfRenderer2 = new PdfDocumentRenderer(true, PdfSharp.Pdf.PdfFontEmbedding.None);
+            string pdfFile = @".\doc\";
+            pdfFile += "User_Guide_" + DateTime.Now.ToString("MM.dd.yyyy_H.mm.ss") + ".pdf";
+            pdfRenderer2.Document = migraDoc2;
+            pdfRenderer2.RenderDocument();
+            pdfRenderer2.PdfDocument.Save(pdfFile);
+
+            #endregion
+            */
+            #endregion
         }
         private void exportPDF_button_Click(object sender, RoutedEventArgs e)
         {

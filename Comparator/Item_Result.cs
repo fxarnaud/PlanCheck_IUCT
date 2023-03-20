@@ -15,6 +15,8 @@ namespace PlanCheck
         private string _comparator;
         private (string, SolidColorBrush) _resultstatus;
         private string _infobulle;
+        //private string _detailedExplanation;
+
 
         public string Label
         {
@@ -46,6 +48,11 @@ namespace PlanCheck
             get { return _infobulle; }
             set { _infobulle = value; }
         }
+        /*public string detailedExplanation
+        {
+            get { return _detailedExplanation; }
+            set { _detailedExplanation = value; }
+        }*/
         public void setToTRUE()
         {
             this.ResultStatus = ("OK", new SolidColorBrush(Colors.LightGreen));

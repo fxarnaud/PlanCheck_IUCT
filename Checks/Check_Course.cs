@@ -240,7 +240,7 @@ namespace PlanCheck
             this._result.Add(myCourseStatus);
             #endregion
 
-            #region Traitements antérieurs
+            #region previous treatments
             Item_Result anteriorTraitement = new Item_Result();
             List<string> anteriorTraitementList = new List<string>();
             anteriorTraitement.Label = "Traitements antérieurs";
@@ -249,10 +249,11 @@ namespace PlanCheck
 
             foreach (Course c in _ctx.Patient.Courses) // loop courses
             {
-                if (c.Id != _ctx.Course.Id) // if not current course: in other course a plan with the same name can exist
+                foreach (PlanSetup p in c.PlanSetups) // loop plan
                 {
-                    foreach (PlanSetup p in c.PlanSetups) // loop plan
+                    if ((c.Id != _ctx.Course.Id) && (p.Id != _ctx.PlanSetup.Id)) // if not same course AND same plan: in other course a plan with the same name can exist
                     {
+
                         bool validPlan = false;
 
                         try // exception for old tomo plan with no beam
@@ -271,35 +272,6 @@ namespace PlanCheck
                                 var theDateTime = DateTime.Parse(p.TreatmentApprovalDate.ToString(), cultureInfo);
                                 anteriorTraitementList.Add(theDateTime.ToString("d") + "\t" + p.Id);
                             }
-                    }
-                }
-                else // in current course
-                {
-                    foreach (PlanSetup p in c.PlanSetups) // loop plans except the context plan
-                    {
-
-
-                        if (p.Id != _ctx.PlanSetup.Id) // dont check the context plan
-                        {
-                            bool validPlan = false;
-
-                            try // exception for old tomo plan with no beam
-                            {
-                                int nBeams = p.Beams.Count();
-                                validPlan = true;
-                            }
-                            catch
-                            {
-                                validPlan = false;// do nothing but catch is mandatory
-                            }
-
-                            if (validPlan)
-                                if (p.ApprovalStatus.ToString() == "TreatmentApproved")
-                                {
-                                    var theDateTime = DateTime.Parse(p.TreatmentApprovalDate.ToString(), cultureInfo);
-                                    anteriorTraitementList.Add(theDateTime.ToString("d") + "\t" + p.Id);
-                                }
-                        }
                     }
                 }
             }

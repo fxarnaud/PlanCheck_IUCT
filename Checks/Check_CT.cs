@@ -40,7 +40,7 @@ namespace PlanCheck
             Comparator testing = new Comparator();
 
 
-            #region jours depuis le CT
+            #region days since CT
             Item_Result CT_age = new Item_Result();
             CT_age.Label = "Ancienneté du CT (jours)";
             CT_age.ExpectedValue = "10";
@@ -172,8 +172,6 @@ namespace PlanCheck
             image3Dnaming.ExpectedValue = imageDate;
             image3Dnaming.MeasuredValue = _context.Image.Id;
             image3Dnaming.Infobulle = "Le nom de l'image 3D doit contenir la date du CT au format jjmmaa (" + imageDate + ") ou jjmmaaaa";
-            //image3Dnaming.ResultStatus = testing.CompareDatas(image3Dnaming.ExpectedValue, image3Dnaming.MeasuredValue, image3Dnaming.Comparator);
-            //image3Dnaming.Comparator = "=";
             this._result.Add(image3Dnaming);
 
             #endregion
