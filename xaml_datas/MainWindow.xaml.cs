@@ -67,30 +67,30 @@ namespace PlanCheck
         private String getIntelligentDefaultProtocol()
         {
 
-            String fileName = @"\check_protocol\prostate.xlsx";
+            String fileName = @"\check_protocol\defaut.xlsx";
             String planName = _pcontext.PlanSetup.Id.ToUpper();
             String nFractions = _pcontext.PlanSetup.NumberOfFractions.ToString();
             if (planName.Contains("SEIN"))
             {
                 bool gg = false;
-                bool hypo = false;
+              //  bool hypo = false;
                 if (planName.Contains("GG"))
                     gg = true;
-                if (_pcontext.PlanSetup.NumberOfFractions == 15)
-                    hypo = true;
+                //if (_pcontext.PlanSetup.NumberOfFractions == 15)
+                  //  hypo = true;
 
                 if (gg)
                 {
-                    if (hypo)
-                        fileName = @"\check_protocol\sein ganglions hypo.xlsx";
-                    else
+                    //if (hypo)
+                      //  fileName = @"\check_protocol\sein ganglions hypo.xlsx";
+                   // else
                         fileName = @"\check_protocol\sein ganglions.xlsx";
                 }
                 else
                 {
-                    if (hypo)
-                        fileName = @"\check_protocol\sein hypo.xlsx";
-                    else
+                    //if (hypo)
+                      //  fileName = @"\check_protocol\sein hypo.xlsx";
+                    //else
                         fileName = @"\check_protocol\sein.xlsx";
                 }
 
@@ -110,7 +110,8 @@ namespace PlanCheck
             if (_pinfo.isHyperArc)
             {
 
-                fileName = @"\check_protocol\hyperarc" + nFractions + "F.xlsx";
+                //fileName = @"\check_protocol\hyperarc" + nFractions + "F.xlsx";
+                fileName = @"\check_protocol\hyperarc.xlsx";
             }
 
             if (planName.ToUpper().Contains("STEC"))
@@ -118,12 +119,18 @@ namespace PlanCheck
                 if (planName.ToUpper().Contains("FOIE"))
                 {
                     //fileName = @"\check_protocol\STEC foie" + nFractions + "F.xlsx";
-                    fileName = @"\check_protocol\STEC foie3F.xlsx";
+                    if(_pinfo.treatmentType == "VMAT")
+                        fileName = @"\check_protocol\STEC foie RA.xlsx";
+                    else
+                        fileName = @"\check_protocol\STEC foie DCA.xlsx";
                 }
                 if (planName.ToUpper().Contains("POUM"))
                 {
                     //fileName = @"\check_protocol\STEC poumon" + nFractions + "F.xlsx";
-                    fileName = @"\check_protocol\STEC poumon3F.xlsx";
+                    if (_pinfo.treatmentType == "VMAT")
+                        fileName = @"\check_protocol\STEC poumon VMAT.xlsx";
+                    else
+                        fileName = @"\check_protocol\STEC poumon DCA.xlsx";
                 }
 
             }
@@ -785,7 +792,7 @@ d3.ToString("0.##");   //24
             pdfRenderer.RenderDocument();
             MessageBox.Show("Rapport PDF sauvegardé :\n" + pdfFile);
             pdfRenderer.PdfDocument.Save(pdfFile);
-
+            System.Diagnostics.Process.Start(pdfFile);
 
 
         }
