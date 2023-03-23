@@ -51,6 +51,39 @@ namespace PlanCheck
             else return (true);
 
         }
+
+        private bool isCalibrationFieldOK(string QAtype, Course c)
+        {
+            bool calibok = true;
+
+            if (QAtype == "RUBY")
+            { // calibation plan must be 6xFFF + 200MU + tolerance table ok and plan approved
+                calibok = false;
+                foreach (PlanSetup p in c.PlanSetups)
+                {
+                    Beam b = p.Beams.FirstOrDefault(b1 => !b1.IsSetupField);
+                    if (p.Id.ToUpper().Contains("10X10"))
+                        if (b.EnergyModeDisplayName == "6X-FFF")
+                            if (b.Meterset.Value == 200.0)
+                                if (b.ToleranceTableLabel == "Physique_0tolera")
+                                    if (p.ApprovalStatus.ToString() == "PlanningApproved")
+                                        calibok = true;
+
+
+                    //p.id.ToUpper().contains
+                }
+
+
+            }
+
+            // no more calib field for octa
+
+
+            return calibok;
+
+        }
+
+
         public void Check()
         {
 
@@ -72,6 +105,7 @@ namespace PlanCheck
                 List<String> qaPlansMissing = new List<String>();
                 List<String> unapprovedQAplans = new List<String>();
                 List<String> wrongAlgoQAplans = new List<String>();
+                List<String> wrongCalibrationQAplans = new List<String>();
                 foreach (Course c in _ctx.Patient.Courses) // list QA plans of the patient
                 {
                     foreach (PlanSetup p in c.PlanSetups)
@@ -144,6 +178,11 @@ namespace PlanCheck
                                         found = true;
                                         if (p.ApprovalStatus.ToString() != "PlanningApproved")
                                             unapprovedQAplans.Add(p.Id);
+
+                                        bool calibrationFieldisOK = isCalibrationFieldOK("RUBY", p.Course);
+                                        if (!calibrationFieldisOK)
+                                            wrongCalibrationQAplans.Add(p.Id);
+
                                         break;
                                     }
                                 }
@@ -153,7 +192,7 @@ namespace PlanCheck
                         {
                             foreach (PlanSetup p in qaPlans) // loop on present QA plans
                             {
-                                if (p.Id.ToUpper().Contains("OCTA4D") || (p.Course.Id.ToUpper().Contains("OCTA4D")))
+                                if (p.Id.ToUpper().Contains("OCT") || (p.Course.Id.ToUpper().Contains("OCT")))
                                 {
                                     if (haveTheSameMU(p, _ctx.PlanSetup))
                                     {
@@ -161,6 +200,9 @@ namespace PlanCheck
                                         found = true;
                                         if (p.ApprovalStatus.ToString() != "PlanningApproved")
                                             unapprovedQAplans.Add(p.Id);
+                                        bool calibrationFieldisOK = isCalibrationFieldOK("Octa", p.Course);
+                                        if (!calibrationFieldisOK)
+                                            wrongCalibrationQAplans.Add(p.Id);
                                         break;
                                     }
                                 }
@@ -177,7 +219,6 @@ namespace PlanCheck
                         }
 
                     }
-
                     if ((qaPlansMissing.Count > 0) || (wrongAlgoQAplans.Count() > 0))
                     {
                         preparedQA.setToFALSE();
@@ -194,7 +235,7 @@ namespace PlanCheck
                     }
                     else if (unapprovedQAplans.Count > 0)
                     {
-                        preparedQA.MeasuredValue = "Plan CQ présents mais non approuvé";
+                        preparedQA.MeasuredValue = "Plan CQ présents mais non planning approuved";
                         preparedQA.Infobulle = "Tous les plans CQ requis sont présents mais au moins un n'est pas approuvé :\n";
                         foreach (String s in unapprovedQAplans)
                             preparedQA.Infobulle += "\n - " + s;
@@ -205,6 +246,18 @@ namespace PlanCheck
                         preparedQA.setToTRUE();
                         preparedQA.MeasuredValue = "Tous les CQ sont présents";// "Différent de Planning Approved";
                         preparedQA.Infobulle = "Les plans CQ requis selon le check-protocole " + _rcp.protocolName + " sont présents, Planning Approved et calculés avec le bon algorithme";
+
+
+                        if (wrongCalibrationQAplans.Count > 0)
+                        {
+                            preparedQA.setToWARNING();
+                            preparedQA.MeasuredValue = "Au moins un CQ a un champ de calibration incorrect";// "Différent de Planning Approved";
+
+                            preparedQA.Infobulle += "\n\nVerifier UM, Table de tolérance, Energie, et statut d'approbation pour :";
+                            foreach (String s in wrongCalibrationQAplans)
+                                preparedQA.Infobulle += "\n - " + s;
+                        }
+
                     }
                     if (qaPlansPresent.Count() > 0)
                     {
@@ -229,14 +282,15 @@ namespace PlanCheck
                     preparedQA.Infobulle = "Aucun CQ attendu selon le protocole: " + _rcp.protocolName;
                 }
 
-                
+
 
                 this._result.Add(preparedQA);
             }
             #endregion
 
-
         }
+
+
         public string Title
         {
             get { return _title; }
@@ -249,4 +303,5 @@ namespace PlanCheck
 
 
     }
+
 }

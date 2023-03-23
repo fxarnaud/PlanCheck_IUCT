@@ -29,30 +29,57 @@ namespace PlanCheck
             return Convert.ToInt32((z - SS.Image.Origin.z) / imageRes);
         }
 
+
+        private Structure isExistAndNotEmpty(String id)
+        {
+            
+            bool isok = false;
+            Structure s = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == id.ToUpper());
+            if(s != null)
+                if(!s.IsEmpty)
+                    isok = true;
+
+            if (isok)
+                return s;
+            else
+                return null;
+
+        }
+
         public double getXcenter()
         {
             double xCenter = 0.0;
 
-            Structure centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CHIASMA"); // find body;
-            if (centralStruct == null)
-                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CANAL MED");
-            if (centralStruct == null)
-                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "RECTUM");
-            if (centralStruct == null)
-                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "VESSIE");
-            if (centralStruct == null)
-                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CERVEAU");
-            if (centralStruct == null)
-                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "TRONC CEREBRAL");
-            if (centralStruct == null)
-                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "PROSTATE");
-            if (centralStruct == null)
-                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "HYPOPHYSE");
-            if (centralStruct == null)
-                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "BODY");
-            if (centralStruct == null)
-                centralStruct = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CONTOUR EXTERNE");
+            Structure centralStruct = isExistAndNotEmpty("CHIASMA");
 
+
+            if (centralStruct == null)
+                centralStruct = isExistAndNotEmpty("CANAL MED");
+ 
+            if (centralStruct == null)
+                centralStruct = isExistAndNotEmpty("RECTUM");
+            
+            if (centralStruct == null)
+                centralStruct = isExistAndNotEmpty("VESSIE");
+            
+            if (centralStruct == null)
+                centralStruct = isExistAndNotEmpty("CERVEAU");
+            
+            if (centralStruct == null)
+                centralStruct = isExistAndNotEmpty("TRONC CEREBRAL");
+            
+            if (centralStruct == null)
+                centralStruct = isExistAndNotEmpty("PROSTATE");
+            
+            if (centralStruct == null)
+                centralStruct = isExistAndNotEmpty("HYPOPHYSE");
+            
+            if (centralStruct == null)
+                centralStruct = isExistAndNotEmpty("BODY");
+            
+            if (centralStruct == null)
+                centralStruct = isExistAndNotEmpty("CONTOUR EXTERNE");
+            
             if (centralStruct != null)
                 xCenter = centralStruct.MeshGeometry.Bounds.X + (centralStruct.MeshGeometry.Bounds.SizeX / 2.0);
 
@@ -572,7 +599,7 @@ namespace PlanCheck
             List<string> badLaterality = new List<string>();
 
 
-            Structure sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "BODY"); // find body
+           // Structure sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "BODY"); // find body
 
             /*            if (sbody == null)
                             sbody = _ctx.StructureSet.Structures.FirstOrDefault(x => x.Id.ToUpper() == "CONTOUR EXTERNE"); // find body

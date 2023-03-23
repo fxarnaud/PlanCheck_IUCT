@@ -157,8 +157,6 @@ namespace PlanCheck
 
             #endregion
 
-
-
             #region LES OPTIONS DE CALCUL
             if (!_pinfo.isTOMO)
             {

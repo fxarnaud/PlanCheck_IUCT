@@ -228,7 +228,7 @@ namespace PlanCheck
             _protocolName = xlRange1.Cells[1, 2].Value2;
 
             // line 2
-            _CTslicewidth = xlRange1.Cells[2, 2].Value2;
+            _CTslicewidth = xlRange1.Cells[3, 2].Value2;
 
 
 
@@ -262,20 +262,20 @@ namespace PlanCheck
             _tolTable = xlRange1.Cells[10, 2].Text;
 
             // line 12
-            if (xlRange1.Cells[12, 2].Text != "")
+            if (xlRange1.Cells[44, 2].Text != "")
             {
-                myNTO = new NTO(xlRange1.Cells[12, 2].Text,
-                    xlRange1.Cells[12, 3].Value2,
-                    xlRange1.Cells[12, 7].Value2,
-                    xlRange1.Cells[12, 5].Value2,
-                    xlRange1.Cells[12, 6].Value2,
-                    xlRange1.Cells[12, 4].Value2);
+                myNTO = new NTO(xlRange1.Cells[44, 2].Text,
+                    xlRange1.Cells[45, 2].Value2,
+                    xlRange1.Cells[49, 2].Value2,
+                    xlRange1.Cells[47, 2].Value2,
+                    xlRange1.Cells[48, 2].Value2,
+                    xlRange1.Cells[46, 2].Value2);
             }
-            // line 14
+            /*// line 14
             _jawTracking = false;
             if (xlRange1.Cells[14, 2].Text == "true")
                 _jawTracking = true;
-
+            */
             // line 16
             int k = 0;
             for (k = 17; k < 29; k++)
