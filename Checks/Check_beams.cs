@@ -52,7 +52,7 @@ namespace PlanCheck
                 Item_Result energy = new Item_Result();
                 energy.Label = "Energie";
                 energy.ExpectedValue = "NA";
-                
+
 
 
                 if ((_rcp.energy == "") || (_rcp.energy == null)) // no energy specified in check-protocol
@@ -97,7 +97,7 @@ namespace PlanCheck
                 Item_Result toleranceTable = new Item_Result();
                 toleranceTable.Label = "Table de tolérance";
                 toleranceTable.ExpectedValue = "NA";
-                
+
 
                 bool toleranceOK = true;
                 List<string> listOfTolTable = new List<string>();
@@ -179,7 +179,7 @@ namespace PlanCheck
             {
                 bool giveup = false;
                 Item_Result fieldTooSmall = new Item_Result();
-               
+
 
                 List<String> fieldTooSmallList = new List<String>();
                 fieldTooSmall.Label = "Champs trop petits";
@@ -321,45 +321,60 @@ namespace PlanCheck
             #endregion
 
             #region NOVA SBRT 
-            if ((_pinfo.isNOVA) && (_pinfo.isModulated))
+            if (_pinfo.isNOVA)
             {
-
                 Item_Result novaSBRT = new Item_Result();
                 novaSBRT.Label = "NOVA SBRT ou NOVA";
                 novaSBRT.MeasuredValue = _pinfo.machine;
-                novaSBRT.Infobulle = "Pour les Nova, la machine NOVA SBRT doit être utilisée pour les champs < 7x7 cm2";
-                Beam b = _ctx.PlanSetup.Beams.FirstOrDefault(x => x.IsSetupField == false);
-                ControlPoint cp = b.ControlPoints.First();
-                double meanJawsXY = 0.5 * (Math.Abs(cp.JawPositions.X1) + Math.Abs(cp.JawPositions.X2)) + (Math.Abs(cp.JawPositions.Y1) + Math.Abs(cp.JawPositions.Y2));
-                double limit = 70.0;
-
-                if (_pinfo.machine == "NOVA SBRT")
+                if (_pinfo.treatmentType == "VMAT")
                 {
-                    novaSBRT.MeasuredValue = "NOVA SBRT (jaws moy. = " + meanJawsXY + ")";
-                    if (meanJawsXY < limit)
+
+                    
+                    novaSBRT.Infobulle = "Pour les Nova en VMAT, la machine NOVA SBRT doit être utilisée pour les champs < 7x7 cm2";
+                    Beam b = _ctx.PlanSetup.Beams.FirstOrDefault(x => x.IsSetupField == false);
+                    ControlPoint cp = b.ControlPoints.First();
+                    double meanJawsXY = 0.5 * (Math.Abs(cp.JawPositions.X1) + Math.Abs(cp.JawPositions.X2)) + (Math.Abs(cp.JawPositions.Y1) + Math.Abs(cp.JawPositions.Y2));
+                    double limit = 70.0;
+
+                    if (_pinfo.machine == "NOVA SBRT")
                     {
-                        novaSBRT.setToTRUE();
+                        novaSBRT.MeasuredValue = "NOVA SBRT (jaws moy. = " + meanJawsXY + ")";
+                        if (meanJawsXY < limit)
+                        {
+                            novaSBRT.setToTRUE();
+                        }
+                        else
+                        {
+                            novaSBRT.setToFALSE();
+                        }
+
                     }
                     else
                     {
-                        novaSBRT.setToFALSE();
-                    }
+                        novaSBRT.MeasuredValue = "NOVA (jaws moy. = " + meanJawsXY + ")";
+                        if (meanJawsXY < limit)
+                        {
+                            novaSBRT.setToFALSE();
+                        }
+                        else
+                        {
+                            novaSBRT.setToTRUE();
+                        }
 
+                    }                    
                 }
                 else
                 {
-                    novaSBRT.MeasuredValue = "NOVA (jaws moy. = " + meanJawsXY + ")";
-                    if (meanJawsXY < limit)
+                    novaSBRT.Infobulle = "Nova non VMAT : machine NOVA SBRT interdite";
+                    if (_pinfo.machine == "NOVA SBRT")
                     {
                         novaSBRT.setToFALSE();
                     }
                     else
                     {
-                        novaSBRT.setToTRUE();
+                        novaSBRT.setToFALSE();
                     }
-
                 }
-
                 this._result.Add(novaSBRT);
             }
 
