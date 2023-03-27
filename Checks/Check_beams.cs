@@ -372,7 +372,7 @@ namespace PlanCheck
                     }
                     else
                     {
-                        novaSBRT.setToFALSE();
+                        novaSBRT.setToTRUE();
                     }
                 }
                 this._result.Add(novaSBRT);
