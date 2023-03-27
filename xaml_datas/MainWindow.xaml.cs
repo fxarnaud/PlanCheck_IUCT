@@ -101,7 +101,6 @@ namespace PlanCheck
 
                 fileName = @"\check_protocol\paroi ganglions.xlsx";
             }
-
             if (planName.Contains("LOGE") || planName.Contains("PROST"))
                 fileName = @"\check_protocol\prostate.xlsx";
 
@@ -128,7 +127,7 @@ namespace PlanCheck
                 {
                     //fileName = @"\check_protocol\STEC poumon" + nFractions + "F.xlsx";
                     if (_pinfo.treatmentType == "VMAT")
-                        fileName = @"\check_protocol\STEC poumon VMAT.xlsx";
+                        fileName = @"\check_protocol\STEC poumon RA.xlsx";
                     else
                         fileName = @"\check_protocol\STEC poumon DCA.xlsx";
                 }
