@@ -309,7 +309,7 @@ namespace PlanCheck
                     Item_Result jawTrack = new Item_Result();
                     jawTrack.Label = "Jaw Track";
                     //OptimizationJawTrackingUsedParameter ojtup = _ctx.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationJawTrackingUsedParameter") as OptimizationJawTrackingUsedParameter;
-                    jawTrack.Infobulle = "Selon le protocole " + _rcp.protocolName + " le jaw tracking doit être " + _rcp.JawTracking;
+                   // jawTrack.Infobulle = "Selon le protocole " + _rcp.protocolName + " le jaw tracking doit être " + _rcp.JawTracking;
 
                     bool isJawTrackingOn = _pcontext.PlanSetup.OptimizationSetup.Parameters.Any(x => x is OptimizationJawTrackingUsedParameter);
                     jawTrack.MeasuredValue = isJawTrackingOn.ToString();
@@ -334,6 +334,10 @@ namespace PlanCheck
                         {
                             jawTrack.setToFALSE();
                             jawTrack.Infobulle += "\nJawTrack activé mais jaws < 3.1";
+                        }
+                        else 
+                        {
+                            jawTrack.Infobulle += "\nJawTrack activé ";
                         }
                     }
                     this._result.Add(jawTrack);
