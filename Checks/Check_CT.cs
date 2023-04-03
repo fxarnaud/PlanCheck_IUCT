@@ -54,13 +54,13 @@ namespace PlanCheck
 
                     if (comment.Contains("%")) // for AVE3phase : only these 3 phases. 
                     {
-                       
+
                         isok = false;
                     }
                     else
                     {
-                        
-                        isok = true; 
+
+                        isok = true;
                     }
                 }
                 else if (expectedPhase == 6)
@@ -77,7 +77,7 @@ namespace PlanCheck
             else // wrong call. Average must contains at least 33 50 and 66% 
                 isok = false;
 
-           
+
             return isok;
         }
 
@@ -224,7 +224,7 @@ namespace PlanCheck
 
 
 
-            #region AVE3/AVE6 (option)
+            #region Composition of AVE3/AVE6 (option)
 
 
             if (_context.Image.Id.ToUpper().Contains("AVE") || _context.Image.Id.ToUpper().Contains("AVG"))
@@ -265,7 +265,7 @@ namespace PlanCheck
                 }
                 else
                 {
-                    
+
                     checkComposition = false;
 
                 }
@@ -280,6 +280,62 @@ namespace PlanCheck
 
 
             #endregion
+
+
+            #region AVE3 or AVE6 is only for lung SBRT  (option)
+
+
+
+
+            Item_Result averageForSBRT = new Item_Result();
+            averageForSBRT.Label = "Image Average";
+            averageForSBRT.ExpectedValue = "none";
+            averageForSBRT.Infobulle = "Les scanners AVERAGE doivent être utilisés pour les STEC poumons uniquement (avec enable Gating)";
+            averageForSBRT.MeasuredValue = _context.Image.Id;
+
+
+            if (_context.Image.Id.ToUpper().Contains("AVE") || _context.Image.Id.ToUpper().Contains("AVG"))
+            {
+                averageForSBRT.setToTRUE();
+
+                if (!_context.PlanSetup.UseGating)
+                {
+                    averageForSBRT.setToFALSE();
+                    
+                }
+
+
+                if (!_rcp.protocolName.ToUpper().Contains("STEC POUMON"))
+                {
+
+                    averageForSBRT.setToFALSE();
+                }
+
+
+
+            }
+            else
+            {
+                if (_rcp.protocolName.ToUpper().Contains("STEC poumon"))
+                {
+                    averageForSBRT.setToFALSE();
+
+                }
+                else
+                {
+                    averageForSBRT.setToTRUE();
+                }
+            }
+
+            this._result.Add(averageForSBRT);
+
+
+
+
+            #endregion
+
+
+
         }
 
         public string Title
