@@ -33,7 +33,53 @@ namespace PlanCheck
         private PreliminaryInformation _pinfo;
         private ScriptContext _context;
         private read_check_protocol _rcp;
+
         private string _title = "CT";
+
+        private bool checAVEcomposition(String comment, int expectedPhase)
+        {
+            // if exepected phase is 3, comment must contains these values and only these values : 33% 50% 66%
+            // if exepected phase is 6, comment must contains these values  : 0% 16% 33% 50% 66% 83%
+            bool isok = false;
+            // Comment is : Ave - IP(3) 33 % _50 % _66 %
+
+            if (comment.Contains("33%") && comment.Contains("50%") && comment.Contains("66%"))
+            {
+
+                comment = comment.Replace("33%", "x");
+                comment = comment.Replace("50%", "x");
+                comment = comment.Replace("66%", "x");
+                if (expectedPhase == 3)
+                {
+
+                    if (comment.Contains("%")) // for AVE3phase : only these 3 phases. 
+                    {
+                       
+                        isok = false;
+                    }
+                    else
+                    {
+                        
+                        isok = true; 
+                    }
+                }
+                else if (expectedPhase == 6)
+                {
+
+                    if (comment.Contains("0%") && comment.Contains("16%") && comment.Contains("83%"))
+                        isok = true;
+                    else
+                        isok = false;
+                }
+                else // wrong call, expected phase must be 3 or 6 
+                    isok = false;
+            }
+            else // wrong call. Average must contains at least 33 50 and 66% 
+                isok = false;
+
+           
+            return isok;
+        }
 
         public void Check()
         {
@@ -176,6 +222,64 @@ namespace PlanCheck
 
             #endregion
 
+
+
+            #region AVE3/AVE6 (option)
+
+
+            if (_context.Image.Id.ToUpper().Contains("AVE") || _context.Image.Id.ToUpper().Contains("AVG"))
+            {
+
+                Item_Result averageCT = new Item_Result();
+                averageCT.Label = "Composition de AVE3 ou AVE6";
+                averageCT.ExpectedValue = "none";
+                averageCT.Infobulle = "Si le nom de l'image contient AVG ou AVE, l'image 3D doit être composé des phases correctes.";
+                averageCT.Infobulle += "\n Une image AVG3 doit être composée des phases 33% 50% et 66%";
+                averageCT.Infobulle += "\n Une image AVG6 doit être composée des phases 0% 16% 33% 50% 66% et 83%";
+                averageCT.Infobulle += "\n\nLa composition est vérifiée dans la description de la serie";
+                averageCT.MeasuredValue = _context.Image.Series.Comment;
+                bool checkComposition = false;
+
+                if (_context.Image.Series.Comment.ToUpper().Contains("AVE"))
+                {
+
+                    if (_context.Image.Id.ToUpper().Contains("AVG3") || _context.Image.Id.ToUpper().Contains("AVE3"))
+                    {
+
+                        checkComposition = checAVEcomposition(_context.Image.Series.Comment, 3);
+                    }
+                    else if (_context.Image.Id.ToUpper().Contains("AVG6") || _context.Image.Id.ToUpper().Contains("AVE6"))
+                    {
+
+                        checkComposition = checAVEcomposition(_context.Image.Series.Comment, 6);
+                    }
+                    else
+                    {
+
+                        checkComposition = false;
+
+                    }
+
+
+
+                }
+                else
+                {
+                    
+                    checkComposition = false;
+
+                }
+                if (checkComposition == false)
+                    averageCT.setToFALSE();
+                else
+                    averageCT.setToTRUE();
+
+                this._result.Add(averageCT);
+
+            }
+
+
+            #endregion
         }
 
         public string Title

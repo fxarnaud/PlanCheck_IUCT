@@ -36,7 +36,7 @@ namespace PlanCheck
         private String _energy;
         private String _tolTable;
         private NTO myNTO;
-        private bool _jawTracking;
+        //private bool _jawTracking;
         //private List<Tuple<string, double>> _couchStructures = new List<Tuple<string, double>>();
         // private List<Tuple<string, double, double, double>> _clinicalStructures = new List<Tuple<string, double, double, double>>();
         // private List<Tuple<string, double>> _optStructures = new List<Tuple<string, double>>();
@@ -452,10 +452,10 @@ namespace PlanCheck
         {
             get { return myNTO; }
         }
-        public bool JawTracking
+        /*public bool JawTracking
         {
             get { return _jawTracking; }
-        }
+        }*/
         #endregion
 
 
