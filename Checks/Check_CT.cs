@@ -316,14 +316,16 @@ namespace PlanCheck
             }
             else
             {
+                averageForSBRT.setToTRUE();
                 if (_rcp.protocolName.ToUpper().Contains("STEC poumon"))
                 {
                     averageForSBRT.setToFALSE();
 
                 }
-                else
+                if (_context.PlanSetup.UseGating)
                 {
-                    averageForSBRT.setToTRUE();
+                    averageForSBRT.setToFALSE();
+
                 }
             }
 
