@@ -14,7 +14,7 @@ using System.Runtime.Remoting.Contexts;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Windows.Navigation;
-using Excel = Microsoft.Office.Interop.Excel;
+using Excel = Microsoft.Office.Interop.Excel;// Interop.Excel;
 using System.Text.RegularExpressions;
 
 

@@ -472,7 +472,7 @@ d3.ToString("0.##");   //24
             Check_contours c_Contours = new Check_contours(_pinfo, _pcontext, rcp);
             var check_point_contours = new CheckScreen_Global(c_Contours.Title, c_Contours.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite
             this.AddCheck(check_point_contours);
-
+            
 
             Check_Isocenter c_Isocenter = new Check_Isocenter(_pinfo, _pcontext);
             var check_point_iso = new CheckScreen_Global(c_Isocenter.Title, c_Isocenter.Result); // faire le Add check item direct pour mettre les bonnes couleurs de suite

@@ -425,7 +425,7 @@ namespace PlanCheck
 
             this._result.Add(optStructuresItem);
             #endregion
-
+            
             #region  Anormal Volume values (cc)
             // entre -3sigma et +3sigma >99.9% des cas
             List<string> anormalVolumeList = new List<string>();
@@ -771,7 +771,7 @@ namespace PlanCheck
 
             this._result.Add(aPTVforEveryone);
             #endregion
-
+            
         }
         public string Title
         {

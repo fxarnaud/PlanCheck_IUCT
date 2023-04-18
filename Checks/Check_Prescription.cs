@@ -79,6 +79,7 @@ namespace PlanCheck
             int nFraction = (int)_ctx.PlanSetup.NumberOfFractions;
             foreach (var target in _ctx.PlanSetup.RTPrescription.Targets) //boucle sur les différents niveaux de dose de la prescription
             {
+                
                 // MessageBox.Show("one : " + target.Name);
                 nPrescribedNFractions = target.NumberOfFractions;
                 if (target.DosePerFraction.Dose > nPrescribedDosePerFraction)  // get the highest dose per fraction level
