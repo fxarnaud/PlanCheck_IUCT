@@ -24,7 +24,7 @@ namespace PlanCheck
             else
             {
                 // > or < only for numbers. not for strings
-                if ((float.TryParse(expectedV, out float expectedV_number) is true) && (float.TryParse(measuredV, out float measuredV_number)) is true)
+                if ((double.TryParse(expectedV, out double expectedV_number) is true) && (double.TryParse(measuredV, out double measuredV_number)) is true)
                 {
                     if (comparator == ">")
                     {

@@ -7,7 +7,7 @@
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PlanCheck</RootNamespace>
-    <AssemblyName>PlanCheck_Beta_v1317.esapi</AssemblyName>
+    <AssemblyName>PlanCheck_Beta_v1347.esapi</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -169,6 +169,7 @@
     <Compile Include="Excel_reader\expectedStructure.cs" />
     <Compile Include="Excel_reader\read_check_protocole.cs" />
     <Compile Include="Excel_reader\NTO.cs" />
+    <Compile Include="pdfReader\tomoReportData.cs" />
     <Compile Include="pdfReader\TomotherapyPdfReportReader.cs" />
     <Compile Include="Users\IUCT_Users.cs" />
     <Compile Include="Users\IUCT_User.cs" />

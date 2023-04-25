@@ -69,7 +69,7 @@ namespace PlanCheck
                 if ((myMLCType == "VMAT") || (myMLCType == "IMRT") || (myMLCType == "DoseDynamic"))
                 {
                     um.setToTRUE();
-                    if (n_um_per_gray > 3.5)
+                    if (n_um_per_gray > 4.5)
                         um.setToWARNING();
 
                     if (n_um_per_gray > 5)
@@ -85,7 +85,7 @@ namespace PlanCheck
                         um.setToTRUE();
 
                 }
-                um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT. En VMAT/IMRT warning si > 3.5 et ERREUR si > 5.";
+                um.Infobulle = "Le nombre d'UM par cGy doit être < 1.5 en RT. En VMAT/IMRT warning si > 4.5 et ERREUR si > 5.";
                 this._result.Add(um);
             }
 

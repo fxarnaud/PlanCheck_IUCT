@@ -30,8 +30,10 @@ namespace VMS.TPS
         [MethodImpl(MethodImplOptions.NoInlining)]
         public void Execute(ScriptContext context)
         {
+           
 
             #region check if a plan with dose is loaded, no verification plan allowed
+
 
             if (context == null)
             {
@@ -63,6 +65,11 @@ namespace VMS.TPS
             string theDirectory = Path.GetDirectoryName(fullPath);//get the folder that's in                                                                  
             Directory.SetCurrentDirectory(theDirectory);// set current directory as the .dll directory
 
+           /* string pdfpath = Directory.GetCurrentDirectory() + @"\..\pdfReader\test.pdf";// @"\users\Users-IUCT.xlsx";
+            TomotherapyPdfReportReader tpr = new TomotherapyPdfReportReader(pdfpath);
+            tpr.displayInfo();
+            return;
+            */
             Perform(context);
         }
 

@@ -46,7 +46,7 @@ namespace PlanCheck
             {
                 targetNumber++;
                 double tot = target.NumberOfFractions * target.DosePerFraction.Dose;
-                prescriptionVolumes.Infobulle += target.TargetId + " : " + target.NumberOfFractions + " x " + target.DosePerFraction.Dose + " Gy " + "(" + tot.ToString("N2") + " Gy)\n";
+                prescriptionVolumes.Infobulle += target.TargetId + " : " + target.NumberOfFractions + " x " + target.DosePerFraction.Dose.ToString("N2") + " Gy " + "(" + tot.ToString("N2") + " Gy)\n";
                 prescriptionVolumes.MeasuredValue += target.TargetId + " (" + tot.ToString("N2") + " Gy)  ";
             }
 
@@ -94,7 +94,7 @@ namespace PlanCheck
             }
 
             fractionation.Label = "Fractionnement de la cible principale (" + PrescriptionName + ")";
-            fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction + " Gy";
+            fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("N2") + " Gy";
             fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.Dose.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
 
 
@@ -108,7 +108,7 @@ namespace PlanCheck
 
 
             fractionation.Infobulle = "Le 'nombre de fractions' et la 'dose par fraction' du plan doivent\nêtre conformes à la prescription " + _ctx.PlanSetup.RTPrescription.Id +
-                " : " + nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
+                " : " + nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction.ToString("N2") + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
             fractionation.Infobulle += "\nNe fonctionne pas pour la TOMO : l'item est mis en INFO";
 
             this._result.Add(fractionation);

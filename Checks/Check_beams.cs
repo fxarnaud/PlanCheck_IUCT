@@ -254,7 +254,7 @@ namespace PlanCheck
             }
             #endregion
 
-            #region FIELD SIZE HALCYON
+            #region MLC SIZE HALCYON
             if (_pinfo.isHALCYON) // if  HALCYON XxY must be < 20x20
             {
                 Item_Result maxPositionMLCHalcyon = new Item_Result();
@@ -263,7 +263,7 @@ namespace PlanCheck
                 maxPositionMLCHalcyon.Infobulle = "Les lames du MLC pour l'Halcyon doivent être < 100 mm (tolérance 5 mm)";
 
                 // List<String> mlcTooLarge = new List<String>();
-                float thisleafnotok = 0;
+                double thisleafnotok = 0;
                 bool allLeavesOK = true;
 
 
@@ -275,7 +275,7 @@ namespace PlanCheck
                     {
                         foreach (ControlPoint cp in b.ControlPoints)
                         {
-                            foreach (float f in cp.LeafPositions)
+                            foreach (double f in cp.LeafPositions)
                             {
                                 if ((f > 105) || (f < -105))
                                 {
@@ -306,7 +306,7 @@ namespace PlanCheck
                 if (!allLeavesOK)
                 {
                     //MessageBox.Show("i = " + i.ToString());
-                    maxPositionMLCHalcyon.setToFALSE();
+                    maxPositionMLCHalcyon.setToWARNING();
                     maxPositionMLCHalcyon.MeasuredValue = "Au moins une lame MLC > 100 mm (" + thisleafnotok + ")";
                 }
                 else
