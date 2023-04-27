@@ -57,8 +57,7 @@ namespace PlanCheck
         public double redLaserYoffset;
         public double redLaserZoffset;
         public double beamOnTime;
-        public String deliveryMode;
-       
+        public String deliveryMode;       
         public String algorithm;
         public String resolutionCalculation;
         public double refDose;
@@ -69,16 +68,17 @@ namespace PlanCheck
         public String patientName;
         public String patientFirstName;
         public String patientID;
-        public String patientDateOfBirth;
-        public String patientSex;
+        //public String patientDateOfBirth;
+        //public String patientSex;
         public String HUcurve;
         public String approverID;
-        public bool isHeadFirst;
-        public bool isSupine;
+        //public bool isHeadFirst;
+        //public bool isSupine;
+        public String patientPosition;
         public double originX;
         public double originY;
         public double originZ;
-        public int numberOfCTslices;
+        //public int numberOfCTslices;
 
         
 

@@ -7,6 +7,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using VMS.TPS.Common.Model.API;
+using System.IO;
+using PlanCheck;
+using System.Windows.Input;
+using VMS.OIS.ARIALocal.WebServices.Document.Contracts;
+//using VMS.TPS.Common.Model.API;
+using Newtonsoft.Json;
 
 namespace PlanCheck
 {
@@ -34,8 +40,35 @@ namespace PlanCheck
         private bool _HYPERARC;
         private bool _isModulated;
         private string _machine;
+        private TomotherapyPdfReportReader _tprd;
+
+
+       /* public void UploadToAria()
+        {
+            //Saving to PDF folder for now
+            //***************************ICICICICICICICICICICI
+            //PdfDocument outputDocument = PdfReader.Open(@"\\srv015\SF_COM\ARNAUD_FX\varianAPI.pdf");
+            //PdfDocument outputDocument = TMLReader.ConvertTMLtoPDF(SelectedFiles.FirstOrDefault().FullPath, Plan);
+            //var outputDirectory = Directory + "\\PDFs\\test.pdf";
+            //outputDocument.Save(outputDirectory);
+
+
+            //Send to Aria
+            MemoryStream stream = new MemoryStream();
+           
+            //outputDocument.Save(stream, false);
+            //BinaryContent = stream.ToArray();
+            //CustomInsertDocumentsParameter.PostDocumentData(PatientId, AppUser,
+            //    BinaryContent, TemplateName, DocumentType, DocSettings);
+        }
+       */
+
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
+            DocSettings docSettings = DocSettings.ReadSettings();// settingsFilePath);
+
+
+
             _ctx = ctx;
 
             if (_ctx.Patient.Name != null)
@@ -105,7 +138,18 @@ namespace PlanCheck
                 }
             }
 
-           
+
+            if (_TOMO)
+            {
+                string pdfpath = Directory.GetCurrentDirectory() + @"\..\pdfReader\test.pdf";// @"\users\Users-IUCT.xlsx";
+                _tprd = new TomotherapyPdfReportReader(pdfpath);
+                _tprd.displayInfo();
+            }
+            else
+                _tprd = null;
+
+
+
             foreach (Beam bn in ctx.PlanSetup.Beams)
             {
 
@@ -308,7 +352,10 @@ namespace PlanCheck
         {
             get { return _machine; }
         }
-
+        public TomotherapyPdfReportReader tprd
+        {
+            get { return _tprd; }
+        }
         #endregion
 
     }

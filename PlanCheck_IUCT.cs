@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +24,7 @@ namespace VMS.TPS
 {
     public class Script
     {
-        // this is a test
+      
         public Script()
         {
         }
@@ -33,6 +34,7 @@ namespace VMS.TPS
            
 
             #region check if a plan with dose is loaded, no verification plan allowed
+            // a new vbv
 
 
             if (context == null)
@@ -65,11 +67,9 @@ namespace VMS.TPS
             string theDirectory = Path.GetDirectoryName(fullPath);//get the folder that's in                                                                  
             Directory.SetCurrentDirectory(theDirectory);// set current directory as the .dll directory
 
-           /* string pdfpath = Directory.GetCurrentDirectory() + @"\..\pdfReader\test.pdf";// @"\users\Users-IUCT.xlsx";
-            TomotherapyPdfReportReader tpr = new TomotherapyPdfReportReader(pdfpath);
-            tpr.displayInfo();
-            return;
-            */
+
+            //return;
+            
             Perform(context);
         }
 

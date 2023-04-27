@@ -265,8 +265,10 @@ namespace PlanCheck
                 // List<String> mlcTooLarge = new List<String>();
                 double thisleafnotok = 0;
                 bool allLeavesOK = true;
-
-
+                int cpNotOk = -1;
+                int totalNumberofCP=-1;
+                String beamNotOk = null;
+                int leafNumbernotOK = -1;
                 //int i = 0;
 
                 foreach (Beam b in _ctx.PlanSetup.Beams)
@@ -275,12 +277,19 @@ namespace PlanCheck
                     {
                         foreach (ControlPoint cp in b.ControlPoints)
                         {
-                            foreach (double f in cp.LeafPositions)
+                            int leafnumber = 0;
+                            foreach (float f in cp.LeafPositions)
                             {
+                                leafnumber++;
                                 if ((f > 105) || (f < -105))
                                 {
                                     allLeavesOK = false; // break loop on leaves
                                     thisleafnotok = f;
+                                   
+                                    cpNotOk = cp.Index;
+                                    totalNumberofCP = b.ControlPoints.Count;
+                                    beamNotOk = b.Id;
+                                    leafNumbernotOK = leafnumber;
                                     //MessageBox.Show("NOT GOOD " + f + " beam " + b.Id + " cp " + cp.Index.ToString());
                                     break;
                                 }
@@ -308,6 +317,7 @@ namespace PlanCheck
                     //MessageBox.Show("i = " + i.ToString());
                     maxPositionMLCHalcyon.setToWARNING();
                     maxPositionMLCHalcyon.MeasuredValue = "Au moins une lame MLC > 100 mm (" + thisleafnotok + ")";
+                    maxPositionMLCHalcyon.Infobulle += "\nBeam: " + beamNotOk + " cp: " + cpNotOk + "/" + totalNumberofCP + " leaf: " + leafNumbernotOK;
                 }
                 else
                 {
