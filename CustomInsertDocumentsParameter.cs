@@ -60,7 +60,7 @@ namespace PlanCheck
                 VMS.OIS.ARIAExternal.WebServices.Documents.Contracts.DocumentResponse documentResponse = JsonConvert.DeserializeObject<VMS.OIS.ARIAExternal.WebServices.Documents.Contracts.DocumentResponse>(response_document);
                 if (documentResponse != null)
                 {
-                    if (documentResponse.PtVisitId != null)
+                    if (documentResponse.PtVisitId != 0)// was null
                     {
                         return true;
                     }
