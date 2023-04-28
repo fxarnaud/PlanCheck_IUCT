@@ -103,30 +103,29 @@ namespace PlanCheck
             string hostName = docSet.HostName;
             string port = docSet.Port;
 
-            //-------------------------------------
-
-
-
+           
             
+            //------------------------------------- next section copied from 
+            //  
+
             string printdata = "";
             string patid = ctx.Patient.Id; //type in your patient Id to search here
 
 
             //replace these 'Document Types' with ones you want to check from your clinic:
             string doc1 = "Dosimétrie";
-            string doc2 = "Physician-Clinical Treatment Plan";
-            string doc3 = "Therapist -CT Simulation Note";
+            string doc2 = "Dosecheck";
+            string doc3 = "Fiche de positionnement";
             string doc4 = "Consent";
             string doc5 = "Treatment Plan";
             string doc6 = "Physics - Patient DQA";
             string doc7 = "Therapist-Verification Simulation";
             string doc8 = "Physics - Weekly Chart Check";
 
-
-
             string request = "{\"__type\":\"GetDocumentsRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"ID1\":\"" + patid + "\"}}";
-            string response = SendData(request, true, apiKeyDoc,docSet.HostName,docSet.Port);
 
+            string response = SendData(request, true, apiKeyDoc, docSet.HostName, docSet.Port);
+            //MessageBox.Show(response);
             var VisitNoteList = new List<string>();
             int visitnoteloc = response.IndexOf("PtVisitNoteId");
             while (visitnoteloc > 0)
@@ -135,6 +134,7 @@ namespace PlanCheck
                 visitnoteloc = response.IndexOf("PtVisitNoteId", visitnoteloc + 1);
             }
             var response_Doc = JsonConvert.DeserializeObject<DocumentsResponse>(response);
+           // MessageBox.Show("ddddd " + response_Doc.ToString());
 
             var DocTypeList = new List<string>();
             var DateServiceList = new List<DateTime>();
@@ -144,21 +144,28 @@ namespace PlanCheck
             foreach (var document in response_Doc.Documents)
             {
                 string thePtId = document.PtId;
-                MessageBox.Show(thePtId);
                 string thePtVisitId = document.PtVisitId.ToString();
                 string theVisitNoteId = VisitNoteList[loopnum];
                 loopnum++;
 
                 string request_docdetails = "{\"__type\":\"GetDocumentRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"PtId\":\"" + thePtId + "\"},\"PatientVisitId\":" + thePtVisitId + ",\"VisitNoteId\":" + theVisitNoteId + "}";
                 string response_docdetails = SendData(request_docdetails, true, apiKeyDoc, docSet.HostName, docSet.Port);
-
+                //MessageBox.Show(response_docdetails);
                 int typeloc = response_docdetails.IndexOf("DocumentType");
                 int enteredloc = response_docdetails.IndexOf("EnteredBy");
-                if (typeloc > 0) { DocTypeList.Add(response_docdetails.Substring(typeloc + 15, enteredloc - typeloc - 18)); }
+                if (typeloc > 0)
+                {
+                    String s = response_docdetails.Substring(typeloc + 15, enteredloc - typeloc - 18);
+                    DocTypeList.Add(s);
+                   // MessageBox.Show("TYPE IS : " + s);
+                }
 
                 int nameloc = response_docdetails.IndexOf("PatientLastName");
                 int dobloc = response_docdetails.IndexOf("PreviewText");
-                if (nameloc > 0) { PatNameList.Add(response_docdetails.Substring(nameloc + 18, dobloc - nameloc - 21)); }
+                if (nameloc > 0)
+                {
+                    PatNameList.Add(response_docdetails.Substring(nameloc + 18, dobloc - nameloc - 21));
+                }
 
                 int dateservloc = response_docdetails.IndexOf("DateOfService");
                 int datesignloc = response_docdetails.IndexOf("DateSigned");
@@ -170,9 +177,9 @@ namespace PlanCheck
                 }
             }
 
-            var SimPhysicianOrderList = new List<DateTime>();
-            var ClinicalTreatPlanList = new List<DateTime>();
-            var CTSimNoteList = new List<DateTime>();
+            var dosimetrie = new List<DateTime>();
+            var dosecheck = new List<DateTime>();
+            var ficheDePosition = new List<DateTime>();
             var ConsentList = new List<DateTime>();
             var TreatmentPlanList = new List<DateTime>();
             var PhysicsDQAList = new List<DateTime>();
@@ -181,9 +188,9 @@ namespace PlanCheck
 
             for (int i = 0; i < DocTypeList.Count; i++)
             {
-                if (DocTypeList[i] == doc1) { SimPhysicianOrderList.Add(DateServiceList[i]); }
-                if (DocTypeList[i] == doc2) { ClinicalTreatPlanList.Add(DateServiceList[i]); }
-                if (DocTypeList[i] == doc3) { CTSimNoteList.Add(DateServiceList[i]); }
+                if (DocTypeList[i] == doc1) { dosimetrie.Add(DateServiceList[i]); }
+                if (DocTypeList[i] == doc2) { dosecheck.Add(DateServiceList[i]); }
+                if (DocTypeList[i] == doc3) { ficheDePosition.Add(DateServiceList[i]); }
                 if (DocTypeList[i] == doc4) { ConsentList.Add(DateServiceList[i]); }
                 if (DocTypeList[i] == doc5) { TreatmentPlanList.Add(DateServiceList[i]); }
                 if (DocTypeList[i] == doc6) { PhysicsDQAList.Add(DateServiceList[i]); }
@@ -191,9 +198,9 @@ namespace PlanCheck
                 if (DocTypeList[i] == doc8) { PhysicsWeeklyList.Add(DateServiceList[i]); }
             }
             printdata += "Patient: " + PatNameList[0] + " - " + patid + "\n";
-            printdata += "(" + SimPhysicianOrderList.Count + ") " + doc1 + ":            " + SimPhysicianOrderList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "(" + ClinicalTreatPlanList.Count + ") " + doc2 + ":  " + ClinicalTreatPlanList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "(" + CTSimNoteList.Count + ") " + doc3 + ":       " + CTSimNoteList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
+            printdata += "(" + dosimetrie.Count + ") " + doc1 + ":            " + dosimetrie.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
+            printdata += "(" + dosecheck.Count + ") " + doc2 + ":  " + dosecheck.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
+            printdata += "(" + ficheDePosition.Count + ") " + doc3 + ":       " + ficheDePosition.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
             printdata += "(" + ConsentList.Count + ") " + doc4 + ":                                            " + ConsentList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
             printdata += "(" + TreatmentPlanList.Count + ") " + doc5 + ":                                 " + TreatmentPlanList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
             printdata += "(" + PhysicsDQAList.Count + ") " + doc6 + ":                      " + PhysicsDQAList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
@@ -206,8 +213,6 @@ namespace PlanCheck
 
 
 
-            //----------------------------------
-
             #endregion
 
         }
@@ -216,7 +221,7 @@ namespace PlanCheck
         {
 
             getAriaDocuments(ctx);
-            
+
             _ctx = ctx;
 
             if (_ctx.Patient.Name != null)

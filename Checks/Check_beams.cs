@@ -315,7 +315,7 @@ namespace PlanCheck
                 if (!allLeavesOK)
                 {
                     //MessageBox.Show("i = " + i.ToString());
-                    maxPositionMLCHalcyon.setToWARNING();
+                    maxPositionMLCHalcyon.setToINFO();
                     maxPositionMLCHalcyon.MeasuredValue = "Au moins une lame MLC > 100 mm (" + thisleafnotok + ")";
                     maxPositionMLCHalcyon.Infobulle += "\nBeam: " + beamNotOk + " cp: " + cpNotOk + "/" + totalNumberofCP + " leaf: " + leafNumbernotOK;
                 }
