@@ -18,6 +18,8 @@ using System.Drawing;
 using System.Net.Http;
 using VMS.OIS.ARIAExternal.WebServices.Documents.Contracts;
 
+
+
 namespace PlanCheck
 {
     public class PreliminaryInformation
@@ -47,85 +49,27 @@ namespace PlanCheck
         private TomotherapyPdfReportReader _tprd;
 
 
-        /* public void UploadToAria()
-         {
-             //Saving to PDF folder for now
-             //***************************ICICICICICICICICICICI
-             //PdfDocument outputDocument = PdfReader.Open(@"\\srv015\SF_COM\ARNAUD_FX\varianAPI.pdf");
-             //PdfDocument outputDocument = TMLReader.ConvertTMLtoPDF(SelectedFiles.FirstOrDefault().FullPath, Plan);
-             //var outputDirectory = Directory + "\\PDFs\\test.pdf";
-             //outputDocument.Save(outputDirectory);
 
 
-             //Send to Aria
-             MemoryStream stream = new MemoryStream();
-
-             //outputDocument.Save(stream, false);
-             //BinaryContent = stream.ToArray();
-             //CustomInsertDocumentsParameter.PostDocumentData(PatientId, AppUser,
-             //    BinaryContent, TemplateName, DocumentType, DocSettings);
-         }
-        */
-        public static string SendData(string request, bool bIsJson, string apiKey, string hostName, string port)
-        {
-            var sMediaTYpe = bIsJson ? "application/json" :
-            "application/xml";
-            var sResponse = System.String.Empty;
-            using (var c = new HttpClient(new
-            HttpClientHandler()
-            { UseDefaultCredentials = true, PreAuthenticate = true }))
-            {
-                if (c.DefaultRequestHeaders.Contains("ApiKey"))
-                {
-                    c.DefaultRequestHeaders.Remove("ApiKey");
-                }
-                c.DefaultRequestHeaders.Add("ApiKey", apiKey);
-                var gatewayURL = $"https://{hostName}:{port}/Gateway/service.svc/interop/rest/Process";
-                var task =
-                c.PostAsync(gatewayURL,
-                new StringContent(request, Encoding.UTF8,
-                sMediaTYpe));
-                Task.WaitAll(task);
-                var responseTask =
-                task.Result.Content.ReadAsStringAsync();
-                Task.WaitAll(responseTask);
-                sResponse = responseTask.Result;
-            }
-            return sResponse;
-        }
 
         public void getAriaDocuments(ScriptContext ctx)
         {
-            #region GET ARIA DOCUMENTS
-            DocSettings docSet = DocSettings.ReadSettings();// settingsFilePath);
+
+            DocSettings docSet = DocSettings.ReadSettings();
             ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
             string apiKeyDoc = docSet.DocKey;
             string hostName = docSet.HostName;
             string port = docSet.Port;
 
-           
-            
-            //------------------------------------- next section copied from 
-            //  
 
-            string printdata = "";
-            string patid = ctx.Patient.Id; //type in your patient Id to search here
-
-
-            //replace these 'Document Types' with ones you want to check from your clinic:
             string doc1 = "Dosimétrie";
             string doc2 = "Dosecheck";
             string doc3 = "Fiche de positionnement";
-            string doc4 = "Consent";
-            string doc5 = "Treatment Plan";
-            string doc6 = "Physics - Patient DQA";
-            string doc7 = "Therapist-Verification Simulation";
-            string doc8 = "Physics - Weekly Chart Check";
 
-            string request = "{\"__type\":\"GetDocumentsRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"ID1\":\"" + patid + "\"}}";
 
-            string response = SendData(request, true, apiKeyDoc, docSet.HostName, docSet.Port);
-            //MessageBox.Show(response);
+            string request = "{\"__type\":\"GetDocumentsRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"ID1\":\"" + ctx.Patient.Id + "\"}}";
+            string response = CustomInsertDocumentsParameter.SendData(request, true, apiKeyDoc, docSet.HostName, docSet.Port);
+
             var VisitNoteList = new List<string>();
             int visitnoteloc = response.IndexOf("PtVisitNoteId");
             while (visitnoteloc > 0)
@@ -133,31 +77,41 @@ namespace PlanCheck
                 VisitNoteList.Add(response.Substring(visitnoteloc + 15, 2).Replace(",", ""));
                 visitnoteloc = response.IndexOf("PtVisitNoteId", visitnoteloc + 1);
             }
-            var response_Doc = JsonConvert.DeserializeObject<DocumentsResponse>(response);
-           // MessageBox.Show("ddddd " + response_Doc.ToString());
+
+            var response_Doc = JsonConvert.DeserializeObject<DocumentsResponse>(response); // get the list of documents
 
             var DocTypeList = new List<string>();
             var DateServiceList = new List<DateTime>();
             var PatNameList = new List<string>();
-
             int loopnum = 0;
-            foreach (var document in response_Doc.Documents)
+
+            foreach (var document in response_Doc.Documents) // parse documents
             {
+                loopnum++;
                 string thePtId = document.PtId;
                 string thePtVisitId = document.PtVisitId.ToString();
                 string theVisitNoteId = VisitNoteList[loopnum];
-                loopnum++;
+
 
                 string request_docdetails = "{\"__type\":\"GetDocumentRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"PtId\":\"" + thePtId + "\"},\"PatientVisitId\":" + thePtVisitId + ",\"VisitNoteId\":" + theVisitNoteId + "}";
-                string response_docdetails = SendData(request_docdetails, true, apiKeyDoc, docSet.HostName, docSet.Port);
-                //MessageBox.Show(response_docdetails);
+                string response_docdetails = CustomInsertDocumentsParameter.SendData(request_docdetails, true, apiKeyDoc, docSet.HostName, docSet.Port);
                 int typeloc = response_docdetails.IndexOf("DocumentType");
                 int enteredloc = response_docdetails.IndexOf("EnteredBy");
+
                 if (typeloc > 0)
                 {
                     String s = response_docdetails.Substring(typeloc + 15, enteredloc - typeloc - 18);
                     DocTypeList.Add(s);
-                   // MessageBox.Show("TYPE IS : " + s);
+                    string saveFilePath = "";
+                    if (s == doc1)
+                    {
+                        saveFilePath = Directory.GetCurrentDirectory() + @"\out\__" + loopnum + "__.pdf";
+                        int startBinary = response_docdetails.IndexOf("\"BinaryContent\"") + 17;
+                        int endBinary = response_docdetails.IndexOf("\"Certifier\"") - 2;
+                        string binaryContent2 = response_docdetails.Substring(startBinary, endBinary - startBinary);
+                        binaryContent2 = binaryContent2.Replace("\\", "");  // the \  makes the string a non valid base64 string
+                        File.WriteAllBytes(saveFilePath, Convert.FromBase64String(binaryContent2));
+                    }
                 }
 
                 int nameloc = response_docdetails.IndexOf("PatientLastName");
@@ -177,45 +131,37 @@ namespace PlanCheck
                 }
             }
 
+
+            #region print the list of docs with date
+
+            string printdata = "";
             var dosimetrie = new List<DateTime>();
             var dosecheck = new List<DateTime>();
             var ficheDePosition = new List<DateTime>();
-            var ConsentList = new List<DateTime>();
-            var TreatmentPlanList = new List<DateTime>();
-            var PhysicsDQAList = new List<DateTime>();
-            var TherapistVSim = new List<DateTime>();
-            var PhysicsWeeklyList = new List<DateTime>();
+
 
             for (int i = 0; i < DocTypeList.Count; i++)
             {
                 if (DocTypeList[i] == doc1) { dosimetrie.Add(DateServiceList[i]); }
                 if (DocTypeList[i] == doc2) { dosecheck.Add(DateServiceList[i]); }
                 if (DocTypeList[i] == doc3) { ficheDePosition.Add(DateServiceList[i]); }
-                if (DocTypeList[i] == doc4) { ConsentList.Add(DateServiceList[i]); }
-                if (DocTypeList[i] == doc5) { TreatmentPlanList.Add(DateServiceList[i]); }
-                if (DocTypeList[i] == doc6) { PhysicsDQAList.Add(DateServiceList[i]); }
-                if (DocTypeList[i] == doc7) { TherapistVSim.Add(DateServiceList[i]); }
-                if (DocTypeList[i] == doc8) { PhysicsWeeklyList.Add(DateServiceList[i]); }
+
             }
-            printdata += "Patient: " + PatNameList[0] + " - " + patid + "\n";
+            printdata += "Patient: " + PatNameList[0] + " - " + ctx.Patient.Id + "\n";
             printdata += "(" + dosimetrie.Count + ") " + doc1 + ":            " + dosimetrie.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
             printdata += "(" + dosecheck.Count + ") " + doc2 + ":  " + dosecheck.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
             printdata += "(" + ficheDePosition.Count + ") " + doc3 + ":       " + ficheDePosition.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "(" + ConsentList.Count + ") " + doc4 + ":                                            " + ConsentList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "(" + TreatmentPlanList.Count + ") " + doc5 + ":                                 " + TreatmentPlanList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "(" + PhysicsDQAList.Count + ") " + doc6 + ":                      " + PhysicsDQAList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "(" + TherapistVSim.Count + ") " + doc7 + ":  " + TherapistVSim.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "(" + PhysicsWeeklyList.Count + ") " + doc8 + ":         " + PhysicsWeeklyList.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "--------------------------------" + "\n";
 
             MessageBox.Show(printdata);
 
-
-
-
             #endregion
 
+
+
         }
+
+
+        // -------------------------------------------------------------------------------------------------------------------------------
 
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {

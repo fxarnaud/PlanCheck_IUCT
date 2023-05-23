@@ -202,7 +202,7 @@ namespace PlanCheck
             else
             {
                 prescriptionName.MeasuredValue += " (différent du nom du plan)";
-                prescriptionName.setToWARNING();
+                prescriptionName.setToINFO();
             }
             prescriptionName.Infobulle = "La prescription et le plan doivent avoir le même nom";
             prescriptionName.Infobulle += "\nIl est recommandé de mettre ce nom en commentaire du course\n";
