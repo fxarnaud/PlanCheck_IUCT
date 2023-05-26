@@ -48,28 +48,97 @@ namespace PlanCheck
         private string _machine;
         private TomotherapyPdfReportReader _tprd;
 
+        private List<DateTime> dosimetrie = new List<DateTime>();
+        private List<DateTime> dosecheck = new List<DateTime>();
+        private List<DateTime> ficheDePosition = new List<DateTime>();
+        private List<DateTime> autres = new List<DateTime>();
 
+        private string documentList;
+        private string tomoReportPath;
+        private bool tomoReportFound;
 
-
-
-        public void getAriaDocuments(ScriptContext ctx)
+        public bool isATomoReport(String s)
         {
+            bool itIs = false;
+            if (s.Contains("Accuray"))
+            {
+                itIs = true;
+                MessageBox.Show("It is a tomo report");
+            }
 
+
+            // Ce test doit forcément convertir en pdf pour voir si c'est une dosi TOMO 
+
+
+
+            //String sp = Directory.GetCurrentDirectory() + @"\out\__TOTO__" + "i" + "__.txt";
+            //StreamWriter sw = new StreamWriter(sp);
+            //sw.WriteLine(s);
+            //sw.Close();
+
+            itIs = true;
+
+            return itIs;
+        }
+        public bool isARecentDocument(DateTime t)
+        {
+            int recent = 20;   // number of days 
+            bool returnBool = false;
+            DateTime myToday = DateTime.Today;
+            int nDays = (myToday - t).Days;
+            if (nDays > recent)
+                returnBool = false;
+            else
+                returnBool = true;
+            return returnBool;
+
+        }
+        public bool connectToAriaDocuments(ScriptContext ctx)
+        {
+            bool DocumentAriaIsConnected = true;
             DocSettings docSet = DocSettings.ReadSettings();
             ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
             string apiKeyDoc = docSet.DocKey;
             string hostName = docSet.HostName;
             string port = docSet.Port;
+            tomoReportFound = false;
 
+           // string doc1 = "Dosimétrie";
+           // string doc2 = "Dosecheck";
+           // string doc3 = "Fiche de positionnement";
+
+            string response = "";
+            string request = "{\"__type\":\"GetDocumentsRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"ID1\":\"" + ctx.Patient.Id + "\"}}";
+            try
+            {
+                response = CustomInsertDocumentsParameter.SendData(request, true, apiKeyDoc, docSet.HostName, docSet.Port);
+
+            }
+            catch
+            {
+                MessageBox.Show("Connexion à Aria Documents impossible.\nLa connexion ne fonctionne pas sous Citrix");
+                DocumentAriaIsConnected = false;
+            }
+
+            if (DocumentAriaIsConnected)
+                getTheAriaDocuments(response, ctx);
+
+            return DocumentAriaIsConnected;
+        }
+        public void getTheAriaDocuments(String response, ScriptContext ctx)
+        {
+
+            #region get the list of docs with date
+            DocSettings docSet = DocSettings.ReadSettings();
+            ServicePointManager.ServerCertificateValidationCallback += (o, c, ch, er) => true;
+            string apiKeyDoc = docSet.DocKey;
+            string hostName = docSet.HostName;
+            string port = docSet.Port;
+            tomoReportFound = false;
 
             string doc1 = "Dosimétrie";
             string doc2 = "Dosecheck";
             string doc3 = "Fiche de positionnement";
-
-
-            string request = "{\"__type\":\"GetDocumentsRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"ID1\":\"" + ctx.Patient.Id + "\"}}";
-            string response = CustomInsertDocumentsParameter.SendData(request, true, apiKeyDoc, docSet.HostName, docSet.Port);
-
             var VisitNoteList = new List<string>();
             int visitnoteloc = response.IndexOf("PtVisitNoteId");
             while (visitnoteloc > 0)
@@ -77,43 +146,47 @@ namespace PlanCheck
                 VisitNoteList.Add(response.Substring(visitnoteloc + 15, 2).Replace(",", ""));
                 visitnoteloc = response.IndexOf("PtVisitNoteId", visitnoteloc + 1);
             }
-
             var response_Doc = JsonConvert.DeserializeObject<DocumentsResponse>(response); // get the list of documents
 
             var DocTypeList = new List<string>();
             var DateServiceList = new List<DateTime>();
             var PatNameList = new List<string>();
             int loopnum = 0;
-
+            System.DateTime mostRecentDate = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
+            int mostRecentTomoReportIndex = -1;
             foreach (var document in response_Doc.Documents) // parse documents
             {
-                loopnum++;
+
+
                 string thePtId = document.PtId;
                 string thePtVisitId = document.PtVisitId.ToString();
                 string theVisitNoteId = VisitNoteList[loopnum];
-
-
                 string request_docdetails = "{\"__type\":\"GetDocumentRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"PtId\":\"" + thePtId + "\"},\"PatientVisitId\":" + thePtVisitId + ",\"VisitNoteId\":" + theVisitNoteId + "}";
                 string response_docdetails = CustomInsertDocumentsParameter.SendData(request_docdetails, true, apiKeyDoc, docSet.HostName, docSet.Port);
                 int typeloc = response_docdetails.IndexOf("DocumentType");
                 int enteredloc = response_docdetails.IndexOf("EnteredBy");
-
+                String thisDocType = "";
                 if (typeloc > 0)
                 {
-                    String s = response_docdetails.Substring(typeloc + 15, enteredloc - typeloc - 18);
-                    DocTypeList.Add(s);
-                    string saveFilePath = "";
-                    if (s == doc1)
-                    {
-                        saveFilePath = Directory.GetCurrentDirectory() + @"\out\__" + loopnum + "__.pdf";
-                        int startBinary = response_docdetails.IndexOf("\"BinaryContent\"") + 17;
-                        int endBinary = response_docdetails.IndexOf("\"Certifier\"") - 2;
-                        string binaryContent2 = response_docdetails.Substring(startBinary, endBinary - startBinary);
-                        binaryContent2 = binaryContent2.Replace("\\", "");  // the \  makes the string a non valid base64 string
-                        File.WriteAllBytes(saveFilePath, Convert.FromBase64String(binaryContent2));
-                    }
-                }
+                    thisDocType = response_docdetails.Substring(typeloc + 15, enteredloc - typeloc - 18);
+                    DocTypeList.Add(thisDocType);
+                    #region old 
+                    /*
+                     string saveFilePath = "";
 
+                       if (thisDocType == doc1) // is a "Dosimétrie"
+                       {
+                           saveFilePath = Directory.GetCurrentDirectory() + @"\out\__" + loopnum + "__.pdf";
+                           int startBinary = response_docdetails.IndexOf("\"BinaryContent\"") + 17;
+                           int endBinary = response_docdetails.IndexOf("\"Certifier\"") - 2;
+                           string binaryContent2 = response_docdetails.Substring(startBinary, endBinary - startBinary);
+                           binaryContent2 = binaryContent2.Replace("\\", "");  // the \  makes the string a non valid base64 string
+                           File.WriteAllBytes(saveFilePath, Convert.FromBase64String(binaryContent2));
+                           tomoReportPath = saveFilePath;
+                       }
+                    */
+                    #endregion
+                }
                 int nameloc = response_docdetails.IndexOf("PatientLastName");
                 int dobloc = response_docdetails.IndexOf("PreviewText");
                 if (nameloc > 0)
@@ -128,32 +201,122 @@ namespace PlanCheck
                     System.DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
                     dtDateTime = dtDateTime.AddSeconds(Convert.ToDouble(response_docdetails.Substring(dateservloc + 23, datesignloc - dateservloc - 34)) / 1000).ToLocalTime();
                     DateServiceList.Add(dtDateTime);
+
+
+                    if ((thisDocType == doc1) && (isATomoReport(response_docdetails))) // looking for the last tomo report
+                        if (dtDateTime > mostRecentDate)
+                        {
+                            mostRecentDate = dtDateTime;
+                            mostRecentTomoReportIndex = loopnum;
+                            MessageBox.Show("This document " + thisDocType + " " + mostRecentDate.ToString() + " " + loopnum);
+                        }
                 }
+
+                loopnum++;
             }
 
-
-            #region print the list of docs with date
-
-            string printdata = "";
-            var dosimetrie = new List<DateTime>();
-            var dosecheck = new List<DateTime>();
-            var ficheDePosition = new List<DateTime>();
-
-
+            #region count each document type
             for (int i = 0; i < DocTypeList.Count; i++)
             {
-                if (DocTypeList[i] == doc1) { dosimetrie.Add(DateServiceList[i]); }
-                if (DocTypeList[i] == doc2) { dosecheck.Add(DateServiceList[i]); }
-                if (DocTypeList[i] == doc3) { ficheDePosition.Add(DateServiceList[i]); }
-
+                if (!isARecentDocument(DateServiceList[i]))
+                    autres.Add(DateServiceList[i]);
+                else if (DocTypeList[i] == doc1) { dosimetrie.Add(DateServiceList[i]); }
+                else if (DocTypeList[i] == doc2) { dosecheck.Add(DateServiceList[i]); }
+                else if (DocTypeList[i] == doc3) { ficheDePosition.Add(DateServiceList[i]); }
+                else { autres.Add(DateServiceList[i]); }
             }
-            printdata += "Patient: " + PatNameList[0] + " - " + ctx.Patient.Id + "\n";
-            printdata += "(" + dosimetrie.Count + ") " + doc1 + ":            " + dosimetrie.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "(" + dosecheck.Count + ") " + doc2 + ":  " + dosecheck.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
-            printdata += "(" + ficheDePosition.Count + ") " + doc3 + ":       " + ficheDePosition.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
 
-            MessageBox.Show(printdata);
+            documentList += "Patient: " + PatNameList[0] + " - " + ctx.Patient.Id + "\n";
+            documentList += "(" + dosimetrie.Count + ") " + doc1 + ":            " + dosimetrie.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
+            documentList += "(" + dosecheck.Count + ") " + doc2 + ":  " + dosecheck.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
+            documentList += "(" + ficheDePosition.Count + ") " + doc3 + ":       " + ficheDePosition.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
+            documentList += "(" + autres.Count + ") " + doc3 + ":       " + autres.DefaultIfEmpty().Max().ToString("MM/dd/yy").Replace("01/01/01", "") + "\n";
+            //MessageBox.Show(documentList);
+            #endregion
+            #endregion
 
+            #region OLD : get the last tomo report index
+
+            /*
+             int lastTomoReportIndex = -1;
+            if (dosimetrie.Count == 0)
+            {
+                MessageBox.Show("Pas de rapport de dosimétrie dans ARIA Documents");
+                tomoReportFound = false;
+            }
+            else
+            {
+                int docIndex = -1;
+
+                for (int i = 0; i < response_Doc.Documents.Count(); i++)
+                {
+                    var document = response_Doc.Documents[i];
+                    string thePtId = document.PtId;
+                    string thePtVisitId = document.PtVisitId.ToString();
+                    string theVisitNoteId = VisitNoteList[loopnum];
+                    string request_docdetails = "{\"__type\":\"GetDocumentRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"PtId\":\"" + thePtId + "\"},\"PatientVisitId\":" + thePtVisitId + ",\"VisitNoteId\":" + theVisitNoteId + "}";
+                    string response_docdetails = CustomInsertDocumentsParameter.SendData(request_docdetails, true, apiKeyDoc, docSet.HostName, docSet.Port);
+                    int typeloc = response_docdetails.IndexOf("DocumentType");
+                    int enteredloc = response_docdetails.IndexOf("EnteredBy");
+                    if (typeloc > 0)
+                    {
+                        String s = response_docdetails.Substring(typeloc + 15, enteredloc - typeloc - 18);
+
+
+
+
+                        if ((s == doc1))// && (isATomoReport(response_docdetails))) // it is a "dosimetrie"
+                        {
+                            String sp = Directory.GetCurrentDirectory() + @"\out\__" + i + "__.txt";
+                            StreamWriter sw = new StreamWriter("srv0Test.txt");
+                            sw.WriteLine(s);
+                            sw.Close();
+
+                        }
+                    }
+
+                }
+            }
+            */
+            #endregion
+
+            #region get pdf report tomo
+            if (_TOMO)
+            {
+                //foreach (var document in response_Doc.Documents) // parse documents
+                //{
+                var document = response_Doc.Documents[mostRecentTomoReportIndex];
+
+                string thePtId = document.PtId;
+                string thePtVisitId = document.PtVisitId.ToString();
+                string theVisitNoteId = VisitNoteList[mostRecentTomoReportIndex];
+
+
+                string request_docdetails = "{\"__type\":\"GetDocumentRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"PtId\":\"" + thePtId + "\"},\"PatientVisitId\":" + thePtVisitId + ",\"VisitNoteId\":" + theVisitNoteId + "}";
+                string response_docdetails = CustomInsertDocumentsParameter.SendData(request_docdetails, true, apiKeyDoc, docSet.HostName, docSet.Port);
+                int typeloc = response_docdetails.IndexOf("DocumentType");
+                int enteredloc = response_docdetails.IndexOf("EnteredBy");
+
+
+                if (typeloc > 0)
+                {
+                    String s = response_docdetails.Substring(typeloc + 15, enteredloc - typeloc - 18);
+                    DocTypeList.Add(s);
+                    string saveFilePath = "";
+
+                    if (s == doc1) // is a "Dosimétrie"
+                    {
+                        saveFilePath = Directory.GetCurrentDirectory() + @"\out\__" + loopnum + "__.pdf";
+                        int startBinary = response_docdetails.IndexOf("\"BinaryContent\"") + 17;
+                        int endBinary = response_docdetails.IndexOf("\"Certifier\"") - 2;
+                        string binaryContent2 = response_docdetails.Substring(startBinary, endBinary - startBinary);
+                        binaryContent2 = binaryContent2.Replace("\\", "");  // the \  makes the string a non valid base64 string
+                        File.WriteAllBytes(saveFilePath, Convert.FromBase64String(binaryContent2));
+                        tomoReportPath = saveFilePath;
+                    }
+                }
+                //}
+            }
             #endregion
 
 
@@ -166,8 +329,8 @@ namespace PlanCheck
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
 
-            getAriaDocuments(ctx);
 
+            #region general info
             _ctx = ctx;
 
             if (_ctx.Patient.Name != null)
@@ -208,7 +371,9 @@ namespace PlanCheck
             int n = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Values.Count;
             _POoptions = new string[n];
             _POoptions = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Values.ToArray();
+            #endregion
 
+            #region machine
             _machine = ctx.PlanSetup.Beams.First().TreatmentUnit.Id.ToUpper();
             _NOVA = false;
             _TOMO = false;
@@ -236,6 +401,13 @@ namespace PlanCheck
                     }
                 }
             }
+
+            #endregion
+
+            #region ARIA documents
+            connectToAriaDocuments(ctx);
+            #endregion
+
 
 
             if (_TOMO)
@@ -378,6 +550,10 @@ namespace PlanCheck
         {
             get { return _patientdob; }
         }
+        public string documentsList
+        {
+            get { return documentList; }
+        }
         public DateTime PatientDOB_dt
         {
             get { return _patientdob_dt; }
@@ -454,6 +630,15 @@ namespace PlanCheck
         public TomotherapyPdfReportReader tprd
         {
             get { return _tprd; }
+        }
+
+        public string tomoReportPathFile
+        {
+            get { return tomoReportPath; }
+        }
+        public bool tomoReportIsFound
+        {
+            get { return tomoReportFound; }
         }
         #endregion
 
