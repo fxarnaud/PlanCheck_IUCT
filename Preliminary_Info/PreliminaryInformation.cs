@@ -116,13 +116,13 @@ namespace PlanCheck
             }
             catch
             {
-                MessageBox.Show("Connexion à Aria Documents impossible.\nLa connexion ne fonctionne pas sous Citrix");
+                MessageBox.Show("La connexion à Aria Documents a échoué.\n La connexion ne fonctionne pas sous Citrix");
                 DocumentAriaIsConnected = false;
             }
-
+            
             if (DocumentAriaIsConnected)
                 getTheAriaDocuments(response, ctx);
-
+            
             return DocumentAriaIsConnected;
         }
         public void getTheAriaDocuments(String response, ScriptContext ctx)
@@ -280,7 +280,7 @@ namespace PlanCheck
             */
             #endregion
 
-            #region get pdf report tomo
+            #region get pdf report tomo and copy in out dir
             if (_TOMO)
             {
                 //foreach (var document in response_Doc.Documents) // parse documents
@@ -297,7 +297,6 @@ namespace PlanCheck
                 int typeloc = response_docdetails.IndexOf("DocumentType");
                 int enteredloc = response_docdetails.IndexOf("EnteredBy");
 
-
                 if (typeloc > 0)
                 {
                     String s = response_docdetails.Substring(typeloc + 15, enteredloc - typeloc - 18);
@@ -305,14 +304,14 @@ namespace PlanCheck
                     string saveFilePath = "";
 
                     if (s == doc1) // is a "Dosimétrie"
-                    {
+                    {                       
                         saveFilePath = Directory.GetCurrentDirectory() + @"\out\__" + loopnum + "__.pdf";
                         int startBinary = response_docdetails.IndexOf("\"BinaryContent\"") + 17;
                         int endBinary = response_docdetails.IndexOf("\"Certifier\"") - 2;
                         string binaryContent2 = response_docdetails.Substring(startBinary, endBinary - startBinary);
-                        binaryContent2 = binaryContent2.Replace("\\", "");  // the \  makes the string a non valid base64 string
+                        binaryContent2 = binaryContent2.Replace("\\", "");  // the \  makes the string a non valid base64 string                       
                         File.WriteAllBytes(saveFilePath, Convert.FromBase64String(binaryContent2));
-                        tomoReportPath = saveFilePath;
+                        tomoReportPath = saveFilePath;                        
                     }
                 }
                 //}
@@ -328,7 +327,7 @@ namespace PlanCheck
 
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
-
+            
 
             #region general info
             _ctx = ctx;
@@ -372,6 +371,7 @@ namespace PlanCheck
             _POoptions = new string[n];
             _POoptions = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Values.ToArray();
             #endregion
+            
 
             #region machine
             _machine = ctx.PlanSetup.Beams.First().TreatmentUnit.Id.ToUpper();
@@ -403,12 +403,14 @@ namespace PlanCheck
             }
 
             #endregion
+           
 
             #region ARIA documents
             connectToAriaDocuments(ctx);
             #endregion
+           
 
-
+            #region set initial values
 
             if (_TOMO)
             {
@@ -418,8 +420,6 @@ namespace PlanCheck
             }
             else
                 _tprd = null;
-
-
 
             foreach (Beam bn in ctx.PlanSetup.Beams)
             {
@@ -469,7 +469,8 @@ namespace PlanCheck
                 else
                     _treatmentType = "Technique non statique inconnue : pas de MLC !";
             }
-
+            #endregion
+            
         }
 
 
