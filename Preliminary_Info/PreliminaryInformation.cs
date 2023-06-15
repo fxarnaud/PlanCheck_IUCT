@@ -305,7 +305,7 @@ namespace PlanCheck
 
                     if (s == doc1) // is a "Dosimétrie"
                     {                       
-                        saveFilePath = Directory.GetCurrentDirectory() + @"\..\out\__" + loopnum + "__.pdf";
+                        saveFilePath = Directory.GetCurrentDirectory() + @"\__" + loopnum + "__.pdf";
                         int startBinary = response_docdetails.IndexOf("\"BinaryContent\"") + 17;
                         int endBinary = response_docdetails.IndexOf("\"Certifier\"") - 2;
                         string binaryContent2 = response_docdetails.Substring(startBinary, endBinary - startBinary);

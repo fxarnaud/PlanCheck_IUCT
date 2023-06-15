@@ -7,7 +7,7 @@
     <OutputType>library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PlanCheck</RootNamespace>
-    <AssemblyName>PlanCheck_Beta_v0002.0002.esapi</AssemblyName>
+    <AssemblyName>PlanCheck_Beta_v0002.0003.esapi</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
