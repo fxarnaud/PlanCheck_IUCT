@@ -67,9 +67,6 @@ namespace VMS.TPS
             string theDirectory = Path.GetDirectoryName(fullPath);//get the folder that's in                                                                  
             Directory.SetCurrentDirectory(theDirectory);// set current directory as the .dll directory
 
-
-            //return;
-            
             Perform(context);
         }
 
