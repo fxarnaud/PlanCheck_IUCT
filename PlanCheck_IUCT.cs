@@ -33,6 +33,8 @@ namespace VMS.TPS
         {
            
 
+
+
             #region check if a plan with dose is loaded, no verification plan allowed
             // a new vbv
 
