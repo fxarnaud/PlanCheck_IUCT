@@ -103,26 +103,25 @@ namespace PlanCheck
             string port = docSet.Port;
             tomoReportFound = false;
 
-           // string doc1 = "Dosimétrie";
-           // string doc2 = "Dosecheck";
-           // string doc3 = "Fiche de positionnement";
+            // string doc1 = "Dosimétrie";
+            // string doc2 = "Dosecheck";
+            // string doc3 = "Fiche de positionnement";
 
             string response = "";
             string request = "{\"__type\":\"GetDocumentsRequest:http://services.varian.com/Patient/Documents\",\"Attributes\":[],\"PatientId\":{ \"ID1\":\"" + ctx.Patient.Id + "\"}}";
-            try
-            {
-                response = CustomInsertDocumentsParameter.SendData(request, true, apiKeyDoc, docSet.HostName, docSet.Port);
+            //try
+            // {
+            response = CustomInsertDocumentsParameter.SendData(request, true, apiKeyDoc, docSet.HostName, docSet.Port);
+            //}
+            //catch
+            /* {
+                 MessageBox.Show("La connexion à Aria Documents a échoué.\n La connexion ne fonctionne pas sous Citrix");
+                 DocumentAriaIsConnected = false;
+             }*/
 
-            }
-            catch
-            {
-                MessageBox.Show("La connexion à Aria Documents a échoué.\n La connexion ne fonctionne pas sous Citrix");
-                DocumentAriaIsConnected = false;
-            }
-            
             if (DocumentAriaIsConnected)
                 getTheAriaDocuments(response, ctx);
-            
+
             return DocumentAriaIsConnected;
         }
         public void getTheAriaDocuments(String response, ScriptContext ctx)
@@ -304,14 +303,14 @@ namespace PlanCheck
                     string saveFilePath = "";
 
                     if (s == doc1) // is a "Dosimétrie"
-                    {                       
+                    {
                         saveFilePath = Directory.GetCurrentDirectory() + @"\__" + loopnum + "__.pdf";
                         int startBinary = response_docdetails.IndexOf("\"BinaryContent\"") + 17;
                         int endBinary = response_docdetails.IndexOf("\"Certifier\"") - 2;
                         string binaryContent2 = response_docdetails.Substring(startBinary, endBinary - startBinary);
                         binaryContent2 = binaryContent2.Replace("\\", "");  // the \  makes the string a non valid base64 string                       
                         File.WriteAllBytes(saveFilePath, Convert.FromBase64String(binaryContent2));
-                        tomoReportPath = saveFilePath;                        
+                        tomoReportPath = saveFilePath;
                     }
                 }
                 //}
@@ -327,7 +326,7 @@ namespace PlanCheck
 
         public PreliminaryInformation(ScriptContext ctx)  //Constructor
         {
-            
+
 
             #region general info
             _ctx = ctx;
@@ -371,7 +370,7 @@ namespace PlanCheck
             _POoptions = new string[n];
             _POoptions = ctx.PlanSetup.GetCalculationOptions("PO_15605New").Values.ToArray();
             #endregion
-            
+
 
             #region machine
             _machine = ctx.PlanSetup.Beams.First().TreatmentUnit.Id.ToUpper();
@@ -403,12 +402,14 @@ namespace PlanCheck
             }
 
             #endregion
-           
+
 
             #region ARIA documents
-            connectToAriaDocuments(ctx);
+            
+            // uncomment if it works
+           connectToAriaDocuments(ctx);
             #endregion
-           
+
 
             #region set initial values
 
@@ -416,7 +417,8 @@ namespace PlanCheck
             {
                 string pdfpath = Directory.GetCurrentDirectory() + @"\..\pdfReader\test.pdf";// @"\users\Users-IUCT.xlsx";
                 _tprd = new TomotherapyPdfReportReader(pdfpath);
-                _tprd.displayInfo();
+               /*     uncomment for details   */
+                // _tprd.displayInfo();
             }
             else
                 _tprd = null;
@@ -470,7 +472,7 @@ namespace PlanCheck
                     _treatmentType = "Technique non statique inconnue : pas de MLC !";
             }
             #endregion
-            
+
         }
 
 
