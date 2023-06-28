@@ -70,49 +70,55 @@ namespace PlanCheck
             #region FRACTIONNEMENT - CIBLE LA PLUS HAUTE
             Item_Result fractionation = new Item_Result();
             //fractionation.Label = "Fractionnement du PTV principal";
-
-            double nPrescribedDosePerFraction = 0;
             int nPrescribedNFractions = 0;
+            double nPrescribedDosePerFraction = 0;
             string PrescriptionName = null;
             double PrescriptionValue = 0;
-            DoseValue myDosePerFraction = _ctx.PlanSetup.DosePerFraction;
-            int nFraction = (int)_ctx.PlanSetup.NumberOfFractions;
+            fractionation.Label = "Fractionnement de la cible principale (" + PrescriptionName + ")";
+            fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("N2") + " Gy";
+            double diffDose = 0.0;
+            double myDosePerFraction = 0.0;
+            int nFraction = 0;
             foreach (var target in _ctx.PlanSetup.RTPrescription.Targets) //boucle sur les différents niveaux de dose de la prescription
             {
-                
-                // MessageBox.Show("one : " + target.Name);
+
+
                 nPrescribedNFractions = target.NumberOfFractions;
                 if (target.DosePerFraction.Dose > nPrescribedDosePerFraction)  // get the highest dose per fraction level
                 {
                     nPrescribedDosePerFraction = target.DosePerFraction.Dose;
                     PrescriptionValue = target.Value;
                     PrescriptionName = target.TargetId;
-
-                    //if(PrescriptionName !=null)
-                    // 
                 }
             }
+            if (!_pinfo.isTOMO)
+            {
+                myDosePerFraction = _ctx.PlanSetup.DosePerFraction.Dose;
+                nFraction = (int)_ctx.PlanSetup.NumberOfFractions;               
+            }
+            else //is tomo
+            {
+                myDosePerFraction = _pinfo.tprd.Trd.prescriptionDosePerFraction;
+                nFraction = _pinfo.tprd.Trd.prescriptionNumberOfFraction;
 
-            fractionation.Label = "Fractionnement de la cible principale (" + PrescriptionName + ")";
-            fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("N2") + " Gy";
-            fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.Dose.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
+            }
 
-
-
-            if ((nPrescribedNFractions == nFraction) && (nPrescribedDosePerFraction == myDosePerFraction.Dose))
+            diffDose = Math.Abs(nPrescribedDosePerFraction - myDosePerFraction);
+            fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
+            if ((nPrescribedNFractions == nFraction) && (diffDose < 0.0001))
                 fractionation.setToTRUE();
             else if (_pinfo.isTOMO)
                 fractionation.setToINFO();
             else
                 fractionation.setToFALSE();
 
-
             fractionation.Infobulle = "Le 'nombre de fractions' et la 'dose par fraction' du plan doivent\nêtre conformes à la prescription " + _ctx.PlanSetup.RTPrescription.Id +
                 " : " + nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction.ToString("N2") + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
-            fractionation.Infobulle += "\nNe fonctionne pas pour la TOMO : l'item est mis en INFO";
 
             this._result.Add(fractionation);
             #endregion
+
+
 
 
             // pas réussi à attraper le % dans la prescription (que dans le plan)
@@ -178,13 +184,13 @@ namespace PlanCheck
                 if (normalisation.MeasuredValue == "Aucune normalisation de plan")
                     normalisation.setToWARNING();
 
-            
 
 
-            normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le check-protocol. Cet item est en WARNING si Aucune normalisation";
-            //normalisation.Infobulle += "\nPour la TOMO l'item est mis en INFO";
 
-            this._result.Add(normalisation);
+                normalisation.Infobulle = "Le mode de normalisation (onglet Dose) doit être en accord avec le check-protocol. Cet item est en WARNING si Aucune normalisation";
+                //normalisation.Infobulle += "\nPour la TOMO l'item est mis en INFO";
+
+                this._result.Add(normalisation);
             }
             #endregion
 

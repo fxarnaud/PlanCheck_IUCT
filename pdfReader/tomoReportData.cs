@@ -78,6 +78,7 @@ namespace PlanCheck
         public double originX;
         public double originY;
         public double originZ;
+        public double maxDose;
         //public int numberOfCTslices;
 
         

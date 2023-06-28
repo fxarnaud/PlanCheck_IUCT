@@ -196,6 +196,9 @@ namespace PlanCheck
                 if (lines[i].Contains("Planned Fractions"))
                     trd.prescriptionNumberOfFraction = Convert.ToInt32(lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1]);
 
+                if (lines[i].Contains("Maximum Dose"))
+                    trd.maxDose = Convert.ToDouble(lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1]);
+
 
                 if (lines[i].Contains("Plan Status:"))
                     trd.approvalStatus = lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1];
