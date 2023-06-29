@@ -44,7 +44,7 @@ namespace PlanCheck
             s += "\n prescriptionMode: " + trd.prescriptionMode;
             s += "\n prescriptionTotalDose: " + trd.prescriptionTotalDose;
             s += "\n prescriptionStructure: " + trd.prescriptionStructure;
-            
+
             s += "\n prescriptionDosePerFraction: " + trd.prescriptionDosePerFraction;
             s += "\n prescriptionNumberOfFraction: " + trd.prescriptionNumberOfFraction;
             s += "\n approvalStatus: " + trd.approvalStatus;
@@ -89,10 +89,10 @@ namespace PlanCheck
             s += "\n originX: " + trd.originX;
             s += "\n originY: " + trd.originY;
             s += "\n originZ: " + trd.originZ;
-            
 
 
-   
+
+
 
             MessageBox.Show(s);
         }
@@ -330,39 +330,45 @@ namespace PlanCheck
 
                     }
 
-                if (lines[i].Contains("Density Model:")) 
+                if (lines[i].Contains("Density Model:"))
                 {
                     string[] sub2 = lines[i].Split(':');
                     trd.HUcurve = sub2[1];
                 }
-                if (lines[i].Contains("User ID:")) 
+                if (lines[i].Contains("User ID:"))
                 {
                     string[] sub2 = lines[i].Split(':');
                     trd.approverID = sub2[1];
                 }
-                if ((lines[i].Contains("Patient Position:"))&&(!lines[i].Contains("Delivery"))) //Planning Method: Classic
+                if ((lines[i].Contains("Patient Position:")) && (!lines[i].Contains("Delivery"))) //Planning Method: Classic
                 {
                     trd.patientPosition = lines[i + 2];
                 }
                 if (lines[i].Contains("Origin")) //Origin(IECp, mm) -325.000 -122.500 325.000
                 {
-                    MessageBox.Show("yes " + lines[i]);
+                    
                     string[] sub2 = lines[i].Split(' ');
                     trd.originX = Convert.ToDouble(sub2[3]);
                     trd.originY = Convert.ToDouble(sub2[4]);
                     trd.originZ = Convert.ToDouble(sub2[5]);
                 }
 
-           
+
 
 
             }
 
-
+            try
+            {
+                File.Delete(pathToPdf);
+            }
+            catch
+            {
+                MessageBox.Show("impossible de supprimer " + pathToPdf);
+            }
 
         }
         #endregion
-        
 
 
     }
