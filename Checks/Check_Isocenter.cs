@@ -41,7 +41,7 @@ namespace PlanCheck
             if (!_pinfo.isTOMO)
             {
                 Item_Result allFieldsSameIso = new Item_Result();
-                
+
                 allFieldsSameIso.Label = "Unicité de l'isocentre";
                 allFieldsSameIso.ExpectedValue = "1";
 
@@ -161,7 +161,7 @@ namespace PlanCheck
                     isoAtCenterOfPTV.Infobulle += "Pas de vérification de la position de l'isocentre dans le volume cible";
 
                 }
-               
+
 
                 this._result.Add(isoAtCenterOfPTV);
             }
@@ -198,7 +198,28 @@ namespace PlanCheck
                 this._result.Add(distanceToOrigin);
             }
             #endregion
+            #region position iso tomo
+            // impossible to get green laser position in the pdf report
+            // there is the red laser, the dose max position (ref point)
+            // and the origin of dicom image
 
+            if (_pinfo.isTOMO)
+            {
+                Item_Result isoTomo = new Item_Result();
+
+                isoTomo.Label = "Red laser Tomotherapy";
+                isoTomo.ExpectedValue = "1";
+
+                isoTomo.MeasuredValue = _pinfo.tprd.Trd.redLaserXoffset + " " + _pinfo.tprd.Trd.redLaserYoffset + " " + _pinfo.tprd.Trd.redLaserZoffset + " mm";
+                isoTomo.Infobulle = "z < 16 cm";
+                if(_pinfo.tprd.Trd.redLaserZoffset < 160)
+                    isoTomo.setToTRUE();
+                else
+                    isoTomo.setToFALSE();
+
+                this._result.Add(isoTomo);
+            }
+            #endregion
         }
         public string Title
         {

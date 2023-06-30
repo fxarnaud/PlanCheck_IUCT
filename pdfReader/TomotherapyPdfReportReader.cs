@@ -33,7 +33,7 @@ namespace PlanCheck
     {
 
         private tomoReportData trd;
-
+        private bool _itisaTomoReport;
         public void displayInfo()
         {
             String s = null;
@@ -100,7 +100,7 @@ namespace PlanCheck
 
         public TomotherapyPdfReportReader(string pathToPdf)  //Constructor. 
         {
-
+            _itisaTomoReport = true;
             trd = new tomoReportData();
             #region convert pdf 2 text file
             string outpath = Directory.GetCurrentDirectory() + @"\..\pdfReader\tomoReportData.txt";
@@ -113,264 +113,267 @@ namespace PlanCheck
                 pageContent += PdfTextExtractor.GetTextFromPage(pdfDoc.GetPage(page), strategy);
 
             }
+            if (pageContent.Contains("Accuray"))
+                _itisaTomoReport = true;
+            else
+                _itisaTomoReport = false;
 
             File.WriteAllText(outpath, pageContent);
             pdfDoc.Close();
             pdfReader.Close();
             #endregion
 
-            #region read text file in a list of strings
-            System.IO.StreamReader file = new System.IO.StreamReader(Directory.GetCurrentDirectory() + @"\..\pdfReader\tomoReportData.txt");
-            String line = null;
-            List<string> lines = new List<string>();
-
-            while ((line = file.ReadLine()) != null)
-            {
-                lines.Add(line);
-
-            }
-
-            #endregion
-
-
-            #region Get the infos (see ex. at the end of file)
-
-
-            /*
-             * string[] separatingStrings2;// = null;
-            string[] separatingStrings;//= null;
-            string[] separatingStrings3 = null;
-            string[] separatingStrings4 = null;
-            string[] sub1 = null;
-            string[] sub2 = null;
-            string[] sub3 = null;*/
-
-            string[] separatingStrings = { "rev" };
-            string[] separatingStrings2 = { ": " };
-            string[] separatingStrings3 = { ", " };
-            string[] separatingStrings4 = { "of " };
-            bool planNameFound = false;  // because Plan name is several times in the file
-            bool patientNameFound = false;  // because patient name is several times in the file
-            for (int i = 0; i < lines.Count; i++)
+            if (_itisaTomoReport)
             {
 
-                if ((lines[i].Contains("Plan Name:")) && (!planNameFound))
+                #region read text file in a list of strings
+                System.IO.StreamReader file = new System.IO.StreamReader(Directory.GetCurrentDirectory() + @"\..\pdfReader\tomoReportData.txt");
+                String line = null;
+                List<string> lines = new List<string>();
+
+                while ((line = file.ReadLine()) != null)
                 {
-                    trd.planName = lines[i + 2];
-                    planNameFound = true;
-                }
-
-                if (lines[i].Contains("Plan Type:"))
-                    trd.planType = lines[i + 2];
-
-                if (lines[i].Contains("Treatment Machine"))
-                {
-                    trd.machineNumber = lines[i + 1];
-                    //string[]  separatingStrings = { "rev" };
-                    string[] sub1 = lines[i].Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
-                    string[] sub2 = sub1[1].Split('/');
-                    trd.machineRevision = sub2[0];
-                }
-
-                if (lines[i].Contains("Prescription:")) //Prescription: Median of PTV sein, 50.00 Gy
-                {
-                    //string[] separatingStrings2 = { ": " };
-                    string[] sub1 = lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // Prescription ... Median of PTV sein, 50.00 Gy
-
-                    //string[] separatingStrings3 = { ", " };
-                    string[] sub2 = sub1[1].Split(separatingStrings3, System.StringSplitOptions.RemoveEmptyEntries); // Median of PTV sein ... 50.00 Gy
-                    string[] sub3 = sub2[1].Split(' ');                      // 
-                    trd.prescriptionMode = sub2[0];
-                    trd.prescriptionTotalDose = Convert.ToDouble(sub3[0]);
-
-                    //string[] separatingStrings4 = { "of " };
-                    trd.prescriptionStructure = sub2[0].Split(separatingStrings4, System.StringSplitOptions.RemoveEmptyEntries)[1];
-                    trd.prescriptionMode = sub2[0].Split(separatingStrings4, System.StringSplitOptions.RemoveEmptyEntries)[0];
-
+                    lines.Add(line);
 
                 }
 
-                if (lines[i].Contains("Prescribed Dose per Fraction"))
-                    trd.prescriptionDosePerFraction = Convert.ToDouble(lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1]);
-
-                if (lines[i].Contains("Planned Fractions"))
-                    trd.prescriptionNumberOfFraction = Convert.ToInt32(lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1]);
-
-                if (lines[i].Contains("Maximum Dose"))
-                    trd.maxDose = Convert.ToDouble(lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1]);
+                #endregion
 
 
-                if (lines[i].Contains("Plan Status:"))
-                    trd.approvalStatus = lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1];
+                #region Get the infos (see ex. at the end of file)
 
 
-                if (lines[i].Contains("MU per Fraction:"))
-                {
-                    string[] sub2 = lines[i].Split(':');
-                    string[] sub3 = sub2[1].Split('/');
-                    trd.MUplanned = Convert.ToDouble(sub3[0]);
-                    trd.MUplannedPerFraction = Convert.ToDouble(sub3[1]);
 
-                }
 
-                if (lines[i].Contains("Field Width")) //Field Width (cm): 5.0, Dynamic
+                string[] separatingStrings = { "rev" };
+                string[] separatingStrings2 = { ": " };
+                string[] separatingStrings3 = { ", " };
+                string[] separatingStrings4 = { "of " };
+                bool planNameFound = false;  // because Plan name is several times in the file
+                bool patientNameFound = false;  // because patient name is several times in the file
+                for (int i = 0; i < lines.Count; i++)
                 {
 
-                    string[] sub2 = lines[i].Split(':');
-                    string[] sub3 = sub2[1].Split(',');
-                    trd.fieldWidth = Convert.ToDouble(sub3[0]);
-
-                    if (sub3[1].Contains("Dynamic"))
-                        trd.isDynamic = true;
-                    else
-                        trd.isDynamic = false;
-                }
-
-                if (lines[i].Contains("Pitch:"))
-                {
-
-                    string[] sub2 = lines[i].Split(':');
-                    trd.pitch = Convert.ToDouble(sub2[1]);
-                }
-                if (lines[i].Contains("Modulation Factor"))
-                {
-
-                    string[] sub2 = lines[i].Split(':');
-                    string[] sub3 = sub2[1].Split('/');
-                    trd.modulationFactor = Convert.ToDouble(sub3[0]);
-
-                }
-                if (lines[i].Contains("Gantry Period (sec)"))
-                {
-
-
-                    trd.gantryPeriod = Convert.ToDouble(lines[i + 2]);
-                    trd.gantryNumberOfRotation = Convert.ToDouble(lines[i + 3]);
-                }
-                if (lines[i].Contains("Couch Travel (mm)"))
-                {
-
-                    trd.couchTravel = Convert.ToDouble(lines[i + 2]);
-                    trd.couchSpeed = Convert.ToDouble(lines[i + 3]);
-
-                }
-
-                //ex.: Red Lasers Offset (IECf, mm): X: -11.58 Y: -85.14 Z: -26.32
-
-                if (lines[i].Contains("Red Lasers Offset (IECf, mm)"))
-                {
-                    string[] sub2 = lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // split with ": "
-
-                    string[] sub3 = sub2[2].Split(' ');
-                    trd.redLaserXoffset = Convert.ToDouble(sub3[0]);
-
-                    string[] sub4 = sub2[3].Split(' ');
-                    trd.redLaserYoffset = Convert.ToDouble(sub4[0]);
-
-                    string[] sub5 = sub2[4].Split(' ');
-                    trd.redLaserZoffset = Convert.ToDouble(sub5[0]);
-                }
-
-                if (lines[i].Contains("Beam On Time"))
-                {
-                    string[] sub2 = lines[i].Split(':');
-                    trd.beamOnTime = Convert.ToDouble(sub2[1]);
-                }
-                if (lines[i].Contains("Delivery Type"))
-                {
-
-                    trd.deliveryMode = lines[i];
-                }
-                if (lines[i].Contains("Dose Calculation Algorithm:"))//Convolution-Superposition Spacing (IECp, mm) X: 1.27 Y: 2.50 Z: 1.27
-                {
-                    string[] sub2 = lines[i + 2].Split('(');
-                    string[] sub2b = sub2[0].Split(' ');
-                    trd.algorithm = sub2b[0];
-
-                    string[] sub3 = lines[i + 1].Split('/');
-                    string[] sub4 = sub3[1].Split(':');
-                    trd.resolutionCalculation = sub4[1].Trim(); // remove space char
-
-                    string[] sub5 = lines[i + 2].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // split with ": "
-                    string[] sub6 = sub5[1].Split(' ');
-                    trd.refPointX = Convert.ToDouble(sub6[0]);
-                    string[] sub7 = sub5[2].Split(' ');
-                    trd.refPointY = Convert.ToDouble(sub7[0]);
-                    string[] sub8 = sub5[3].Split(' ');
-                    trd.refPointZ = Convert.ToDouble(sub8[0]);
-                }
-                if (lines[i].Contains("Reference Dose (Gy)"))
-                {
-                    string[] sub2 = lines[i].Split(':');
-                    trd.refDose = Convert.ToDouble(sub2[1]);
-
-                }
-
-                if (lines[i].Contains("Planning Method:")) //Planning Method: Classic
-                {
-                    string[] sub2 = lines[i].Split(':');
-                    trd.planningMethod = sub2[1];
-
-                }
-                if (!patientNameFound)
-                    if ((lines[i].Contains("Patient Name:")) && (lines[i].Contains("Plan Name:"))) //Patient Name: TOTO, TITI; Medical ID: 123456789; Plan Name: SeinG+gg; Version: Accuray Precision 
+                    if ((lines[i].Contains("Plan Name:")) && (!planNameFound))
                     {
-                        patientNameFound = true;
+                        trd.planName = lines[i + 2];
+                        planNameFound = true;
+                    }
 
-                        string[] sub2 = lines[i].Split(';');//Patient Name: TOTO, TITI    +     Medical ID: 123456789   +   ...
+                    if (lines[i].Contains("Plan Type:"))
+                        trd.planType = lines[i + 2];
 
+                    if (lines[i].Contains("Treatment Machine"))
+                    {
+                        trd.machineNumber = lines[i + 1];
+                        //string[]  separatingStrings = { "rev" };
+                        string[] sub1 = lines[i].Split(separatingStrings, System.StringSplitOptions.RemoveEmptyEntries);
+                        string[] sub2 = sub1[1].Split('/');
+                        trd.machineRevision = sub2[0];
+                    }
 
-                        string[] sub3 = sub2[0].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // split with ": "
-                        string[] sub4 = sub3[1].Split(separatingStrings3, System.StringSplitOptions.RemoveEmptyEntries); // split with ", "
-                        trd.patientName = sub4[0];
-                        trd.patientFirstName = sub4[1];
+                    if (lines[i].Contains("Prescription:")) //Prescription: Median of PTV sein, 50.00 Gy
+                    {
+                        //string[] separatingStrings2 = { ": " };
+                        string[] sub1 = lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // Prescription ... Median of PTV sein, 50.00 Gy
 
-                        string[] sub5 = sub2[1].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // split with ": "
-                        trd.patientID = sub5[1];
+                        //string[] separatingStrings3 = { ", " };
+                        string[] sub2 = sub1[1].Split(separatingStrings3, System.StringSplitOptions.RemoveEmptyEntries); // Median of PTV sein ... 50.00 Gy
+                        string[] sub3 = sub2[1].Split(' ');                      // 
+                        trd.prescriptionMode = sub2[0];
+                        trd.prescriptionTotalDose = Convert.ToDouble(sub3[0]);
+
+                        //string[] separatingStrings4 = { "of " };
+                        trd.prescriptionStructure = sub2[0].Split(separatingStrings4, System.StringSplitOptions.RemoveEmptyEntries)[1];
+                        trd.prescriptionMode = sub2[0].Split(separatingStrings4, System.StringSplitOptions.RemoveEmptyEntries)[0];
+
 
                     }
 
-                if (lines[i].Contains("Density Model:"))
-                {
-                    string[] sub2 = lines[i].Split(':');
-                    trd.HUcurve = sub2[1];
-                }
-                if (lines[i].Contains("User ID:"))
-                {
-                    string[] sub2 = lines[i].Split(':');
-                    trd.approverID = sub2[1];
-                }
-                if ((lines[i].Contains("Patient Position:")) && (!lines[i].Contains("Delivery"))) //Planning Method: Classic
-                {
-                    trd.patientPosition = lines[i + 2];
-                }
-                if (lines[i].Contains("Origin")) //Origin(IECp, mm) -325.000 -122.500 325.000
-                {
-                    
-                    string[] sub2 = lines[i].Split(' ');
-                    trd.originX = Convert.ToDouble(sub2[3]);
-                    trd.originY = Convert.ToDouble(sub2[4]);
-                    trd.originZ = Convert.ToDouble(sub2[5]);
-                }
+                    if (lines[i].Contains("Prescribed Dose per Fraction"))
+                        trd.prescriptionDosePerFraction = Convert.ToDouble(lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1]);
+
+                    if (lines[i].Contains("Planned Fractions"))
+                        trd.prescriptionNumberOfFraction = Convert.ToInt32(lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1]);
+
+                    if (lines[i].Contains("Maximum Dose"))
+                        trd.maxDose = Convert.ToDouble(lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1]);
+
+
+                    if (lines[i].Contains("Plan Status:"))
+                        trd.approvalStatus = lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries)[1];
+
+
+                    if (lines[i].Contains("MU per Fraction:"))
+                    {
+                        string[] sub2 = lines[i].Split(':');
+                        string[] sub3 = sub2[1].Split('/');
+                        trd.MUplanned = Convert.ToDouble(sub3[0]);
+                        trd.MUplannedPerFraction = Convert.ToDouble(sub3[1]);
+
+                    }
+
+                    if (lines[i].Contains("Field Width")) //Field Width (cm): 5.0, Dynamic
+                    {
+
+                        string[] sub2 = lines[i].Split(':');
+                        string[] sub3 = sub2[1].Split(',');
+                        trd.fieldWidth = Convert.ToDouble(sub3[0]);
+
+                        if (sub3[1].Contains("Dynamic"))
+                            trd.isDynamic = true;
+                        else
+                            trd.isDynamic = false;
+                    }
+
+                    if (lines[i].Contains("Pitch:"))
+                    {
+
+                        string[] sub2 = lines[i].Split(':');
+                        trd.pitch = Convert.ToDouble(sub2[1]);
+                    }
+                    if (lines[i].Contains("Modulation Factor"))
+                    {
+
+                        string[] sub2 = lines[i].Split(':');
+                        string[] sub3 = sub2[1].Split('/');
+                        trd.modulationFactor = Convert.ToDouble(sub3[0]);
+
+                    }
+                    if (lines[i].Contains("Gantry Period (sec)"))
+                    {
+
+
+                        trd.gantryPeriod = Convert.ToDouble(lines[i + 2]);
+                        trd.gantryNumberOfRotation = Convert.ToDouble(lines[i + 3]);
+                    }
+                    if (lines[i].Contains("Couch Travel (mm)"))
+                    {
+
+                        trd.couchTravel = Convert.ToDouble(lines[i + 2]);
+                        trd.couchSpeed = Convert.ToDouble(lines[i + 3]);
+
+                    }
+
+                    //ex.: Red Lasers Offset (IECf, mm): X: -11.58 Y: -85.14 Z: -26.32
+
+                    if (lines[i].Contains("Red Lasers Offset (IECf, mm)"))
+                    {
+                        string[] sub2 = lines[i].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // split with ": "
+
+                        string[] sub3 = sub2[2].Split(' ');
+                        trd.redLaserXoffset = Convert.ToDouble(sub3[0]);
+
+                        string[] sub4 = sub2[3].Split(' ');
+                        trd.redLaserYoffset = Convert.ToDouble(sub4[0]);
+
+                        string[] sub5 = sub2[4].Split(' ');
+                        trd.redLaserZoffset = Convert.ToDouble(sub5[0]);
+                    }
+
+                    if (lines[i].Contains("Beam On Time"))
+                    {
+                        string[] sub2 = lines[i].Split(':');
+                        trd.beamOnTime = Convert.ToDouble(sub2[1]);
+                    }
+                    if (lines[i].Contains("Delivery Type"))
+                    {
+
+                        trd.deliveryMode = lines[i];
+                    }
+                    if (lines[i].Contains("Dose Calculation Algorithm:"))//Convolution-Superposition Spacing (IECp, mm) X: 1.27 Y: 2.50 Z: 1.27
+                    {
+                        string[] sub2 = lines[i + 2].Split('(');
+                        string[] sub2b = sub2[0].Split(' ');
+                        trd.algorithm = sub2b[0];
+
+                        string[] sub3 = lines[i + 1].Split('/');
+                        string[] sub4 = sub3[1].Split(':');
+                        trd.resolutionCalculation = sub4[1].Trim(); // remove space char
+
+                        string[] sub5 = lines[i + 2].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // split with ": "
+                        string[] sub6 = sub5[1].Split(' ');
+                        trd.refPointX = Convert.ToDouble(sub6[0]);
+                        string[] sub7 = sub5[2].Split(' ');
+                        trd.refPointY = Convert.ToDouble(sub7[0]);
+                        string[] sub8 = sub5[3].Split(' ');
+                        trd.refPointZ = Convert.ToDouble(sub8[0]);
+                    }
+                    if (lines[i].Contains("Reference Dose (Gy)"))
+                    {
+                        string[] sub2 = lines[i].Split(':');
+                        trd.refDose = Convert.ToDouble(sub2[1]);
+
+                    }
+
+                    if (lines[i].Contains("Planning Method:")) //Planning Method: Classic
+                    {
+                        string[] sub2 = lines[i].Split(':');
+                        trd.planningMethod = sub2[1];
+
+                    }
+                    if (!patientNameFound)
+                        if ((lines[i].Contains("Patient Name:")) && (lines[i].Contains("Plan Name:"))) //Patient Name: TOTO, TITI; Medical ID: 123456789; Plan Name: SeinG+gg; Version: Accuray Precision 
+                        {
+                            patientNameFound = true;
+
+                            string[] sub2 = lines[i].Split(';');//Patient Name: TOTO, TITI    +     Medical ID: 123456789   +   ...
+
+
+                            string[] sub3 = sub2[0].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // split with ": "
+                            string[] sub4 = sub3[1].Split(separatingStrings3, System.StringSplitOptions.RemoveEmptyEntries); // split with ", "
+                            trd.patientName = sub4[0];
+                            trd.patientFirstName = sub4[1];
+
+                            string[] sub5 = sub2[1].Split(separatingStrings2, System.StringSplitOptions.RemoveEmptyEntries); // split with ": "
+                            trd.patientID = sub5[1];
+
+                        }
+
+                    if (lines[i].Contains("Density Model:"))
+                    {
+                        string[] sub2 = lines[i].Split(':');
+                        trd.HUcurve = sub2[1];
+                    }
+                    if (lines[i].Contains("User ID:"))
+                    {
+                        string[] sub2 = lines[i].Split(':');
+                        trd.approverID = sub2[1];
+                    }
+                    if ((lines[i].Contains("Patient Position:")) && (!lines[i].Contains("Delivery"))) //Planning Method: Classic
+                    {
+                        trd.patientPosition = lines[i + 2];
+                    }
+                    if (lines[i].Contains("Origin")) //Origin(IECp, mm) -325.000 -122.500 325.000
+                    {
+
+                        string[] sub2 = lines[i].Split(' ');
+                        trd.originX = Convert.ToDouble(sub2[3]);
+                        trd.originY = Convert.ToDouble(sub2[4]);
+                        trd.originZ = Convert.ToDouble(sub2[5]);
+                    }
+
+                    if (lines[i].Contains("Scan Date")) 
+                    {
+
+                        string[] sub2 = lines[i+3].Split(',');
+                        trd.CTDate = sub2[0];
+                    }
 
 
 
+                }
+
+                #endregion
 
             }
-
-            try
-            {
-                File.Delete(pathToPdf);
-            }
-            catch
-            {
-                MessageBox.Show("impossible de supprimer " + pathToPdf);
-            }
-
         }
-        #endregion
 
 
+        public bool itIsATomoReport
+        {
+            get { return _itisaTomoReport; }
+        }
     }
 
 

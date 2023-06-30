@@ -266,7 +266,7 @@ namespace PlanCheck
                 double thisleafnotok = 0;
                 bool allLeavesOK = true;
                 int cpNotOk = -1;
-                int totalNumberofCP=-1;
+                int totalNumberofCP = -1;
                 String beamNotOk = null;
                 int leafNumbernotOK = -1;
                 //int i = 0;
@@ -285,7 +285,7 @@ namespace PlanCheck
                                 {
                                     allLeavesOK = false; // break loop on leaves
                                     thisleafnotok = f;
-                                   
+
                                     cpNotOk = cp.Index;
                                     totalNumberofCP = b.ControlPoints.Count;
                                     beamNotOk = b.Id;
@@ -339,7 +339,7 @@ namespace PlanCheck
                 if (_pinfo.treatmentType == "VMAT")
                 {
 
-                    
+
                     novaSBRT.Infobulle = "Pour les Nova en VMAT, la machine NOVA SBRT doit être utilisée pour les champs < 7x7 cm2";
                     Beam b = _ctx.PlanSetup.Beams.FirstOrDefault(x => x.IsSetupField == false);
                     ControlPoint cp = b.ControlPoints.First();
@@ -371,7 +371,7 @@ namespace PlanCheck
                             novaSBRT.setToTRUE();
                         }
 
-                    }                    
+                    }
                 }
                 else
                 {
@@ -386,6 +386,66 @@ namespace PlanCheck
                     }
                 }
                 this._result.Add(novaSBRT);
+            }
+
+            #endregion
+
+            #region TOMO PARAMETERS
+            if ((_pinfo.isTOMO) && (_pinfo.tomoReportIsFound))
+            {
+                Item_Result tomoParamsFieldWidth = new Item_Result();
+                Item_Result tomoParamsGantryPeriod = new Item_Result();
+                Item_Result tomoParamsPitch = new Item_Result();
+                Item_Result tomoParamsModulationFactor = new Item_Result();
+
+                tomoParamsFieldWidth.Label = "Field Width";
+                tomoParamsGantryPeriod.Label = "Gantry period";
+                tomoParamsPitch.Label = "Pitch";
+                tomoParamsModulationFactor.Label = "Modulation factor";
+
+
+                tomoParamsFieldWidth.MeasuredValue = _pinfo.tprd.Trd.fieldWidth.ToString();
+                tomoParamsGantryPeriod.MeasuredValue = _pinfo.tprd.Trd.gantryPeriod.ToString();
+                tomoParamsPitch.MeasuredValue = _pinfo.tprd.Trd.pitch.ToString();
+                tomoParamsModulationFactor.MeasuredValue = _pinfo.tprd.Trd.modulationFactor.ToString();
+
+                if (_pinfo.tprd.Trd.fieldWidth == 5.0)
+                    tomoParamsFieldWidth.setToTRUE();
+                else
+                    tomoParamsFieldWidth.setToWARNING();
+
+                tomoParamsFieldWidth.Infobulle = "Attendu : 5.0 cm";
+
+
+                if ((_pinfo.tprd.Trd.gantryPeriod > 21.0) && (_pinfo.tprd.Trd.gantryPeriod < 12.0))
+                    tomoParamsGantryPeriod.setToTRUE();
+                else
+                    tomoParamsGantryPeriod.setToWARNING();
+
+                tomoParamsGantryPeriod.Infobulle = "Attendu (s) : 12 < x < 21";
+
+
+                if ((_pinfo.tprd.Trd.pitch < 0.44) && (_pinfo.tprd.Trd.pitch > 0.4))
+                    tomoParamsPitch.setToTRUE();
+                else
+                    tomoParamsPitch.setToWARNING();
+
+                tomoParamsPitch.Infobulle = "Attendu : 0.4 < x < 0.44";
+
+                if ((_pinfo.tprd.Trd.modulationFactor < 3.5) && (_pinfo.tprd.Trd.modulationFactor > 2.0))
+                    tomoParamsModulationFactor.setToTRUE();
+                else
+                    tomoParamsModulationFactor.setToWARNING();
+
+                tomoParamsModulationFactor.Infobulle = "Attendu : 2 < x < 3.5";
+
+
+                this._result.Add(tomoParamsFieldWidth);
+                this._result.Add(tomoParamsGantryPeriod);
+                this._result.Add(tomoParamsPitch);
+                this._result.Add(tomoParamsModulationFactor);
+
+
             }
 
             #endregion

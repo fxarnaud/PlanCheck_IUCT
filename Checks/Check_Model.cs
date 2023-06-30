@@ -106,19 +106,45 @@ namespace PlanCheck
 
             #region Nom de l'algo
             Item_Result algo_name = new Item_Result();
+            algo_name.Label = "Algorithme de calcul";
             if (!_pinfo.isTOMO)
             {
 
 
-                algo_name.Label = "Algorithme de calcul";
+
                 algo_name.ExpectedValue = _rcp.algoName;
                 algo_name.MeasuredValue = _pinfo.AlgoName;
                 algo_name.Comparator = "=";
                 algo_name.Infobulle = "Algorithme attendu pour le check-protocol " + _rcp.protocolName + " : " + algo_name.ExpectedValue;
                 algo_name.Infobulle += "\nLes options de calcul ne sont pas vérifiées si l'algorithme n'est pas celui attendu";
                 algo_name.ResultStatus = testing.CompareDatas(algo_name.ExpectedValue, algo_name.MeasuredValue, algo_name.Comparator);
-                this._result.Add(algo_name);
+
             }
+            else
+            {
+                if (_pinfo.tomoReportIsFound)
+                {
+                    string tomoAlgo = _pinfo.tprd.Trd.algorithm;
+                    string planningMethod = _pinfo.tprd.Trd.planningMethod;
+                    algo_name.MeasuredValue = tomoAlgo + " (" + planningMethod + ")";
+
+                    if ((tomoAlgo.Contains("Convolution-Superposition")) && (planningMethod.Contains("Classic")))  // Change to VOLO Ultra
+                        algo_name.setToTRUE();
+                    else
+                        algo_name.setToFALSE();
+                    algo_name.Infobulle = "Pour les plans Tomotherapy l'algorithme doit être Convolution Superposition, méthode Classique. ";
+
+
+                }
+                else
+                {
+                    algo_name.setToINFO();
+                    algo_name.MeasuredValue = "Pas de rapport de Dosimetrie Tomotherapy dans ARIA Documents";
+
+                }
+
+            }
+            this._result.Add(algo_name);
             #endregion
 
             #region Grille de resolution
@@ -140,6 +166,7 @@ namespace PlanCheck
             }
             if (_pinfo.isTOMO)
             {
+                algo_grid.Infobulle = "Pour les tomos, la grille doit être 1.27 mm (obtenu dans le plan DTO\net la grille de Final Dose doit être High (obtenu dans le rapport de Dosimétrie si disponible)";
                 if (_pcontext.PlanSetup.Dose.XRes - 1.2695 < 0.01)
                 {
                     algo_grid.setToTRUE();
@@ -148,7 +175,14 @@ namespace PlanCheck
                 {
                     algo_grid.setToFALSE();
                 }
-                algo_grid.Infobulle = "Pour les tomos, la grille doit être 1.27 mm (check protocol ignoré)";
+                if (_pinfo.tomoReportIsFound)
+                {
+                    if (!_pinfo.tprd.Trd.resolutionCalculation.ToLower().Contains("high"))
+                        algo_grid.setToFALSE();
+                    
+                }
+                else
+                    algo_grid.Infobulle = "Pas de rapport de Dosimétrie Tomotherapy dans Aria Documents";
 
             }
 
@@ -302,14 +336,14 @@ namespace PlanCheck
             // en fait c'est actif systemetiquement au nova. pas fait a l'halcyon 
             // sauf toute petite lésion : 3x3
 
-            if ((_pinfo.isNOVA)&&(!_pinfo.isHyperArc))
+            if ((_pinfo.isNOVA) && (!_pinfo.isHyperArc))
             {
                 if (_pcontext.PlanSetup.OptimizationSetup.Parameters.Count() > 0) // if there is an optim. pararam
                 {
                     Item_Result jawTrack = new Item_Result();
                     jawTrack.Label = "Jaw Track";
                     //OptimizationJawTrackingUsedParameter ojtup = _ctx.PlanSetup.OptimizationSetup.Parameters.FirstOrDefault(x => x.GetType().Name == "OptimizationJawTrackingUsedParameter") as OptimizationJawTrackingUsedParameter;
-                   // jawTrack.Infobulle = "Selon le protocole " + _rcp.protocolName + " le jaw tracking doit être " + _rcp.JawTracking;
+                    // jawTrack.Infobulle = "Selon le protocole " + _rcp.protocolName + " le jaw tracking doit être " + _rcp.JawTracking;
 
                     bool isJawTrackingOn = _pcontext.PlanSetup.OptimizationSetup.Parameters.Any(x => x is OptimizationJawTrackingUsedParameter);
                     jawTrack.MeasuredValue = isJawTrackingOn.ToString();
@@ -335,7 +369,7 @@ namespace PlanCheck
                             jawTrack.setToFALSE();
                             jawTrack.Infobulle += "\nJawTrack activé mais jaws < 3.1";
                         }
-                        else 
+                        else
                         {
                             jawTrack.Infobulle += "\nJawTrack activé ";
                         }

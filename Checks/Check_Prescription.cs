@@ -74,7 +74,7 @@ namespace PlanCheck
             double nPrescribedDosePerFraction = 0;
             string PrescriptionName = null;
             double PrescriptionValue = 0;
-            fractionation.Label = "Fractionnement de la cible principale (" + PrescriptionName + ")";
+            
             fractionation.ExpectedValue = nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("N2") + " Gy";
             double diffDose = 0.0;
             double myDosePerFraction = 0.0;
@@ -98,23 +98,36 @@ namespace PlanCheck
             }
             else //is tomo
             {
-                myDosePerFraction = _pinfo.tprd.Trd.prescriptionDosePerFraction;
-                nFraction = _pinfo.tprd.Trd.prescriptionNumberOfFraction;
+                if (_pinfo.tomoReportIsFound)
+                {
+                    myDosePerFraction = _pinfo.tprd.Trd.prescriptionDosePerFraction;
+                    nFraction = _pinfo.tprd.Trd.prescriptionNumberOfFraction;
+                    fractionation.Infobulle = "Données récupées du rapport Aria Documents Dosimétrie Tomotherapy du plan : " + _pinfo.tprd.Trd.planName;
+                }
+            }
+            if (((_pinfo.isTOMO) && (_pinfo.tomoReportIsFound))||(!_pinfo.isTOMO))
+            {
+
+
+                diffDose = Math.Abs(nPrescribedDosePerFraction - myDosePerFraction);
+                fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
+                if ((nPrescribedNFractions == nFraction) && (diffDose < 0.0001))
+                    fractionation.setToTRUE();
+                else
+                    fractionation.setToFALSE();
+
+                fractionation.Infobulle += "\n\nLe 'nombre de fractions' et la 'dose par fraction' du plan doivent\nêtre conformes à la prescription " + _ctx.PlanSetup.RTPrescription.Id +
+                    " : " + nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction.ToString("N2") + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
 
             }
-
-            diffDose = Math.Abs(nPrescribedDosePerFraction - myDosePerFraction);
-            fractionation.MeasuredValue = "Plan : " + nFraction + " x " + myDosePerFraction.ToString("0.00") + " Gy - Prescrits : " + nPrescribedNFractions + " x " + nPrescribedDosePerFraction.ToString("0.00") + " Gy";
-            if ((nPrescribedNFractions == nFraction) && (diffDose < 0.0001))
-                fractionation.setToTRUE();
-            else if (_pinfo.isTOMO)
-                fractionation.setToINFO();
             else
-                fractionation.setToFALSE();
+            {
+                fractionation.setToINFO();
+                fractionation.MeasuredValue = "Pas de rapport de plan Tomotherapy dans Aria Documents";
+                fractionation.Infobulle = "Pas de rapport de plan Tomotherapy dans Aria Documents";
+            }
 
-            fractionation.Infobulle = "Le 'nombre de fractions' et la 'dose par fraction' du plan doivent\nêtre conformes à la prescription " + _ctx.PlanSetup.RTPrescription.Id +
-                " : " + nPrescribedNFractions.ToString() + " x " + nPrescribedDosePerFraction.ToString("N2") + " Gy.\n\n Le système récupère la dose la plus haute prescrite\nsi il existe plusieurs niveaux de dose dans la prescription";
-
+            fractionation.Label = "Fractionnement de la cible principale (" + PrescriptionName + ")";
             this._result.Add(fractionation);
             #endregion
 
@@ -144,11 +157,12 @@ namespace PlanCheck
 
 
             #region NORMALISATION DU PLAN
+            Item_Result normalisation = new Item_Result(); 
+            normalisation.Label = "Mode de normalisation du plan"; 
             if (!_pinfo.isTOMO)
             {
-                Item_Result normalisation = new Item_Result();
+               
                 //string normMethod = _ctx.PlanSetup.PlanNormalizationMethod;
-                normalisation.Label = "Mode de normalisation du plan";
                 normalisation.ExpectedValue = _rcp.normalisationMode;
                 normalisation.MeasuredValue = _ctx.PlanSetup.PlanNormalizationMethod;
 
@@ -192,6 +206,31 @@ namespace PlanCheck
 
                 this._result.Add(normalisation);
             }
+            else // tomo
+            {
+                if(_pinfo.tomoReportIsFound)
+                {
+                    normalisation.MeasuredValue = _pinfo.tprd.Trd.prescriptionMode;
+                    if (_pinfo.tprd.Trd.prescriptionMode.Contains("Median of"))
+                    {
+                        
+                        normalisation.setToTRUE();
+                    }
+                    else
+                    {
+                       
+                        normalisation.setToFALSE();
+                    }
+                }
+                else
+                {
+                    normalisation.MeasuredValue = "Pas de rapport de dosimétrie Tomotherapy dans ARIA documents";
+                    normalisation.setToWARNING();
+                }
+            }
+
+
+            this._result.Add(normalisation);
             #endregion
 
             #region NOM DE LA PRESCRIPTION

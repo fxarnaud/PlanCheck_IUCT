@@ -106,7 +106,6 @@ namespace PlanCheck
             this._result.Add(CT_age);
             #endregion
 
-
             #region Origine placée
             Item_Result origin = new Item_Result();
             origin.Label = "Origine modifiée";
@@ -128,7 +127,6 @@ namespace PlanCheck
             this._result.Add(origin);
             #endregion
 
-
             #region Epaisseur de coupes
             Item_Result sliceThickness = new Item_Result();
             sliceThickness.Label = "Epaisseur de coupes (mm)";
@@ -149,20 +147,36 @@ namespace PlanCheck
 
             #region courbe HU
             Item_Result HUcurve = new Item_Result();
-            String courbeHU = _context.Image.Series.ImagingDeviceId;
-            String expectedHUcurve;
-
-            if ((myToday - (DateTime)_context.Patient.DateOfBirth).Days < (14 * 365))
-                expectedHUcurve = "Scan_IUC_100kV";
-            else
-                expectedHUcurve = "TDMRT";
-
             HUcurve.Label = "Courbe HU";
-            HUcurve.ExpectedValue = expectedHUcurve;
-            HUcurve.MeasuredValue = courbeHU;
-            HUcurve.Comparator = "=";
-            HUcurve.Infobulle = "La courbe doit être TDMRT sauf si âge patient < 14";
-            HUcurve.ResultStatus = testing.CompareDatas(HUcurve.ExpectedValue, HUcurve.MeasuredValue, HUcurve.Comparator);
+            if (!_pinfo.isTOMO)
+            {
+                String courbeHU = _context.Image.Series.ImagingDeviceId;
+                String expectedHUcurve;
+
+                if ((myToday - (DateTime)_context.Patient.DateOfBirth).Days < (14 * 365))
+                    expectedHUcurve = "Scan_IUC_100kV";
+                else
+                    expectedHUcurve = "TDMRT";
+
+
+                HUcurve.ExpectedValue = expectedHUcurve;
+                HUcurve.MeasuredValue = courbeHU;
+                HUcurve.Comparator = "=";
+                HUcurve.Infobulle = "La courbe doit être TDMRT sauf si âge patient < 14";
+                HUcurve.ResultStatus = testing.CompareDatas(HUcurve.ExpectedValue, HUcurve.MeasuredValue, HUcurve.Comparator);
+            }
+            else // tomo
+            {
+                HUcurve.MeasuredValue = _pinfo.tprd.Trd.HUcurve;
+
+                HUcurve.ExpectedValue = "";
+                if (HUcurve.MeasuredValue.Contains("IUC-120kV"))
+                    HUcurve.setToTRUE();
+                else
+                    HUcurve.setToFALSE();
+                HUcurve.Infobulle = "Pour Tomotherapy la courbe doit être IUC-120kV";
+            }
+
             this._result.Add(HUcurve);
             #endregion
 
@@ -222,8 +236,6 @@ namespace PlanCheck
 
             #endregion
 
-
-
             #region Composition of AVE3/AVE6 (option)
 
 
@@ -281,7 +293,6 @@ namespace PlanCheck
 
             #endregion
 
-
             #region AVE3 or AVE6 is only for lung SBRT  (option)
 
 
@@ -301,7 +312,7 @@ namespace PlanCheck
                 if (!_context.PlanSetup.UseGating)
                 {
                     averageForSBRT.setToFALSE();
-                    
+
                 }
 
 
@@ -336,7 +347,24 @@ namespace PlanCheck
 
             #endregion
 
+            #region CT used for tomo Check date
+            if (_pinfo.isTOMO)
+            {
+                Item_Result tomoReportCT_date = new Item_Result();
 
+
+                tomoReportCT_date.Label = "Date du CT dans le rapport Tomotherapy";
+                tomoReportCT_date.ExpectedValue = "";//XXXXX TO GET         
+                tomoReportCT_date.MeasuredValue = _pinfo.tprd.Trd.CTDate;  //format 11 Apr 2023
+                var parsedDate = DateTime.Parse(_pinfo.tprd.Trd.CTDate);
+                if (DateTime.Compare(parsedDate, _context.Image.Series.HistoryDateTime) < 2) // different hours gives difference = 1
+                    tomoReportCT_date.setToTRUE();
+                else
+                    tomoReportCT_date.setToFALSE();
+                tomoReportCT_date.Infobulle = "Comparaison de la date du CT ("+parsedDate.ToString()+") dans le rapport Tomo et de la date du scanner ("+ _context.Image.Series.HistoryDateTime.ToString()+")";
+                this._result.Add(tomoReportCT_date);
+            }
+            #endregion
 
         }
 

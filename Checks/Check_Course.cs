@@ -294,6 +294,44 @@ namespace PlanCheck
 
             this._result.Add(anteriorTraitement);
             #endregion
+
+            #region Tomo report approved ?  
+            if (_pinfo.isTOMO)
+            {
+             
+                Item_Result tomoReportApproved = new Item_Result();
+                tomoReportApproved.Label = "Approbation du rapport Tomo";
+                tomoReportApproved.ExpectedValue = "";
+
+                if (_pinfo.positionReportIsFound)
+                {
+                    if(_pinfo.tprd.Trd.approvalStatus == "Approved")
+                    {
+                        string str = _pinfo.tprd.Trd.approverID.Trim();
+                        string str2 = char.ToUpper(str[0]) + str.Substring(1);
+                        tomoReportApproved.MeasuredValue = "Rapport de Dosimétrie Tomotherapy approuvé par Dr " +  str2; // Dr Dalmasso
+                        tomoReportApproved.setToTRUE();
+                    }
+                    else
+                    {
+                        tomoReportApproved.MeasuredValue = "Rapport de Dosimétrie Tomotherapy non approuvé";
+                        tomoReportApproved.setToFALSE();
+                    }
+                        
+
+
+                }
+                else
+                {
+                    tomoReportApproved.setToFALSE();
+                    tomoReportApproved.MeasuredValue = "Pas de rapport de Dosimétrie Tomotherapy dans Aria Documents";
+                }
+
+                tomoReportApproved.Infobulle = "Le rapport pdf du plan Tomotherapy doit être approuvé";
+                this._result.Add(tomoReportApproved);
+            }
+            #endregion
+
         }
         public string Title
         {
